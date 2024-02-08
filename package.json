@@ -1,0 +1,24 @@
+{
+  "name": "team-project",
+  "version": "0.0.1",
+  "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.cardiff.ac.uk/c21052928/team-project.git"
+  },
+  "author": "Jack Richards, Isaac Vieira, Rhiannon Austin, Khalid Al Shamsi, Hamed Al Sarmi",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodejs-polars": "^0.8.4",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "typescript": "^5.3.3"
+  }
+}
