@@ -4,6 +4,7 @@
   "description": "To make it easy for you to get started with GitLab, here's a list of recommended next steps.",
   "main": "index.js",
   "scripts": {
+    "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -13,12 +14,22 @@
   "author": "Jack Richards, Isaac Vieira, Rhiannon Austin, Khalid Al Shamsi, Hamed Al Sarmi",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.2",
     "express": "^4.18.2",
+    "helmet": "^7.1.0",
     "nodejs-polars": "^0.8.4",
     "pg": "^8.11.3"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.5",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.17",
+    "@types/pg": "^8.11.0",
     "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
 }
