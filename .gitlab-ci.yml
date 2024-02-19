@@ -29,13 +29,7 @@ build:
     - npm install
     - npm run build
 
-lint_frontend:
-  stage: lint
-  script:
-    - npm install lint
-    - npm run lint
-
-lint_backend:
+lint:
   stage: lint
   script:
     - npm install lint
