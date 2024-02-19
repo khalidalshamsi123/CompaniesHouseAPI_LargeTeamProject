@@ -62,6 +62,12 @@ test_frontend:
     - npm install
     - npm run test-ci -t FRONTEND
 
+test_database:
+  stage: test
+  script:
+    - npm install
+    - npm run test-ci -t DATABASE
+
 deploy_staging:
   stage: deploy
   script:
