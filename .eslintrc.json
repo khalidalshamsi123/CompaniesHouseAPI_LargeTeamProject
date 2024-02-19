@@ -21,5 +21,6 @@
         "ecmaVersion": "latest"
     },
     "rules": {
+        "new-cap": 0
     }
 }
