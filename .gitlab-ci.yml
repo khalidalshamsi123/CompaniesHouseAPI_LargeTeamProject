@@ -1,0 +1,82 @@
+image: node:latest
+
+# Only needed when using docker container to run the tests.
+# Check out: https://docs.gitlab.com/ee/ci/services/index.html
+services:
+  - mysql:latest
+  - redis:latest
+  - postgres:latest
+
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - install
+  - build
+  - lint
+  - test
+  - deploy
+
+install_dependencies:
+  stage: install
+  script:
+    - npm install
+
+build:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+lint_frontend:
+  stage: lint
+  script:
+    - npm install lint
+    - npm run lint
+
+lint_backend:
+  stage: lint
+  script:
+    - npm install lint
+    - npm run lint
+
+test_submit:
+  stage: test
+  script:
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t SUBMIT
+
+test_approved:
+  stage: test
+  script:
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t APPROVED
+
+test_upload:
+  stage: test
+  script:
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t UPLOAD
+
+test_frontend:
+  stage: test
+  script:
+    - npm install
+    - npm run test-ci -t FRONTEND
+
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "this is where we would deploy to a staging environment"
+
+deploy_production:
+  stage: deploy
+  only:
+    - main
+  script:
+    - echo "this is where we would deploy to a production environment"
+  environment: production
