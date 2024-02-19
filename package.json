@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -p .",
-    "lint": "eslint . --ext js,jsx",
+    "lint": "eslint src/**/*.ts",
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage"
-
   },
   "repository": {
     "type": "git",
@@ -31,6 +30,9 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
+    "@typescript-eslint/parser": "^7.0.1",
+    "eslint": "^8.56.0",
     "jest": "^29.7.0",
     "lint": "^0.8.19",
     "nodemon": "^3.0.3",
