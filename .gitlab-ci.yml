@@ -32,7 +32,7 @@ build:
 lint:
   stage: lint
   script:
-    - npm install lint
+    - npm install eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser
     - npm run lint
 
 test_submit:
