@@ -7,11 +7,17 @@ const app = express();
 dotenv.config();
 
 // Import and use routes.
-import formRoute from './routes/form';
-app.use('/form', formRoute);
+import approvedRoute from './routes/approved';
+app.use('/approved', approvedRoute);
+
+import submitRoute from './routes/submit';
+app.use('/submit', submitRoute);
+
+import uploadRoute from './routes/upload';
+app.use('/upload', uploadRoute);
 
 // Configure port and start listening for requests.
-const port = process.env.port ?? 5000;
+const PORT = process.env.port ?? 5000;
 
 app.listen(port, () => {
 	console.log(`Listening on port ${port}.`);
