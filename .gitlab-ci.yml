@@ -1,5 +1,10 @@
 image: node:latest
 
+.standard-rules:     
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
 # Only needed when using docker container to run the tests.
 # Check out: https://docs.gitlab.com/ee/ci/services/index.html
 services:
@@ -19,23 +24,32 @@ stages:
   - deploy
 
 install_dependencies:
+  extends:
+    - .standard-rules
   stage: install
   script:
     - npm install
 
 build:
+  extends:
+    - .standard-rules
   stage: build
   script:
     - npm install
     - npm run build
 
 lint:
+  extends:
+    - .standard-rules
   stage: lint
   script:
     - npm install eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser
     - npm run lint
+  allow_failure: false #for now we arent allowing failure as we want to be very strict with formatting however we can change this in future
 
 test_submit:
+  extends:
+    - .standard-rules
   stage: test
   script:
     - npm install
@@ -43,6 +57,8 @@ test_submit:
     - npm run test-ci -t SUBMIT
 
 test_approved:
+  extends:
+    - .standard-rules
   stage: test
   script:
     - npm install
@@ -50,6 +66,8 @@ test_approved:
     - npm run test-ci -t APPROVED
 
 test_upload:
+  extends:
+    - .standard-rules
   stage: test
   script:
     - npm install
@@ -57,12 +75,16 @@ test_upload:
     - npm run test-ci -t UPLOAD
 
 test_frontend:
+  extends:
+    - .standard-rules
   stage: test
   script:
     - npm install
     - npm run test-ci -t FRONTEND
 
 test_database:
+  extends:
+    - .standard-rules
   stage: test
   script:
     - npm install
