@@ -94,6 +94,8 @@ deploy_staging:
   stage: deploy
   script:
     - echo "this is where we would deploy to a staging environment"
+  only:
+    - development
 
 deploy_production:
   stage: deploy
