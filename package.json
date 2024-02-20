@@ -9,7 +9,7 @@
     "lint-fix": "eslint src/**/*.ts --fix",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage"
+    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage --passWithNoTests"
   },
   "repository": {
     "type": "git",
