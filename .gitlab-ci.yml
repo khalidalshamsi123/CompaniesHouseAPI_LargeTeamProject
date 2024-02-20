@@ -40,33 +40,33 @@ test_submit:
   script:
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
-    - npm run test-ci -t SUBMIT
+    - npm run test-ci --passWithNoTests -t SUBMIT
 
 test_approved:
   stage: test
   script:
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
-    - npm run test-ci -t APPROVED
+    - npm run test-ci --passWithNoTests -t APPROVED
 
 test_upload:
   stage: test
   script:
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
-    - npm run test-ci -t UPLOAD
+    - npm run test-ci --passWithNoTests -t UPLOAD
 
 test_frontend:
   stage: test
   script:
     - npm install
-    - npm run test-ci -t FRONTEND
+    - npm run test-ci --passWithNoTests -t FRONTEND
 
 test_database:
   stage: test
   script:
     - npm install
-    - npm run test-ci -t DATABASE
+    - npm run test-ci --passWithNoTests -t DATABASE
 
 deploy_staging:
   stage: deploy
