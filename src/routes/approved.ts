@@ -1,21 +1,23 @@
 import { Router } from 'express'
-import pl from 'nodejs-polars'
+import pl, { col } from 'nodejs-polars'
 const router = Router()
 
 router.get('/', (req, res) => {
   res.send("Success").status(200)
 })
 
-//reads csv files
-function csvReader(csvFile: string){
-  let json_csv = pl.readCSV(csvFile);
-  return json_csv;
+
+function csvReader(csvFile: string, columnName1: string, columnName2: string){
+  //reads the file
+  let csvData = pl.readCSV(csvFile);
+  //filters the response with two columns
+  let filteredData = csvData.select(columnName1, columnName2);
+  return filteredData;
 }
 
 //creating a sub route
 router.get('/hmrc', (req, res) => {
- //res.send("HMRC page").status(200)
-  res.send(csvReader("hmrc-supervised-data-test-data.csv"))
+  res.send(csvReader("hmrc-supervised-data-test-data.csv", 'BUSINESS_NAME', 'STATUS1')).status(200);
 } )
 
 
