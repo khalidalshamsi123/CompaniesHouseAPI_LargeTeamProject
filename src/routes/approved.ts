@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import axios, {type AxiosRequestConfig} from 'axios';
-import pl, { col } from 'nodejs-polars'
+import pl, {col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
 
@@ -45,19 +45,17 @@ router.get('/fca', async (req, res) => {
 	}
 });
 
-
-function csvReader(csvFile: string, columnName1: string, columnName2: string){
-  //reads the file
-  let csvData = pl.readCSV(csvFile);
-  //filters the response with two columns
-  let filteredData = csvData.select(columnName1, columnName2);
-  return filteredData;
+function csvReader(csvFile: string, columnName1: string, columnName2: string) {
+	// Reads the file
+	const csvData = pl.readCSV(csvFile);
+	// Filters the response with two columns
+	const filteredData = csvData.select(columnName1, columnName2);
+	return filteredData;
 }
 
-//creating a sub route
+// Creating a sub route
 router.get('/hmrc', (req, res) => {
-  res.send(csvReader("hmrc-supervised-data-test-data.csv", 'BUSINESS_NAME', 'STATUS1')).status(200);
-} )
+	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
+});
 
-
-export default router
+export default router;
