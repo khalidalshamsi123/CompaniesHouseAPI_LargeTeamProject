@@ -1,5 +1,6 @@
 import {Router} from 'express';
 import axios, {type AxiosRequestConfig} from 'axios';
+import pl, { col } from 'nodejs-polars'
 
 import * as dotenv from 'dotenv';
 
