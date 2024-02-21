@@ -8,7 +8,7 @@ dotenv.config();
 
 const axiosConfig: AxiosRequestConfig = {
 	headers: {
-		'X-Auth-Email': 'alsarmih@cardiff.ac.uk',
+		'X-Auth-Email': 'vieirai@cardiff.ac.uk',
 		'X-Auth-Key': process.env.API_KEY_FCA,
 		'Content-Type': 'application/json',
 	},
