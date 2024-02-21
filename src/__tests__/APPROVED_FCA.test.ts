@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../src/index';
+import app from '../index';
 
 // Scenario: Retrieve Barclays Approval Status from FCA Endpoint.
 
