@@ -1,6 +1,5 @@
 import request from 'supertest';
 import app from '../app';
-import exp from 'constants';
 
 // Given.
 describe('Given Companies House wants to retrieve the approval status of GWYN DEBBSON AND DAUGHTER from the HMRC CSV file.', () => {

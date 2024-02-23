@@ -19,6 +19,11 @@ type ResponseBody = {
 	timestamp: number;
 };
 
+type JsonValue = {
+	name: string;
+	status: string;
+};
+
 const router = Router();
 
 router.get('/fca', async (req, res) => {
@@ -45,33 +50,33 @@ router.get('/fca', async (req, res) => {
 	}
 });
 
-function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string){
-  //reads the file
-  let csvData = pl.readCSV(csvFile)
+function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
+	// Reads the file
+	const csvData = pl.readCSV(csvFile);
 
-  //filters the response with two columns
-  let columnOneValues = csvData.getColumn(columnName1);
-  let columnTwoValues = csvData.getColumn(columnName2);
+	// Filters the response with two columns
+	const columnOneValues = csvData.getColumn(columnName1);
+	const columnTwoValues = csvData.getColumn(columnName2);
 
-  let index = 0;
-  //looping to find the index of a specific value
-  for(let i = 0; i < columnOneValues.length; i++){
-    if(columnOneValues[i] === targetValue){
-      index = i;
-      break;
-    }
-  }
+	let index = 0;
+	// Looping to find the index of a specific value
+	for (let i = 0; i < columnOneValues.length; i++) {
+		if (columnOneValues[i] === targetValue) {
+			index = i;
+			break;
+		}
+	}
 
-  //Grouping the two values in one variable.
-  let specificValue = columnOneValues[index] + columnTwoValues[index];
+	const specifcColumnOneValue: string = columnOneValues[index] as string;
+	const specifcColumnTwoValue: string = columnTwoValues[index] as string;
 
-  let jsonValue = {'Name': columnOneValues[index], 'Status': columnTwoValues[index]}
-  return jsonValue;
+	const jsonValue: JsonValue = {name: specifcColumnOneValue, status: specifcColumnTwoValue};
+	return jsonValue;
 }
 
 // Creating a sub route
 router.get('/hmrc', (req, res) => {
-  res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
-} )
+	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
+});
 
 export default router;
