@@ -47,7 +47,7 @@ router.get('/fca', async (req, res) => {
 
 function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string){
   //reads the file
-  let csvData = pl.readCSV(csvFile);
+  let csvData = pl.readCSV(csvFile)
 
   //filters the response with two columns
   let columnOneValues = csvData.getColumn(columnName1);
@@ -65,12 +65,13 @@ function csvReader(csvFile: string, columnName1: string, columnName2: string, ta
   //Grouping the two values in one variable.
   let specificValue = columnOneValues[index] + columnTwoValues[index];
 
-  return specificValue;
+  let jsonValue = {'Name': columnOneValues[index], 'Status': columnTwoValues[index]}
+  return jsonValue;
 }
 
 // Creating a sub route
 router.get('/hmrc', (req, res) => {
-  res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'HARRY SMITH AND SONS')).status(200);
+  res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
 } )
 
 export default router;
