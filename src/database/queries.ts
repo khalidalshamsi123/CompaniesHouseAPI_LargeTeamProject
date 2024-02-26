@@ -12,9 +12,14 @@ async function insertBusinessData(registrationId: string, businessName: string, 
         await pool.query(query, values);
 
         console.log('Data inserted successfully!');
-    } catch (error) {
-        console.error('Error inserting data:', error);
-        throw error;
+    } catch (error: any) { // Specify 'any' type for the error variable
+        // Check if the error is a unique constraint violation
+        if (error.code === '23505') {
+            console.log('Data with registration ID', registrationId, 'already exists in the database.');
+        } else {
+            console.error('Error inserting data:', error);
+            throw error;
+        }
     }
 }
 
