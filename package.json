@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "build": "tsc -p . && tsc ./src/database/index.ts ./src/database/queries.ts",
+    "insert-database": "node build/database/index.js",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",
     "test": "jest",
