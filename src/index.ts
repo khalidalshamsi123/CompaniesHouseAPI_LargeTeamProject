@@ -1,17 +1,12 @@
-import express from 'express';
-// For good security defaults.
-import helmet from 'helmet';
+import app from './app';
 
-const app = express();
+import * as dotenv from 'dotenv';
 
-// Import and use routes.
-import approvedRoute from './routes/approved';
-app.use('/approved', approvedRoute);
+dotenv.config();
 
-import submitRoute from './routes/submit';
-app.use('/submit', submitRoute);
+// Configure port and start listening for requests.
+const port = process.env.port ?? 5000;
 
-import uploadRoute from './routes/upload';
-app.use('/upload', uploadRoute);
-
-export default app;
+app.listen(port, () => {
+	console.log(`Listening on port ${port}.`);
+});

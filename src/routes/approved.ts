@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import axios, {type AxiosRequestConfig} from 'axios';
-import pl, {col} from 'nodejs-polars';
+import pl, {DataFrame, col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
 
@@ -17,6 +17,11 @@ const axiosConfig: AxiosRequestConfig = {
 type ResponseBody = {
 	authorized: boolean;
 	timestamp: number;
+};
+
+type JsonValue = {
+	name: string;
+	status: string;
 };
 
 const router = Router();
@@ -45,17 +50,33 @@ router.get('/fca', async (req, res) => {
 	}
 });
 
-function csvReader(csvFile: string, columnName1: string, columnName2: string) {
+function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
 	// Reads the file
 	const csvData = pl.readCSV(csvFile);
+
 	// Filters the response with two columns
-	const filteredData = csvData.select(columnName1, columnName2);
-	return filteredData;
+	const columnOneValues = csvData.getColumn(columnName1);
+	const columnTwoValues = csvData.getColumn(columnName2);
+
+	let index = 0;
+	// Looping to find the index of a specific value
+	for (let i = 0; i < columnOneValues.length; i++) {
+		if (columnOneValues[i] === targetValue) {
+			index = i;
+			break;
+		}
+	}
+
+	const specifcColumnOneValue: string = columnOneValues[index] as string;
+	const specifcColumnTwoValue: string = columnTwoValues[index] as string;
+
+	const jsonValue: JsonValue = {name: specifcColumnOneValue, status: specifcColumnTwoValue};
+	return jsonValue;
 }
 
 // Creating a sub route
 router.get('/hmrc', (req, res) => {
-	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
+	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
 });
 
 export default router;
