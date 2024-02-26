@@ -5,7 +5,7 @@ import { insertBusinessData } from './queries';
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
-    database: 'ProjectDatabase',
+    database: 'postgres',
     password: 'postgres',
     port: 5432,
 });
