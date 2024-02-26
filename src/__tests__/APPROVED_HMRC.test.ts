@@ -9,8 +9,8 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 			// Make the request and wait for the response and expect status code 200
 			const response = await request(app).get('/approved/hmrc').expect(200);
 			// Assert the response
-			expect(response.body).toHaveProperty('Status');
-			expect(response.body.Status).toBe('APPROVED');
+			expect(response.body).toHaveProperty('status');
+			expect(response.body.status).toBe('APPROVED');
 		});
 	});
 });
