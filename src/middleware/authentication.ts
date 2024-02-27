@@ -5,7 +5,7 @@ import type express from 'express';
 dotenv.config();
 
 const isAuthorised = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-	const apiKey = req.header('x-api-key');
+	const apiKey = req.get('x-api-key');
 	if (!apiKey) {
 		res.status(401).json({message: 'Missing API Key In Headers.'});
 	} else if (apiKey === process.env.API_KEY) {
