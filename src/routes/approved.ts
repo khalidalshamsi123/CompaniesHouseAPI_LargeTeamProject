@@ -50,6 +50,35 @@ router.get('/fca', async (req, res) => {
 	}
 });
 
+type ResponseBodyIndividual = {
+	certified: boolean;
+};
+
+router.get('/fcaind', async (req, res) => {
+	try {
+		const fcaResponse = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702/Individuals', axiosConfig);
+
+		const data = fcaResponse.data.Data[0] as Record<string, unknown>;
+		const status = data.Status;
+		const isCertified = (status === 'Certified' || status === 'Approved by regulator');
+
+		const statusCode = isCertified ? 200 : 400;
+		const timestamp = Math.floor(new Date().getTime() / 1000);
+
+		// Unix timestamp.
+		const responseBodyIndividual: ResponseBodyIndividual = {
+			certified: isCertified,
+		};
+
+		console.log(data);
+
+		res.send(responseBodyIndividual).status(statusCode);
+	} catch (error) {
+		console.error(error);
+		res.sendStatus(400);
+	}
+});
+
 function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
 	// Reads the file
 	const csvData = pl.readCSV(csvFile);
