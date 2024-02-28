@@ -50,10 +50,12 @@ router.get('/fca', async (req, res) => {
 	}
 });
 
+// Handles the individual FCA logic.
 type ResponseBodyIndividual = {
 	certified: boolean;
 };
 
+// This route is only temporary and will be changed in the next commit once logic is sufficen.
 router.get('/fcaind', async (req, res) => {
 	try {
 		const fcaResponse = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702/Individuals', axiosConfig);
