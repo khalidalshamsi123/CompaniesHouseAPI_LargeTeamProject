@@ -49,7 +49,7 @@ router.get('/fca', async (req, res) => {
 		res.sendStatus(400);
 	}
 });
-
+// First implementation, used for client showcase.
 function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
 	// Reads the file
 	const csvData = pl.readCSV(csvFile);
@@ -74,9 +74,39 @@ function csvReader(csvFile: string, columnName1: string, columnName2: string, ta
 	return jsonValue;
 }
 
+// Second implementation, refactoring the code to return all data with boolean values
+function csvRefactoredReader(csvFile: string, columnName1: string, columnName2: string) {
+	// Reads the file
+	const csvData = pl.readCSV(csvFile);
+
+	// Filters the response with two columns
+	const columnOneValues = csvData.getColumn(columnName1);
+	const columnTwoValues = csvData.getColumn(columnName2);
+
+	const jsonObjects = [];
+
+	// Looping to find the index of all values with APPROVED
+	for (let i = 0; i < columnOneValues.length; i++) {
+		if (columnTwoValues[i] === 'APPROVED') {
+			const specifcColumnOneValue: string = columnOneValues[i] as string;
+			const specifcColumnTwoValue: string = columnTwoValues[i] as string;
+
+			const jsonValue: JsonValue = {name: specifcColumnOneValue, status: specifcColumnTwoValue};
+			jsonObjects.push(jsonValue);
+		}
+	}
+
+	return jsonObjects;
+}
+
 // Creating a sub route
 router.get('/hmrc', (req, res) => {
 	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
+});
+
+// Test router.
+router.get('/test', (req, res) => {
+	res.send(csvRefactoredReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 
 export default router;
