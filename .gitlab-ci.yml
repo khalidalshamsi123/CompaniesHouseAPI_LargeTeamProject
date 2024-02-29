@@ -53,7 +53,7 @@ test_submit:
   stage: test
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -66,7 +66,7 @@ test_approved:
   script:
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -78,7 +78,7 @@ test_upload:
   stage: test
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -90,7 +90,7 @@ test_frontend:
   stage: test
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t FRONTEND
@@ -101,7 +101,7 @@ test_database:
   stage: test
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t DATABASE
@@ -112,7 +112,7 @@ test_authentication:
   stage: test
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t AUTHENTICATION
@@ -121,7 +121,7 @@ deploy_staging:
   stage: deploy
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - echo "this is where we would deploy to a staging environment"
   only:
@@ -133,7 +133,7 @@ deploy_production:
     - main
   script:
   - >
-    echo -e "API_KEY_FCA=${FCA_API_KEY}
+    echo "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - echo "this is where we would deploy to a production environment"
   environment: production
