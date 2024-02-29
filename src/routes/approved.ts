@@ -24,6 +24,11 @@ type JsonValue = {
 	status: string;
 };
 
+type JsonObjectValues = {
+	name: string;
+	status: boolean;
+};
+
 const router = Router();
 
 router.get('/fca', async (req, res) => {
@@ -76,27 +81,36 @@ function csvReader(csvFile: string, columnName1: string, columnName2: string, ta
 
 // Second implementation, refactoring the code to return all data with boolean values
 function csvRefactoredReader(csvFile: string, columnName1: string, columnName2: string) {
-	// Reads the file
-	const csvData = pl.readCSV(csvFile);
+	try {
+		// Reads the file
+		const csvData = pl.readCSV(csvFile);
 
-	// Filters the response with two columns
-	const columnOneValues = csvData.getColumn(columnName1);
-	const columnTwoValues = csvData.getColumn(columnName2);
+		// Filters the response with two columns
+		const columnOneValues = csvData.getColumn(columnName1);
+		const columnTwoValues = csvData.getColumn(columnName2);
 
-	const jsonObjects = [];
+		const jsonObjects = [];
 
-	// Looping to find the index of all values with APPROVED
-	for (let i = 0; i < columnOneValues.length; i++) {
-		if (columnTwoValues[i] === 'APPROVED') {
-			const specifcColumnOneValue: string = columnOneValues[i] as string;
-			const specifcColumnTwoValue: string = columnTwoValues[i] as string;
+		// Looping to find the index of all values with APPROVED
+		// After finding the values, i convert them to a boolean type
+		// to true if it was approved, false if it wasnt.
+		for (let i = 0; i < columnOneValues.length; i++) {
+			let specifcColumnTwoValue = false;
+			if (columnTwoValues[i] === 'APPROVED') {
+				specifcColumnTwoValue = true;
+			}
 
-			const jsonValue: JsonValue = {name: specifcColumnOneValue, status: specifcColumnTwoValue};
+			// This stores the data of the two columns 'name' and 'status' in a JSON object
+			// Finally it would be pushed to an array containing all of the JSON objects.
+			const jsonValue: JsonObjectValues = {name: columnOneValues[i] as string, status: specifcColumnTwoValue};
 			jsonObjects.push(jsonValue);
 		}
-	}
 
-	return jsonObjects;
+		return jsonObjects;
+	} catch (error: any) {
+		console.error('Error reading CSV file:', error.message);
+		return [];
+	}
 }
 
 // Creating a sub route
@@ -104,8 +118,8 @@ router.get('/hmrc', (req, res) => {
 	res.send(csvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER')).status(200);
 });
 
-// Test router.
-router.get('/test', (req, res) => {
+// All hmrc data router.
+router.get('/allhmrc', (req, res) => {
 	res.send(csvRefactoredReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 
