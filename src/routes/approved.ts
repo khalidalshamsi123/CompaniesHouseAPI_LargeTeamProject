@@ -3,6 +3,7 @@ import axios, {type AxiosRequestConfig} from 'axios';
 import pl, {DataFrame, col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
+import isAuthorised from '../middleware/authentication';
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ type JsonValue = {
 
 const router = Router();
 
-router.get('/fca', async (req, res) => {
+router.get('/fca', isAuthorised, async (req, res) => {
 	try {
 		const fcaResponse = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702', axiosConfig);
 
