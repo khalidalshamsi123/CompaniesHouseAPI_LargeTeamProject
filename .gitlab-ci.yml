@@ -52,8 +52,8 @@ test_submit:
     - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -64,8 +64,9 @@ test_approved:
     - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  script:
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -76,8 +77,8 @@ test_upload:
     - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
@@ -88,8 +89,8 @@ test_frontend:
     - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t FRONTEND
@@ -99,8 +100,8 @@ test_database:
     - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t DATABASE
@@ -110,8 +111,8 @@ test_authentication:
       - .standard-rules
   stage: test
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - npm install
     - npm run test-ci -t AUTHENTICATION
@@ -119,8 +120,8 @@ test_authentication:
 deploy_staging:
   stage: deploy
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - echo "this is where we would deploy to a staging environment"
   only:
@@ -131,8 +132,8 @@ deploy_production:
   only:
     - main
   script:
-    - |
-    echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+  - >
+    echo -e "API_KEY_FCA=${FCA_API_KEY}
     API_KEY=${API_KEY}" >> ".env"
     - echo "this is where we would deploy to a production environment"
   environment: production
