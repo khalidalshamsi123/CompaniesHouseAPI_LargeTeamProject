@@ -18,6 +18,11 @@ type ResponseBody = {
 	authorized: boolean;
 	timestamp: number;
 };
+// Handles the individual FCA logic.
+type ResponseBodyIndividual = {
+	certified: boolean | undefined;
+	statusCode: number;
+};
 
 type JsonValue = {
 	name: string;
@@ -34,9 +39,12 @@ router.get('/fca', async (req, res) => {
 		const status = data.Status;
 		const isAuthorised = (status === 'Authorised');
 
-		if (!isAuthorised) {
+		if (fcaResponse.data.Status === 'FSR-API-02-01-11') {
 			// If not authorized, end the response and redirect to the individual FCA route
-			res.status(400).send('Not authorized').end();
+			// Execute additional logic (e.g., call requestIndividual)
+			const individualApproved = await requestIndividual();
+			// Return to avoid further execution of the route logic
+			res.send(individualApproved).status(200);
 			return;
 		}
 
@@ -52,41 +60,32 @@ router.get('/fca', async (req, res) => {
 		res.send(responseBody).status(statusCode);
 	} catch (error) {
 		console.error(error);
-		// If there's an error or the response is 400, execute logic for the individual FCA route
-		res.redirect('/fcaind');
+		res.sendStatus(500);
 	}
 });
-
-// Handles the individual FCA logic.
-type ResponseBodyIndividual = {
-	certified: boolean;
-};
 
 // This route is only temporary and will be changed in the next commit once logic is sufficen.
-router.get('/fcaind', async (req, res) => {
+const requestIndividual = async () => {
 	try {
 		const fcaResponseInd = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702/Individuals', axiosConfig);
-
 		const data = fcaResponseInd.data.Data[0] as Record<string, unknown>;
 		const status = data.Status;
-		const isCertified = (status === 'Certified' || status === 'Approved by regulator');
-
-		const statusCode = isCertified ? 200 : 400;
+		const isCertified = (status === 'Approved by regulator');
+		const statusCode = isCertified ? 200 : 404;
 		const timestamp = Math.floor(new Date().getTime() / 1000);
-
 		// Unix timestamp.
 		const responseBodyIndividual: ResponseBodyIndividual = {
+			statusCode,
 			certified: isCertified,
 		};
-
-		console.log(data);
-
-		res.send(responseBodyIndividual).status(statusCode);
+		// Send the response to the client
+		return responseBodyIndividual;
 	} catch (error) {
 		console.error(error);
-		res.sendStatus(400);
+		// Send a 400 response to the client if there's an error
+		return 400;
 	}
-});
+};
 
 function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
 	// Reads the file
