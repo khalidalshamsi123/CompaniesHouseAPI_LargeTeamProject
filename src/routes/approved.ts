@@ -34,6 +34,12 @@ router.get('/fca', async (req, res) => {
 		const status = data.Status;
 		const isAuthorised = (status === 'Authorised');
 
+		if (!isAuthorised) {
+			// If not authorized, end the response and redirect to the individual FCA route
+			res.status(400).send('Not authorized').end();
+			return;
+		}
+
 		const statusCode = isAuthorised ? 200 : 400;
 		const timestamp = Math.floor(new Date().getTime() / 1000);
 
@@ -46,7 +52,8 @@ router.get('/fca', async (req, res) => {
 		res.send(responseBody).status(statusCode);
 	} catch (error) {
 		console.error(error);
-		res.sendStatus(400);
+		// If there's an error or the response is 400, execute logic for the individual FCA route
+		res.redirect('/fcaind');
 	}
 });
 
@@ -58,9 +65,9 @@ type ResponseBodyIndividual = {
 // This route is only temporary and will be changed in the next commit once logic is sufficen.
 router.get('/fcaind', async (req, res) => {
 	try {
-		const fcaResponse = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702/Individuals', axiosConfig);
+		const fcaResponseInd = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702/Individuals', axiosConfig);
 
-		const data = fcaResponse.data.Data[0] as Record<string, unknown>;
+		const data = fcaResponseInd.data.Data[0] as Record<string, unknown>;
 		const status = data.Status;
 		const isCertified = (status === 'Certified' || status === 'Approved by regulator');
 
