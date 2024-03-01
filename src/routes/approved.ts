@@ -56,29 +56,28 @@ router.get('/fca', async (req, res) => {
 });
 // First implementation, used for client showcase.
 // This function will show the columns (such as business name and status) of the csv that is passed to.
-// The parameter 'targetValue' will be used to pick out which business you want to return.
-// This is very generic so that it could be used with other csvs such as the gambling commision.
-function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
+// The parameter 'targetBusinessName' will be used to pick out which business you want to return.
+function csvReader(csvFile: string, businessNames: string, approvalStatus: string, targetBusinessName: string) {
 	// Reads the file
 	const csvData = pl.readCSV(csvFile);
 
 	// Filters the response with two columns
-	const columnOneValues = csvData.getColumn(columnName1);
-	const columnTwoValues = csvData.getColumn(columnName2);
+	const businessNamesValues = csvData.getColumn(businessNames);
+	const approvalStatusValues = csvData.getColumn(approvalStatus);
 
 	let index = 0;
 	// Looping to find the index of a specific value
-	for (let i = 0; i < columnOneValues.length; i++) {
-		if (columnOneValues[i] === targetValue) {
+	for (let i = 0; i < businessNamesValues.length; i++) {
+		if (businessNamesValues[i] === targetBusinessName) {
 			index = i;
 			break;
 		}
 	}
 
-	const specifcColumnOneValue: string = columnOneValues[index] as string;
-	const specifcColumnTwoValue: string = columnTwoValues[index] as string;
+	const specificBusinessNameValue: string = businessNamesValues[index] as string;
+	const specificApprovalStatusValue: string = approvalStatusValues[index] as string;
 
-	const jsonValue: JsonValue = {name: specifcColumnOneValue, status: specifcColumnTwoValue};
+	const jsonValue: JsonValue = {name: specificBusinessNameValue, status: specificApprovalStatusValue};
 	return jsonValue;
 }
 
