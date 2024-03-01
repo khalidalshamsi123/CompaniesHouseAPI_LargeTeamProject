@@ -55,6 +55,9 @@ router.get('/fca', async (req, res) => {
 	}
 });
 // First implementation, used for client showcase.
+// This function will show the columns (such as business name and status) of the csv that is passed to.
+// The parameter 'targetValue' will be used to pick out which business you want to return.
+// This is very generic so that it could be used with other csvs such as the gambling commision.
 function csvReader(csvFile: string, columnName1: string, columnName2: string, targetValue: string) {
 	// Reads the file
 	const csvData = pl.readCSV(csvFile);
@@ -79,30 +82,30 @@ function csvReader(csvFile: string, columnName1: string, columnName2: string, ta
 	return jsonValue;
 }
 
-// Second implementation, refactoring the code to return all data with boolean values
-function csvRefactoredReader(csvFile: string, columnName1: string, columnName2: string) {
+// Second implementation, refactoring the code to return all hmrc businesses with boolean values
+function hmrcCsvReader(csvFile: string, businessName: string, statusColumn: string) {
 	try {
 		// Reads the file
 		const csvData = pl.readCSV(csvFile);
 
 		// Filters the response with two columns
-		const columnOneValues = csvData.getColumn(columnName1);
-		const columnTwoValues = csvData.getColumn(columnName2);
+		const businessNameValues = csvData.getColumn(businessName);
+		const statusColumnValues = csvData.getColumn(statusColumn);
 
 		const jsonObjects = [];
 
 		// Looping to find the index of all values with APPROVED
 		// After finding the values, i convert them to a boolean type
 		// to true if it was approved, false if it wasnt.
-		for (let i = 0; i < columnOneValues.length; i++) {
-			let specifcColumnTwoValue = false;
-			if (columnTwoValues[i] === 'APPROVED') {
-				specifcColumnTwoValue = true;
+		for (let i = 0; i < businessNameValues.length; i++) {
+			let statusColumnValue = false;
+			if (statusColumnValues[i] === 'APPROVED') {
+				statusColumnValue = true;
 			}
 
 			// This stores the data of the two columns 'name' and 'status' in a JSON object
 			// Finally it would be pushed to an array containing all of the JSON objects.
-			const jsonValue: JsonObjectValues = {name: columnOneValues[i] as string, status: specifcColumnTwoValue};
+			const jsonValue: JsonObjectValues = {name: businessNameValues[i] as string, status: statusColumnValue};
 			jsonObjects.push(jsonValue);
 		}
 
@@ -120,7 +123,7 @@ router.get('/hmrc', (req, res) => {
 
 // All hmrc data router.
 router.get('/allhmrc', (req, res) => {
-	res.send(csvRefactoredReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
+	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 
 export default router;
