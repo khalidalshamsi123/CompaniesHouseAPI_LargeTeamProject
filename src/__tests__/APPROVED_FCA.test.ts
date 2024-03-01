@@ -10,12 +10,12 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 		it('Then authorized should either be true or false.', async () => {
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).get('/approved/fca')
+			const response = await request(app).get('/approved/')
 				.set(headers);
 			// Assert the response
 			expect([400, 200]).toContain(response.statusCode);
-			expect(response.body).toHaveProperty('authorized');
-			expect(typeof response.body.authorized).toBe('boolean');
+			expect(response.body).toHaveProperty('fca');
+			expect(typeof response.body.fca).toBe('boolean');
 		});
 	});
 });
