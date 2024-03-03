@@ -12,6 +12,8 @@ export async function processCsv({filename, client, batchSize}: CsvProcessorOpti
 	let rowCount = 0;
 	let status1Index = -1;
 	let regIdIndex = -1;
+	// Define a cache object to store processed registration IDs
+	const cache: Record<string, boolean> = {};
 
 	return new Promise((resolve, reject) => {
 		fs.createReadStream(filename)
@@ -57,8 +59,16 @@ export async function processCsv({filename, client, batchSize}: CsvProcessorOpti
 						return;
 					}
 
+					// Check if the row has already been processed (exists in the cache)
+					if (cache[registrationId]) {
+						// Skip database query for already processed row
+						return;
+					}
+
 					// Execute the query to insert the row into the database
 					await client.query(query, values);
+					// Cache the registration ID to mark it as processed
+					cache[registrationId] = true;
 
 					// Commit transaction every batchSize rows, a new transaction is started to improve performance and avoid long-running transactions.
 					if (rowCount % batchSize === 0) {

@@ -23,7 +23,6 @@ const createSchemaQuery = `
 export async function createSchema() {
 	try {
 		console.log('Creating database schema...');
-		console.log('SQL Query:', createSchemaQuery);
 
 		const client = await pool.connect();
 
