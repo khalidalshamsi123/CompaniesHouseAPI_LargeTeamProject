@@ -19,9 +19,11 @@ describe('Setup Database - Creating business_registry table for the following te
 		describe('When the registration ID 122702 is provided to the endpoint.', () => {
 			it('Then the response should contain FCA authorization as true and HMRC and Gambling Commission authorization as false.', async () => {
 				// Make the request and wait for the response
+				const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 				const response = await request(app)
-					.get('/approved/allApproved')
-					.query({registrationId: '122702', businessName: 'Barclays'});
+					.get('/approved')
+					.query({registrationId: '122702', businessName: 'Barclays'})
+					.set(headers);
 
 				// Assert the response
 				expect(response.status).toBe(200);
@@ -39,9 +41,11 @@ describe('Setup Database - Creating business_registry table for the following te
 		describe('When the registration ID 9912392193219 is provided to the endpoint.', () => {
 			it('Then the response should contain FCA authorization as false and HMRC and Gambling Commission authorization as false.', async () => {
 				// Make the request and wait for the response
+				const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 				const response = await request(app)
-					.get('/approved/allApproved')
-					.query({registrationId: '9912392193219', businessName: 'RandomTestBusiness'});
+					.get('/approved')
+					.query({registrationId: '9912392193219', businessName: 'RandomTestBusiness'})
+					.set(headers);
 
 				// Assert the response
 				expect(response.status).toBe(400);
