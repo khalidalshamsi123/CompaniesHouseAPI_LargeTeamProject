@@ -155,7 +155,7 @@ router.get('/allApproved', async (req, res) => {
 			registrationId: registrationId,
 			businessName: businessName,
 			Approved: {
-				FCA: authorized,
+				FCA: isAuthorised,
 				HMRC: businessData?.hmrcApproved ?? false,
 				Gambling_Comission: businessData?.gamblingApproved ?? false,
 			},
