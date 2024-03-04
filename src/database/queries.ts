@@ -32,4 +32,23 @@ async function insertBusinessData(data: BusinessData): Promise<void> {
 	}
 }
 
+//Finds and returns all the approved (HMRC and gambling) by registration ID
+async function findAllApprovedByRegID(registrationId: string): Promise<BusinessData | null> {
+	try {
+		const result = await pool.query('SELECT * FROM registration_schema.business_registry WHERE registrationid = $1', [registrationId]);
+		const businessData: BusinessData = result.rows[0];
+
+		//return null if cant find any data
+		if (!businessData) {
+			return null;
+		}
+
+		return businessData;
+	} catch (error) {
+		console.error('Error retrieving data:', error);
+		throw new Error('Error retrieving data');
+	}
+}
+
+export {findAllApprovedByRegID};
 export {insertBusinessData};

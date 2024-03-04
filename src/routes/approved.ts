@@ -4,6 +4,7 @@ import pl, {DataFrame, col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
 import isAuthorised from '../middleware/authentication';
+import {findAllApprovedByRegID} from "../database/queries";
 
 dotenv.config();
 
@@ -125,5 +126,42 @@ router.get('/hmrc', (req, res) => {
 router.get('/allhmrc', (req, res) => {
 	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
+
+
+//Sub route to get all approved (/approved/allApproved)
+router.get('/allApproved', async (req, res) => {
+	try {
+		const registrationId = req.query.registrationId;
+		// @ts-ignore
+		const businessData = await findAllApprovedByRegID(registrationId);
+
+		//Check if business data was found and if not return 404.
+		const statusCode = businessData ? 200 : 404;
+
+		if (!businessData) {
+			res.sendStatus(statusCode);
+			return;
+		}
+
+		//Construct the response JSON object
+		const responseObj = {
+			registrationId: businessData.registrationId,
+			businessName: businessData.businessName,
+			Approved: {
+				FCA: businessData.fcaApproved,
+				HMRC: businessData.hmrcApproved,
+				Gambling_Comission: businessData.gamblingApproved,
+			},
+		};
+
+		//Send the response with correct status code
+		res.json(responseObj).status(statusCode);
+	} catch (error) {
+		console.error(error);
+		res.sendStatus(400);
+	}
+});
+
+
 
 export default router;
