@@ -4,8 +4,8 @@ import pl, {DataFrame, col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
 import isAuthorised from '../middleware/authentication';
-import {findAllApprovedByRegID} from "../database/queries";
-import {fcaGetApprovalStatus} from "../components/fcaQuerier";
+import {findAllApprovedByRegID} from '../database/queries';
+import {fcaGetApprovalStatus} from '../components/fcaQuerier';
 
 dotenv.config();
 
@@ -128,47 +128,47 @@ router.get('/allhmrc', (req, res) => {
 	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 
-
-//Sub route to get all approved (/approved/allApproved)
+// Sub route to get all approved (/approved/allApproved)
 router.get('/allApproved', async (req, res) => {
 	try {
-		const registrationId = req.query.registrationId;
-		const businessName = req.query.businessName;
-		// @ts-ignore
-		//This will only be used for the HMRC and gambling status
+		const {registrationId} = req.query;
+		const {businessName} = req.query;
+		// @ts-expect-error
+		// This will only be used for the HMRC and gambling status
 		const businessData = await findAllApprovedByRegID(registrationId);
 
-		//Get FCA Approved with absolute latest relevant data from FCA Api
-		// @ts-ignore
-		const { isAuthorised } = await fcaGetApprovalStatus(registrationId);
+		// Get FCA Approved with absolute latest relevant data from FCA Api
+		// @ts-expect-error
+		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
 
-		//Check if business data was found and if change status code to return 404.
+		// Check if business data was found and if change status code to return 404.
 		const statusCode = businessData ? 200 : 404;
-		//Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
+		// Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
 		if (!businessData && !isAuthorised) {
 			res.sendStatus(statusCode);
 			return;
 		}
+		const hmrcApproved = businessData?.hmrcApproved ?? false;
 
-		//Construct the response JSON object
+		const gamblingApproved = businessData?.gamblingApproved ?? false;
+		// Construct the response JSON object
 		const responseObj = {
-			registrationId: registrationId,
-			businessName: businessName,
-			Approved: {
-				FCA: isAuthorised,
-				HMRC: businessData?.hmrcApproved ?? false,
-				Gambling_Comission: businessData?.gamblingApproved ?? false,
+			registrationId,
+			businessName,
+			approvedWith: {
+				fca: isAuthorised,
+				hmrc: hmrcApproved,
+				gamblingCommission: gamblingApproved,
 			},
+			approved: isAuthorised || hmrcApproved || gamblingApproved,
 		};
 
-		//Send the response with correct status code
+		// Send the response with correct status code
 		res.json(responseObj).status(statusCode);
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(400);
 	}
 });
-
-
 
 export default router;
