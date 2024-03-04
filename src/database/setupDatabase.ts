@@ -10,14 +10,6 @@ const createSchemaQuery = `
         hmrc_approved BOOLEAN,
         gambling_approved BOOLEAN
     );
-
-    CREATE TABLE IF NOT EXISTS registration_schema.non_approved_registry (
-        registrationid INT PRIMARY KEY,
-        businessname VARCHAR(255),
-        fca_applied BOOLEAN,
-        hmrc_applied BOOLEAN,
-        gambling_applied BOOLEAN
-    );
 `;
 
 export async function createSchema() {

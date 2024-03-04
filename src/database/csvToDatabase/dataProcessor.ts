@@ -20,16 +20,7 @@ export async function processDataRow({row, regIdIndex, cache, client, batchSize,
 	let values: any[] = [];
 	// Determine the query and values based on the status1Value
 	if (status1Value && status1Value.toLowerCase() === 'approved') {
-		query = 'INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved) VALUES ($1, $2, $3, $4, $5)';
-		values = [
-			registrationId,
-			row.BUSINESS_NAME,
-			false,
-			true,
-			false,
-		];
-	} else if (status1Value && status1Value.toLowerCase() === 'applied') {
-		query = 'INSERT INTO registration_schema.non_approved_registry (registrationid, businessname, fca_applied, hmrc_applied, gambling_applied) VALUES ($1, $2, $3, $4, $5)';
+		query = 'INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (registrationid) DO UPDATE SET businessname = EXCLUDED.businessname';
 		values = [
 			registrationId,
 			row.BUSINESS_NAME,
@@ -38,7 +29,7 @@ export async function processDataRow({row, regIdIndex, cache, client, batchSize,
 			false,
 		];
 	} else {
-		// Skip processing if status is neither 'approved' nor 'applied', which won't happen
+		// Skip processing if status is not 'approved'
 		return;
 	}
 

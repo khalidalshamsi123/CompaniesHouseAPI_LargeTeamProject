@@ -28,7 +28,7 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 					// Check if it's the header row
 					if (rowCount === 1) {
 						// Find the index of the 'STATUS1' and registration ID columns in the header
-						status1Index = Object.keys(row).findIndex(key => key.toLowerCase() === 'status1');
+						status1Index = Object.keys(row).findIndex(key => key.toLowerCase() === 'status');
 						regIdIndex = Object.keys(row).findIndex(key => key.toLowerCase().includes('reg'));
 						return;
 					}
