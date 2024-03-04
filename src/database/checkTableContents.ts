@@ -40,7 +40,6 @@ async function main() {
 	try {
 		// Call the function to print contents of both tables
 		await printAllTableContents('registration_schema');
-		console.log('All table contents printed successfully.');
 	} catch (error) {
 		console.error('Failed to print table contents:', error);
 	} finally {

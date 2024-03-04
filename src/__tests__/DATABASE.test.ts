@@ -1,11 +1,13 @@
 // Mock the database module
 import {createSchema} from '../database/setupDatabase';
+import fs from 'fs';
 
+// Mock the fs.createReadStream and csvParser modules
+jest.mock('csv-parser');
+jest.mock('pg');
+jest.mock('fs');
 jest.mock('../database/setupDatabase', () => ({
 	createSchema: jest.fn(),
-}));
-jest.mock('../database/queries', () => ({
-	insertBusinessData: jest.fn(),
 }));
 
 describe('Database Setup and Insertion Tests', () => {

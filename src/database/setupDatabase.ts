@@ -28,7 +28,6 @@ export async function createSchema() {
 
 		try {
 			await client.query(createSchemaQuery);
-			console.log('Database schema created successfully.');
 		} finally {
 			client.release();
 		}
