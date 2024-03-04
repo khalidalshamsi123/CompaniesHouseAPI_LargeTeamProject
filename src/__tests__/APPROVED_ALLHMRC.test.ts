@@ -16,8 +16,8 @@ describe('Setup Database - Creating business_registry table for the following te
 		await createSchema();
 		expect(createSchema).toHaveBeenCalled();
 	});
-// Scenario 1, a business with the status false
-// Given.
+	// Scenario 1, a business with the status false
+	// Given.
 	describe('Given Companies House wants to retrieve the approval status of HARRY SMITH AND SONS from the HMRC CSV file.', () => {
 		// When.
 		describe('When Companies House sends a request to the /approved/allhmrc endpoint.', () => {
@@ -32,8 +32,8 @@ describe('Setup Database - Creating business_registry table for the following te
 		});
 	});
 
-// Scenario 2, a business with the status true
-// Given.
+	// Scenario 2, a business with the status true
+	// Given.
 	describe('Given Companies House wants to retrieve the approval status of FRANK SIMONS AND SONS from the HMRC CSV file.', () => {
 		// When.
 		describe('When Companies House sends a request to the /approved/allhmrc endpoint.', () => {
@@ -47,8 +47,5 @@ describe('Setup Database - Creating business_registry table for the following te
 			});
 		});
 	});
-
-
-
 });
 

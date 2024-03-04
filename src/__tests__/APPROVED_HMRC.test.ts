@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../app';
 
-
 import {createSchema} from '../database/setupDatabase';
 
 jest.mock('../database/setupDatabase', () => ({
@@ -11,7 +10,6 @@ jest.mock('../database/queries', () => ({
 	insertBusinessData: jest.fn(),
 	findAllApprovedByRegId: jest.fn(),
 }));
-
 
 describe('Setup Database - Creating business_registry table for the following tests', () => {
 	it('should create business_registry table with correct columns', async () => {

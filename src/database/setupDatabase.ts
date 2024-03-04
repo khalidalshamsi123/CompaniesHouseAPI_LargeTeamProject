@@ -26,7 +26,6 @@ export async function createSchema() {
 
 		// Release the client connection
 		client.release();
-
 	} catch (error) {
 		console.error('Error creating database schema:', error);
 		throw error; // Rethrow the error to propagate it to the caller

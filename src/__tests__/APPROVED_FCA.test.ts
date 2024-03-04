@@ -11,9 +11,6 @@ jest.mock('../database/queries', () => ({
 	findAllApprovedByRegId: jest.fn(),
 }));
 
-
-
-
 describe('Setup Database - Creating business_registry table for the following tests', () => {
 	it('should create business_registry table with correct columns', async () => {
 		await createSchema();
@@ -21,7 +18,7 @@ describe('Setup Database - Creating business_registry table for the following te
 	});
 	// Scenario: Retrieve Barclays Approval Status from FCA Endpoint.
 
-// Given.
+	// Given.
 	describe('Given Companies House wants to retrieve the approval status of Barclays from the FCA endpoint and its approved by FCA.', () => {
 		// When.
 		describe('When Companies House sends a request to the /approved/fca endpoint.', () => {
@@ -39,5 +36,4 @@ describe('Setup Database - Creating business_registry table for the following te
 			});
 		});
 	});
-
 });
