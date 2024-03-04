@@ -21,7 +21,7 @@ const axiosConfig: AxiosRequestConfig = {
 // Since if we handle it, we would need to return a boolean which would be incorrect. As just because
 // the API request may have failed, that doesn't mean the business itself is unapproved.
 async function fcaGetApprovalStatus(registrationId: string): Promise<{ isAuthorised: boolean }> {
-    const fcaResponse = await axios.get('https://register.fca.org.uk/services/V0.1/Firm/122702', axiosConfig);
+    const fcaResponse = await axios.get(`https://register.fca.org.uk/services/V0.1/Firm/${registrationId}`, axiosConfig);
 
     const data = fcaResponse.data.Data[0] as Record<string, unknown>;
     const status = data.Status;
