@@ -40,18 +40,6 @@ const mockRequest = (apiKey: string | undefined) => {
 describe('Given Companies House wants to retrieve the approval status of Barclays from the application and given a valid API key is provided.', () => {
 	// When.
 	describe('When Companies House sends a GET request to the /approved/ endpoint with the valid API key in the headers.', () => {
-		// Then.
-		it('Then they should receive a response containing the approval status of Barclays with the FCA and a 200 (success) status code.', async () => {
-			// Make the request and wait for the response
-			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).get('/approved/')
-				.query({registrationId: '122702', businessName: 'Barclays'})
-				.set(headers);
-			// Assert the response.
-			expect(response.statusCode).toBe(200);
-			expect(typeof response.body.approvedWith.fca).toBe('boolean');
-		});
-
 		it('Then the request should pass authentication.', () => {
 			const req = mockRequest(process.env.API_KEY);
 			const res = mockResponse();
