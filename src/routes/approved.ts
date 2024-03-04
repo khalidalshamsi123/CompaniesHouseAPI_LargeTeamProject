@@ -140,12 +140,12 @@ router.get('/allApproved', async (req, res) => {
 
 		//Get FCA Approved with absolute latest relevant data from FCA Api
 		// @ts-ignore
-		const { authorized, timestamp } = await fcaGetApprovalStatus(registrationId);
+		const { isAuthorised } = await fcaGetApprovalStatus(registrationId);
 
 		//Check if business data was found and if change status code to return 404.
 		const statusCode = businessData ? 200 : 404;
 		//Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
-		if (!businessData && !authorized) {
+		if (!businessData && !isAuthorised) {
 			res.sendStatus(statusCode);
 			return;
 		}
