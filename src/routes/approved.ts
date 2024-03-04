@@ -133,30 +133,31 @@ router.get('/allhmrc', (req, res) => {
 router.get('/allApproved', async (req, res) => {
 	try {
 		const registrationId = req.query.registrationId;
+		const businessName = req.query.businessName;
 		// @ts-ignore
 		//This will only be used for the HMRC and gambling status
 		const businessData = await findAllApprovedByRegID(registrationId);
 
-		//Check if business data was found and if not return 404.
+		//Get FCA Approved with absolute latest relevant data from FCA Api
+		// @ts-ignore
+		const { authorized, timestamp } = await isApprovedFCA(registrationId);
+
+		//Check if business data was found and if change status code to return 404.
 		const statusCode = businessData ? 200 : 404;
-		if (!businessData) {
+		//Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
+		if (!businessData && !authorized) {
 			res.sendStatus(statusCode);
 			return;
 		}
 
-		//Update the FCA Approved with absolute relevant data from FCA Api
-		// @ts-ignore
-		const { authorized, timestamp } = await isApprovedFCA(registrationId);
-		businessData.fcaApproved = authorized;
-
 		//Construct the response JSON object
 		const responseObj = {
-			registrationId: businessData.registrationId,
-			businessName: businessData.businessName,
+			registrationId: registrationId,
+			businessName: businessName,
 			Approved: {
-				FCA: businessData.fcaApproved,
-				HMRC: businessData.hmrcApproved,
-				Gambling_Comission: businessData.gamblingApproved,
+				FCA: authorized,
+				HMRC: businessData?.hmrcApproved ?? false,
+				Gambling_Comission: businessData?.gamblingApproved ?? false,
 			},
 		};
 
