@@ -22,8 +22,8 @@ describe('Setup Database - Creating business_registry table for the following te
 				const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 				const response = await request(app)
 					.get('/approved')
-					.query({registrationId: '122702', businessName: 'Barclays'})
-					.set(headers);
+					.set(headers)
+					.query({registrationId: '122702', businessName: 'Barclays'});
 
 				// Assert the response
 				expect(response.status).toBe(200);
@@ -37,7 +37,7 @@ describe('Setup Database - Creating business_registry table for the following te
 		});
 	});
 
-	describe('Given a request is made to retrieve approval status for a non existent registration ID from the /allApproved endpoint.', () => {
+	describe('Given a request is made to retrieve approval status for a non existent registration ID from the /approved endpoint.', () => {
 		describe('When the registration ID 9912392193219 is provided to the endpoint.', () => {
 			it('Then the response should contain FCA authorization as false and HMRC and Gambling Commission authorization as false.', async () => {
 				// Make the request and wait for the response
@@ -48,7 +48,7 @@ describe('Setup Database - Creating business_registry table for the following te
 					.set(headers);
 
 				// Assert the response
-				expect(response.status).toBe(400);
+				expect(response.status).toBe(404);
 			});
 		});
 	});

@@ -13,8 +13,9 @@ router.get('/', isAuthorised, async (req, res) => {
 	try {
 		const registrationId = req.query.registrationId;
 		const businessName = req.query.businessName;
+
 		// @ts-ignore registrationid will always be string, so this error can be supressed, any error handling is done within the function
-		const responseObj: ResponseBodyStatus = queryAggregator(registrationId, businessName);
+		const responseObj: ResponseBodyStatus = await queryAggregator(registrationId, businessName);
 
 		//Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
 		if (!responseObj) {

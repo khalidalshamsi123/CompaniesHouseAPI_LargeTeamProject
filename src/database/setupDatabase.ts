@@ -22,10 +22,11 @@ export async function createSchema() {
 		// Execute the SQL commands to create the schema
 		await client.query(createSchemaQuery);
 
+		console.log('Database schema created successfully.');
+
 		// Release the client connection
 		client.release();
 
-		console.log('Database schema created successfully.');
 	} catch (error) {
 		console.error('Error creating database schema:', error);
 		throw error; // Rethrow the error to propagate it to the caller

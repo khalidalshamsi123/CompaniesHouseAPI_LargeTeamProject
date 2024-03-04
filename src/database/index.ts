@@ -2,7 +2,7 @@ import {createSchema as setupDatabase} from './setupDatabase';
 import {insertBusinessData} from './queries';
 import type {BusinessData} from './queries';
 
-async function main() {
+export async function main() {
 	try {
 		// Call the setupDatabase function to create the schema
 		await setupDatabase();

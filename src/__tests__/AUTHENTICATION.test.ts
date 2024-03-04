@@ -45,11 +45,11 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app).get('/approved/')
+				.query({registrationId: '122702', businessName: 'Barclays'})
 				.set(headers);
 			// Assert the response.
-			expect([400, 200]).toContain(response.statusCode);
-			expect(response.body).toHaveProperty('fca');
-			expect(typeof response.body.fca).toBe('boolean');
+			expect(response.statusCode).toBe(200);
+			expect(typeof response.body.approvedWith.fca).toBe('boolean');
 		});
 
 		it('Then the request should pass authentication.', () => {
