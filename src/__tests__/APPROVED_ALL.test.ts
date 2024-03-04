@@ -7,7 +7,7 @@ jest.mock('../database/setupDatabase', () => ({
 }));
 jest.mock('../database/queries', () => ({
 	insertBusinessData: jest.fn(),
-	findAllApprovedByRegID: jest.fn(),
+	findAllApprovedByRegId: jest.fn(),
 }));
 describe('Setup Database - Creating business_registry table for the following tests', () => {
 	it('should create business_registry table with correct columns', async () => {

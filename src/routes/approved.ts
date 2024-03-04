@@ -4,7 +4,7 @@ import pl, {DataFrame, col} from 'nodejs-polars';
 
 import * as dotenv from 'dotenv';
 import isAuthorised from '../middleware/authentication';
-import {findAllApprovedByRegID} from '../database/queries';
+import {findAllApprovedByRegId} from '../database/queries';
 import {fcaGetApprovalStatus} from '../components/fcaQuerier';
 
 dotenv.config();
@@ -133,12 +133,12 @@ router.get('/allApproved', async (req, res) => {
 	try {
 		const {registrationId} = req.query;
 		const {businessName} = req.query;
-		// @ts-expect-error
 		// This will only be used for the HMRC and gambling status
-		const businessData = await findAllApprovedByRegID(registrationId);
+		// @ts-expect-error Its possible registrationid could be null, if it is null this is dealt within the function.
+		const businessData = await findAllApprovedByRegId(registrationId);
 
 		// Get FCA Approved with absolute latest relevant data from FCA Api
-		// @ts-expect-error
+		// @ts-expect-error Its possible registrationid could be null, if it is null this is dealt within the function.
 		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
 
 		// Check if business data was found and if change status code to return 404.
@@ -148,6 +148,7 @@ router.get('/allApproved', async (req, res) => {
 			res.sendStatus(statusCode);
 			return;
 		}
+
 		const hmrcApproved = businessData?.hmrcApproved ?? false;
 
 		const gamblingApproved = businessData?.gamblingApproved ?? false;
