@@ -5,6 +5,7 @@ import pl, {DataFrame, col} from 'nodejs-polars';
 import * as dotenv from 'dotenv';
 import isAuthorised from '../middleware/authentication';
 import {findAllApprovedByRegID} from "../database/queries";
+import {isApprovedFCA} from "../route_utils/fca_util";
 
 dotenv.config();
 
@@ -133,15 +134,20 @@ router.get('/allApproved', async (req, res) => {
 	try {
 		const registrationId = req.query.registrationId;
 		// @ts-ignore
+		//This will only be used for the HMRC and gambling status
 		const businessData = await findAllApprovedByRegID(registrationId);
 
 		//Check if business data was found and if not return 404.
 		const statusCode = businessData ? 200 : 404;
-
 		if (!businessData) {
 			res.sendStatus(statusCode);
 			return;
 		}
+
+		//Update the FCA Approved with absolute relevant data from FCA Api
+		// @ts-ignore
+		const { authorized, timestamp } = await isApprovedFCA(registrationId);
+		businessData.fcaApproved = authorized;
 
 		//Construct the response JSON object
 		const responseObj = {

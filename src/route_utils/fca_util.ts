@@ -24,3 +24,5 @@ async function isApprovedFCA(registrationId: string): Promise<{ authorized: bool
         throw new Error('Error checking FCA approval');
     }
 }
+
+export {isApprovedFCA};
