@@ -34,5 +34,19 @@ describe('Setup Database - Creating business_registry table for the following te
 			});
 		});
 	});
+
+	describe('Given a request is made to retrieve approval status for a non existent registration ID from the /allApproved endpoint.', () => {
+		describe('When the registration ID 9912392193219 is provided to the endpoint.', () => {
+			it('Then the response should contain FCA authorization as false and HMRC and Gambling Commission authorization as false.', async () => {
+				// Make the request and wait for the response
+				const response = await request(app)
+					.get('/approved/allApproved')
+					.query({registrationId: '9912392193219', businessName: 'RandomTestBusiness'});
+
+				// Assert the response
+				expect(response.status).toBe(400);
+			});
+		});
+	});
 });
 
