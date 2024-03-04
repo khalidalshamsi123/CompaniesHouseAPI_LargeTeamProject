@@ -50,7 +50,8 @@ jspm_packages/
 web_modules/
 
 # Typescript
-build/
+build
+dist/
 
 # TypeScript cache
 *.tsbuildinfo

@@ -1,11 +1,10 @@
 import pool from './databasePool';
 
-// Define the SQL commands to create the schema
 const createSchemaQuery = `
     CREATE SCHEMA IF NOT EXISTS registration_schema;
-    
+
     CREATE TABLE IF NOT EXISTS registration_schema.business_registry (
-        registrationid VARCHAR(8) PRIMARY KEY,
+        registrationid INT PRIMARY KEY,
         businessname VARCHAR(255),
         fca_approved BOOLEAN,
         hmrc_approved BOOLEAN,
@@ -13,21 +12,30 @@ const createSchemaQuery = `
     );
 `;
 
-// Function to execute SQL commands to create the schema
 export async function createSchema() {
 	try {
-		// Connect to the database
+		console.log('Creating database schema...');
+
 		const client = await pool.connect();
 
-		// Execute the SQL commands to create the schema
-		await client.query(createSchemaQuery);
-
-		// Release the client connection
-		client.release();
-
-		console.log('Database schema created successfully.');
+		try {
+			await client.query(createSchemaQuery);
+		} finally {
+			client.release();
+		}
 	} catch (error) {
 		console.error('Error creating database schema:', error);
-		throw error; // Rethrow the error to propagate it to the caller
+		throw error;
 	}
 }
+
+// Call the createSchema function
+createSchema()
+	.then(() => {
+		console.log('Schema creation completed successfully.');
+		// Any additional code to run after schema creation
+	})
+	.catch(error => {
+		console.error('Schema creation failed:', error);
+		// Handle errors if necessary
+	});
