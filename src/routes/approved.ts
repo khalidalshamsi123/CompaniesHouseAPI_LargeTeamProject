@@ -5,7 +5,7 @@ import pl, {DataFrame, col} from 'nodejs-polars';
 import * as dotenv from 'dotenv';
 import isAuthorised from '../middleware/authentication';
 import {findAllApprovedByRegID} from "../database/queries";
-import {isApprovedFCA} from "../route_utils/fca_util";
+import {fcaGetApprovalStatus} from "../components/fcaQuerier";
 
 dotenv.config();
 
@@ -140,7 +140,7 @@ router.get('/allApproved', async (req, res) => {
 
 		//Get FCA Approved with absolute latest relevant data from FCA Api
 		// @ts-ignore
-		const { authorized, timestamp } = await isApprovedFCA(registrationId);
+		const { authorized, timestamp } = await fcaGetApprovalStatus(registrationId);
 
 		//Check if business data was found and if change status code to return 404.
 		const statusCode = businessData ? 200 : 404;
