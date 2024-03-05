@@ -21,7 +21,7 @@ async function queryAggregator(registrationId: string, businessName: string) {
 		}
 
 		// Unix timestamp generation.
-		const timestamp = Math.floor(new Date().getTime() / 1000);
+		const timestamp = new Date().toISOString();
 
 		const hmrcApproved = businessData?.hmrcApproved ?? false;
 
@@ -36,7 +36,7 @@ async function queryAggregator(registrationId: string, businessName: string) {
 				hmrc: hmrcApproved,
 				gamblingCommission: gamblingApproved,
 			},
-			approved: isAuthorised || hmrcApproved || gamblingApproved,
+			approved: (isAuthorised || hmrcApproved || gamblingApproved),
 		};
 
 		// Send the response with correct status code

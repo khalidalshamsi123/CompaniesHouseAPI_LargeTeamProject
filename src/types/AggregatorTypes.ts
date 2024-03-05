@@ -1,6 +1,6 @@
 // Define type that enforces the response object to contain these needed values.
 export type ResponseBodyStatus = {
-	timestamp: number;
+	timestamp: string;
 	registrationId: string;
 	businessName: string;
 	approvedWith: {
