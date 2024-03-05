@@ -9,10 +9,15 @@ export async function main() {
 
 		// Call insertBusinessData function with actual data
 		const businessData: BusinessData = {
+
 			registrationid: '00445790',
+
 			businessname: 'TESCO PLC',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			fca_approved: false,
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			hmrc_approved: true,
+			// eslint-disable-next-line @typescript-eslint/naming-convention
 			gambling_approved: false,
 		};
 

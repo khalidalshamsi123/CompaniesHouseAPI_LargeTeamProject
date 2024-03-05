@@ -9,9 +9,9 @@
     "database-setup+insert": "node build/database/index.js",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage --passWithNoTests"
+    "test": "jest --runInBand",
+    "test:coverage": "jest --coverage --runInBand",
+    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage --passWithNoTests --runInBand"
   },
   "repository": {
     "type": "git",

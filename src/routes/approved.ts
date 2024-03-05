@@ -27,7 +27,7 @@ router.get('/', isAuthorised, async (req, res) => {
 		const statusCode = responseObj.approved ? 200 : 400;
 
 		// Send the response with correct status code
-		res.json(responseObj).status(statusCode);
+		res.status(statusCode).json(responseObj);
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(400);

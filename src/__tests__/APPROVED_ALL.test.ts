@@ -1,7 +1,6 @@
 import request from 'supertest';
 import app from '../app';
-import {clearTestDatabase, setupTestDatabase} from "../utils/databaseTestFuncs";
-
+import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 
 beforeAll(async () => {
 	await setupTestDatabase();
@@ -9,6 +8,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
 	await clearTestDatabase();
+	jest.clearAllMocks();
 });
 
 describe('Given a request is made to retrieve approval status for a specific registration ID from the /approved endpoint.', () => {
@@ -33,17 +33,17 @@ describe('Given a request is made to retrieve approval status for a specific reg
 	});
 });
 describe('Given a request is made to retrieve approval status for a non existent registration ID from the /approved endpoint.', () => {
-	describe('When the registration ID 9912392193219 is provided to the endpoint.', () => {
+	describe('When the registration ID 991239 is provided to the endpoint.', () => {
 		it('Then the response should contain FCA authorization as false and HMRC and Gambling Commission authorization as false.', async () => {
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
 				.get('/approved')
-				.query({registrationId: '9912392193219', businessName: 'RandomTestBusiness'})
-				.set(headers);
+				.set(headers)
+				.query({registrationId: '9912399', businessName: 'RandomTestBusiness'});
 
 			// Assert the response
-			expect(response.status).toBe(404);
+			expect(response.status).toBe(400);
 		});
 	});
 });

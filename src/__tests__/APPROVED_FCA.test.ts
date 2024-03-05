@@ -7,7 +7,6 @@ jest.mock('../database/queries', () => ({
 	findAllApprovedByRegId: jest.fn(),
 }));
 
-
 // Scenario: Retrieve Barclays Approval Status from FCA Endpoint.
 
 // Given.

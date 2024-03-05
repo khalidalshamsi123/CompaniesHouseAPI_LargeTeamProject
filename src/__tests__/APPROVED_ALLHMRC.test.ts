@@ -1,8 +1,7 @@
 import request from 'supertest';
 import app from '../app';
 
-import {clearTestDatabase, setupTestDatabase} from "../utils/databaseTestFuncs";
-
+import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 
 beforeAll(async () => {
 	await setupTestDatabase();

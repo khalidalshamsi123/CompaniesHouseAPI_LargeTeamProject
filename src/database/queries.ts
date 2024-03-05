@@ -1,6 +1,6 @@
 import pool from './databasePool';
 
-//these need to be spelt to match the column names in database so when we read it maps it correctly to this type.
+// These need to be spelt to match the column names in database so when we read it maps it correctly to this type.
 export type BusinessData = {
 	registrationid: string;
 	businessname: string;
@@ -10,6 +10,7 @@ export type BusinessData = {
 };
 
 async function insertBusinessData(data: BusinessData): Promise<void> {
+	// eslint-disable-next-line @typescript-eslint/naming-convention
 	const {registrationid, businessname, fca_approved, hmrc_approved, gambling_approved} = data;
 	try {
 		const query = `

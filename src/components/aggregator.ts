@@ -13,13 +13,6 @@ async function queryAggregator(registrationId: string, businessName: string) {
 		// Get FCA Approved with absolute latest relevant data from FCA Api
 		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
 
-		// Check if business data was found and if change status code to return 404.
-		const statusCode = businessData ? 200 : 404;
-		// Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
-		if (!businessData && !isAuthorised) {
-			return statusCode;
-		}
-
 		// Unix timestamp generation.
 		const timestamp = new Date().toISOString();
 
@@ -38,8 +31,7 @@ async function queryAggregator(registrationId: string, businessName: string) {
 			},
 			approved: (isAuthorised || hmrcApproved || gamblingApproved),
 		};
-
-		// Send the response with correct status code
+		// Send the response object
 		return responseObj;
 	} catch (error) {
 		console.error(error);
