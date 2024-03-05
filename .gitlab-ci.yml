@@ -54,7 +54,8 @@ test_submit:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SUBMIT
