@@ -12,6 +12,13 @@ services:
   - redis:latest
   - postgres:latest
 
+variables:
+    # Configure postgres service (https://hub.docker.com/_/postgres/)
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+
+
 cache:
   paths:
     - node_modules/
