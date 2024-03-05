@@ -1,24 +1,41 @@
 import {hmrcStatusRetriever, hmrcCsvReader} from '../components/HmrcProcessing';
-import {fcaGetApprovalStatus} from '../components/fcaQuerier';
+import {fcaGetApprovalStatus} from './fcaQuerier';
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
+import {findAllApprovedByRegId} from '../database/queries';
 
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
-export async function queryAggregator() {
-	// Query both of our sources to recieve a expected response - a boolean.
-	const hmrcStatusValue: boolean = hmrcStatusRetriever('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1', 'GWYN DEBBSON AND DAUGHTER');
-	const fcaQuerierResponse: boolean = await fcaGetApprovalStatus();
+async function queryAggregator(registrationId: string, businessName: string) {
+	try {
+		// This will only be used for the HMRC and gambling status
+		const businessData = await findAllApprovedByRegId(registrationId);
 
-	// Unix timestamp generation.
-	const timestamp = Math.floor(new Date().getTime() / 1000);
+		// Get FCA Approved with absolute latest relevant data from FCA Api
+		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
 
-	// Construct a object that contains the approval statuses across the different sources.
-	// Provides a unix timestamp as well.
-	const response: ResponseBodyStatus = {
-		timestamp,
-		hmrc: hmrcStatusValue,
-		fca: fcaQuerierResponse,
-	};
+		// Unix timestamp generation.
+		const timestamp = new Date().toISOString();
 
-	return response;
+		const hmrcApproved = businessData?.hmrc_approved ?? false;
+
+		const gamblingApproved = businessData?.gambling_approved ?? false;
+		// Construct the response JSON object
+		const responseObj: ResponseBodyStatus = {
+			timestamp,
+			registrationId,
+			businessName,
+			approvedWith: {
+				fca: isAuthorised,
+				hmrc: hmrcApproved,
+				gamblingCommission: gamblingApproved,
+			},
+			approved: (isAuthorised || hmrcApproved || gamblingApproved),
+		};
+		// Send the response object
+		return responseObj;
+	} catch (error) {
+		console.error(error);
+	}
 }
+
+export {queryAggregator};
