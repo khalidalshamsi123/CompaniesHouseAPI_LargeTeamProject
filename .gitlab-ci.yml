@@ -54,7 +54,8 @@ test_submit:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SUBMIT
@@ -66,7 +67,8 @@ test_approved:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t APPROVED
@@ -78,7 +80,8 @@ test_upload:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t UPLOAD
@@ -90,7 +93,8 @@ test_frontend:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - npm run test-ci -t FRONTEND
 
@@ -101,7 +105,8 @@ test_database:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - npm run test-ci -t DATABASE
 
@@ -112,7 +117,8 @@ test_authentication:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - npm run test-ci -t AUTHENTICATION
 
@@ -121,7 +127,8 @@ deploy_staging:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - echo "this is where we would deploy to a staging environment"
   only:
     - development
@@ -133,6 +140,7 @@ deploy_production:
   script:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
-      API_KEY=${API_KEY}" >> ".env"
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - echo "this is where we would deploy to a production environment"
   environment: production
