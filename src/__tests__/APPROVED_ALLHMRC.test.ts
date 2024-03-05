@@ -1,13 +1,16 @@
 import request from 'supertest';
 import app from '../app';
 
-import {createSchema} from '../database/setupDatabase';
+import {clearTestDatabase, setupTestDatabase} from "../utils/databaseTestFuncs";
 
-jest.mock('../database/queries', () => ({
-	findAllApprovedByRegId: jest.fn(),
-}));
 
-beforeAll(async () => createSchema());
+beforeAll(async () => {
+	await setupTestDatabase();
+});
+
+afterAll(async () => {
+	await clearTestDatabase();
+});
 
 // Scenario 1, a business with the status false
 // Given.

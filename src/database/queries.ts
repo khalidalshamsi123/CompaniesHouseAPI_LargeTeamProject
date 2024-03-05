@@ -1,22 +1,23 @@
 import pool from './databasePool';
 
+//these need to be spelt to match the column names in database so when we read it maps it correctly to this type.
 export type BusinessData = {
-	registrationId: string;
-	businessName: string;
-	fcaApproved: boolean;
-	hmrcApproved: boolean;
-	gamblingApproved: boolean;
+	registrationid: string;
+	businessname: string;
+	fca_approved: boolean;
+	hmrc_approved: boolean;
+	gambling_approved: boolean;
 };
 
 async function insertBusinessData(data: BusinessData): Promise<void> {
-	const {registrationId, businessName, fcaApproved, hmrcApproved, gamblingApproved} = data;
+	const {registrationid, businessname, fca_approved, hmrc_approved, gambling_approved} = data;
 	try {
 		const query = `
             INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
             VALUES ($1, $2, $3, $4, $5)
         `;
 
-		const values = [registrationId, businessName, fcaApproved, hmrcApproved, gamblingApproved];
+		const values = [registrationid, businessname, fca_approved, hmrc_approved, gambling_approved];
 
 		await pool.query(query, values);
 
@@ -24,7 +25,7 @@ async function insertBusinessData(data: BusinessData): Promise<void> {
 	} catch (error: any) {
 		// Check if the error is a unique constraint violation
 		if (error.code === '23505') {
-			console.log(`Data with registration ID ${registrationId} already exists in the database.`);
+			console.log(`Data with registration ID ${registrationid} already exists in the database.`);
 		} else {
 			console.error('Error inserting data:', error);
 			throw new Error('Error inserting data'); // Creating and throwing an error object

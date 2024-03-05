@@ -1,16 +1,19 @@
 import request from 'supertest';
 import app from '../app';
-import {createSchema} from '../database/setupDatabase';
+import {clearTestDatabase, setupTestDatabase} from "../utils/databaseTestFuncs";
 
-jest.mock('../database/queries', () => ({
-	findAllApprovedByRegId: jest.fn(),
-}));
 
-beforeAll(async () => createSchema());
+beforeAll(async () => {
+	await setupTestDatabase();
+});
 
-describe('Given a request is made to retrieve approval status for a specific registration ID from the /allApproved endpoint.', () => {
+afterAll(async () => {
+	await clearTestDatabase();
+});
+
+describe('Given a request is made to retrieve approval status for a specific registration ID from the /approved endpoint.', () => {
 	describe('When the registration ID 122702 is provided to the endpoint.', () => {
-		it('Then the response should contain FCA authorization as true and HMRC and Gambling Commission authorization as false.', async () => {
+		it('Then the response should contain FCA and HMRC authorization as true and Gambling Commission authorization as false.', async () => {
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
@@ -23,7 +26,7 @@ describe('Given a request is made to retrieve approval status for a specific reg
 			expect(response.body).toHaveProperty('registrationId', '122702');
 			expect(response.body).toHaveProperty('businessName');
 			expect(response.body.approvedWith.fca).toBe(true);
-			expect(response.body.approvedWith.hmrc).toBe(false);
+			expect(response.body.approvedWith.hmrc).toBe(true);
 			expect(response.body.approvedWith.gamblingCommission).toBe(false);
 			expect(response.body.approved).toBe(true);
 		});

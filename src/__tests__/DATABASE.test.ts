@@ -21,20 +21,20 @@ describe('Database Setup and Insertion Tests', () => {
 		it('should insert correct mock data into the database', async () => {
 			// Call the insertBusinessData function with mock data
 			await insertBusinessData({
-				registrationId: '00445790',
-				businessName: 'TESCO PLC',
-				fcaApproved: false,
-				hmrcApproved: true,
-				gamblingApproved: false,
+				registrationid: '00445790',
+				businessname: 'TESCO PLC',
+				fca_approved: false,
+				hmrc_approved: true,
+				gambling_approved: false,
 			});
 
 			// Assert that the data insertion is successful
 			expect(insertBusinessData).toHaveBeenCalledWith({
-				registrationId: '00445790',
-				businessName: 'TESCO PLC',
-				fcaApproved: false,
-				hmrcApproved: true,
-				gamblingApproved: false,
+				registrationid: '00445790',
+				businessname: 'TESCO PLC',
+				fca_approved: false,
+				hmrc_approved: true,
+				gambling_approved: false,
 			});
 		});
 	});

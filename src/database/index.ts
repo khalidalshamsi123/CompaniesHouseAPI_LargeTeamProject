@@ -9,11 +9,11 @@ export async function main() {
 
 		// Call insertBusinessData function with actual data
 		const businessData: BusinessData = {
-			registrationId: '00445790',
-			businessName: 'TESCO PLC',
-			fcaApproved: false,
-			hmrcApproved: true,
-			gamblingApproved: false,
+			registrationid: '00445790',
+			businessname: 'TESCO PLC',
+			fca_approved: false,
+			hmrc_approved: true,
+			gambling_approved: false,
 		};
 
 		await insertBusinessData(businessData);

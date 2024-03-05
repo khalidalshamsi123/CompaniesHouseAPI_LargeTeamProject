@@ -23,9 +23,13 @@ const axiosConfig: AxiosRequestConfig = {
 async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthorised: boolean}> {
 	const fcaResponse = await axios.get(`https://register.fca.org.uk/services/V0.1/Firm/${registrationId}`, axiosConfig);
 
-	const data = fcaResponse.data.Data[0] as Record<string, unknown>;
-	const status = data.Status;
-	const isAuthorised = (status === 'Authorised');
+	let isAuthorised = false;
+	//The response could be null which can throw error when we try to read it for the authorised value.
+	if (fcaResponse.data.Data[0] !== null){
+		const data = fcaResponse.data.Data[0] as Record<string, unknown>;
+		const status = data.Status;
+		isAuthorised = (status === 'Authorised');
+	}
 
 	return {isAuthorised};
 }

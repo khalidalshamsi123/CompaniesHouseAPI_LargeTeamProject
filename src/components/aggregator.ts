@@ -23,9 +23,9 @@ async function queryAggregator(registrationId: string, businessName: string) {
 		// Unix timestamp generation.
 		const timestamp = new Date().toISOString();
 
-		const hmrcApproved = businessData?.hmrcApproved ?? false;
+		const hmrcApproved = businessData?.hmrc_approved ?? false;
 
-		const gamblingApproved = businessData?.gamblingApproved ?? false;
+		const gamblingApproved = businessData?.gambling_approved ?? false;
 		// Construct the response JSON object
 		const responseObj: ResponseBodyStatus = {
 			timestamp,

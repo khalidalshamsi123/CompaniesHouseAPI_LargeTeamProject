@@ -1,13 +1,16 @@
 import request from 'supertest';
 import app from '../app';
 
-import {createSchema} from '../database/setupDatabase';
+import {clearTestDatabase, setupTestDatabase} from "../utils/databaseTestFuncs";
 
-jest.mock('../database/queries', () => ({
-	findAllApprovedByRegId: jest.fn(),
-}));
 
-beforeAll(async () => createSchema());
+beforeAll(async () => {
+	await setupTestDatabase();
+});
+
+afterAll(async () => {
+	await clearTestDatabase();
+});
 
 // Given.
 describe('Given Companies House wants to retrieve the approval status of GWYN DEBBSON AND DAUGHTER from the HMRC CSV file.', () => {
