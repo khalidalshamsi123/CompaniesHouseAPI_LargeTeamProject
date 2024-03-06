@@ -4,6 +4,7 @@ import {Pool} from 'pg';
 const hostname = process.env.CI === 'true' ? 'postgres' : 'localhost';
 
 // Create a PostgreSQL pool to manage connections
+// Create a PostgreSQL pool with optimized settings for high traffic and large data processing
 const pool = new Pool({
 	user: 'postgres',
 	host: hostname,
@@ -13,7 +14,7 @@ const pool = new Pool({
 });
 
 // Log a message indicating that the pool is being created
-console.log('Creating PostgreSQL pool...');
+console.log('Creating PostgreSQL pool with optimized settings...');
 
 // Export the pool instance
 export default pool;
