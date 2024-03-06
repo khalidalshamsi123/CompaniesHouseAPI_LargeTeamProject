@@ -15,7 +15,7 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 	let status1Index = -1;
 	let regIdIndex = -1;
 	const cache: Record<string, boolean> = {}; // Cache to store processed registration IDs
-
+	console.log('Starting to read CSV');
 	return new Promise((resolve, reject) => {
 		// Create a readable stream from the CSV file
 		fs.createReadStream(filename)
@@ -32,11 +32,12 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 						regIdIndex = Object.keys(row).findIndex(key => key.toLowerCase().includes('reg'));
 						return;
 					}
-
 					// Process the current row of data
+
 					await processDataRow({
 						row,
 						regIdIndex,
+						status1Index,
 						cache,
 						client,
 						batchSize,

@@ -4,7 +4,7 @@ const createSchemaQuery = `
     CREATE SCHEMA IF NOT EXISTS registration_schema;
 
     CREATE TABLE IF NOT EXISTS registration_schema.business_registry (
-        registrationid INT PRIMARY KEY,
+        registrationid VARCHAR PRIMARY KEY,
         businessname VARCHAR(255),
         fca_approved BOOLEAN,
         hmrc_approved BOOLEAN,
@@ -15,9 +15,7 @@ const createSchemaQuery = `
 export async function createSchema() {
 	try {
 		console.log('Creating database schema...');
-
 		const client = await pool.connect();
-
 		try {
 			await client.query(createSchemaQuery);
 		} finally {
