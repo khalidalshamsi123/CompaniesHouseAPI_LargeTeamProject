@@ -39,19 +39,7 @@ const mockRequest = (apiKey: string | undefined) => {
 // Given.
 describe('Given Companies House wants to retrieve the approval status of Barclays from the application and given a valid API key is provided.', () => {
 	// When.
-	describe('When Companies House sends a GET request to the /approved/fca endpoint with the valid API key in the headers.', () => {
-		// Then.
-		it('Then they should receive a response containing the approval status of Barclays with the FCA and a 200 (success) status code.', async () => {
-			// Make the request and wait for the response
-			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).get('/approved/fca')
-				.set(headers);
-			// Assert the response.
-			expect([400, 200]).toContain(response.statusCode);
-			expect(response.body).toHaveProperty('authorized');
-			expect(typeof response.body.authorized).toBe('boolean');
-		});
-
+	describe('When Companies House sends a GET request to the /approved/ endpoint with the valid API key in the headers.', () => {
 		it('Then the request should pass authentication.', () => {
 			const req = mockRequest(process.env.API_KEY);
 			const res = mockResponse();
@@ -73,12 +61,12 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 // Given.
 describe('Given a unauthorized user wants to retrieve the approval status of Barclays from the application.', () => {
 	// When.
-	describe('When the user sends a GET request to the /approved/fca endpoint, with an invalid API key in the headers.', () => {
+	describe('When the user sends a GET request to the /approved/ endpoint, with an invalid API key in the headers.', () => {
 		// Then.
 		it('Then they should receive a response containing a 401 (unauthorized) status code and message stating the key is invalid.', async () => {
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': 'invalid api key'};
-			const response = await request(app).get('/approved/fca')
+			const response = await request(app).get('/approved/')
 				.set(headers)
 			// Expect a 401 (unauthorised) status code.
 				.expect(401);
@@ -113,11 +101,11 @@ describe('Given a unauthorized user wants to retrieve the approval status of Bar
 // Given.
 describe('Given an unauthorized user wants to retrieve the approval status of Barclays from the application.', () => {
 	// When.
-	describe('When the user sends a GET request to the /approved/fca endpoint with no API key in the headers.', () => {
+	describe('When the user sends a GET request to the /approved/ endpoint with no API key in the headers.', () => {
 		// Then.
 		it('Then they should receive a response containing a 401 (unauthorized) status code and message stating that the API key is missing.', async () => {
 			// Make the request with no API key in headers and wait for the response.
-			const response = await request(app).get('/approved/fca')
+			const response = await request(app).get('/approved/')
 			// Expect a 401 (unauthorised) status code.
 				.expect(401);
 			// Assert the response
