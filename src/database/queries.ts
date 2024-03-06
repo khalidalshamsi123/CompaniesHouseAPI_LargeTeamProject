@@ -52,5 +52,4 @@ async function findAllApprovedByRegId(registrationId: string): Promise<BusinessD
 	}
 }
 
-export {findAllApprovedByRegId};
-export {insertBusinessData};
+export {findAllApprovedByRegId, insertBusinessData};

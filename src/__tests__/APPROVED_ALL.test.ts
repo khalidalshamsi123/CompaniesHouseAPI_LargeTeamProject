@@ -1,14 +1,18 @@
 import request from 'supertest';
 import app from '../app';
-import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
+import {clearTestDatabase, setupTestDatabase, selectFromTestDatabase} from '../utils/databaseTestFuncs';
+import * as productionQueries from '../database/queries';
 
 beforeAll(async () => {
+	// Replace the implementation for the findAllApprovedByRegId() method with the one
+	// that interacts with the test database, for the duration of this test suite.
+	jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockImplementation(selectFromTestDatabase);
 	await setupTestDatabase();
 });
 
 afterAll(async () => {
-	await clearTestDatabase();
 	jest.clearAllMocks();
+	await clearTestDatabase();
 });
 
 describe('Given a request is made to retrieve approval status for a specific registration ID from the /approved endpoint.', () => {
@@ -32,6 +36,7 @@ describe('Given a request is made to retrieve approval status for a specific reg
 		});
 	});
 });
+
 describe('Given a request is made to retrieve approval status for a non existent registration ID from the /approved endpoint.', () => {
 	describe('When the registration ID 991239 is provided to the endpoint.', () => {
 		it('Then the response should contain FCA authorization as false and HMRC and Gambling Commission authorization as false.', async () => {
