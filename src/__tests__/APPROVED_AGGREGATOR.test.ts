@@ -26,7 +26,6 @@ describe('Given the business is approved by at least one regulatory body.', () =
 
 			// Make the request and wait for the response
 			const response = await queryAggregator('122702', 'Barclays');
-			console.error(response);
 			expect(response).toHaveProperty('approved');
 			expect(response?.approved).toEqual(true);
 		});
