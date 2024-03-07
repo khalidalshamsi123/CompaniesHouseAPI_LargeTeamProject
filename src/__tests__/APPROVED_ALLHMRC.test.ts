@@ -1,16 +1,6 @@
 import request from 'supertest';
 import app from '../app';
 
-import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
-
-beforeAll(async () => {
-	await setupTestDatabase();
-});
-
-afterAll(async () => {
-	await clearTestDatabase();
-});
-
 // Scenario 1, a business with the status false
 // Given.
 describe('Given Companies House wants to retrieve the approval status of HARRY SMITH AND SONS from the HMRC CSV file.', () => {
