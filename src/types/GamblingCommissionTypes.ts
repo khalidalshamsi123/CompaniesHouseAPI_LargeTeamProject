@@ -1,15 +1,12 @@
-type GamblingCommissionCsv = {
-	businessesCsv: {
-		byteData: Uint8Array;
-	};
-	licensesCsv: {
-		byteData: Uint8Array;
-	};
-};
-
-type GamblingCommissionKeys = {
+type GamblingCommissionColumns = {
 	businessesCsv: string[];
-	licensesCsv: string[];
+	licencesCsv: string[];
 };
 
-export type {GamblingCommissionCsv, GamblingCommissionKeys};
+type GamblingCommissionFileDetails = {
+	filename: string;
+	encoding: string;
+	mimeType: string;
+};
+
+export type {GamblingCommissionFileDetails, GamblingCommissionColumns};

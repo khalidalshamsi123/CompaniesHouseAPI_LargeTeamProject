@@ -42,7 +42,7 @@ const clearTestDatabase = async () => {
         `);
 
 		await pool.query(`
-            DROP SCHEMA IF EXISTS test_schema;
+            DROP SCHEMA IF EXISTS test_schema CASCADE;
         `);
 
 		// End the database connection pool
@@ -51,6 +51,10 @@ const clearTestDatabase = async () => {
 		console.error('Error clearing test database:', error);
 		throw error; // Rethrow the error to propagate it to the caller
 	}
+};
+
+const deleteTableFromTestDatabase = async (tableName: string) => {
+	await pool.query(`DROP TABLE IF EXISTS test_schema.${tableName};`);
 };
 
 const selectFromTestDatabase = async (registrationId: string): Promise<BusinessData | undefined> => {
@@ -66,4 +70,26 @@ const selectFromTestDatabase = async (registrationId: string): Promise<BusinessD
 	return businessData;
 };
 
-export {clearTestDatabase, setupTestDatabase, selectFromTestDatabase};
+const createTestGamblingCommissionTables = async () => {
+	// Table definitions match the current format used for the required gambling commission CSVs.
+	await pool.query(`
+		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_businesses (
+			account_number BIGINT PRIMARY KEY,
+			licence_account_name VARCHAR(255) NOT NULL
+		);
+		
+		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_licences (
+			account_number BIGINT NOT NULL,
+			licence_number VARCHAR(255) NOT NULL,
+			status VARCHAR(255) NOT NULL,
+			type VARCHAR(255) NOT NULL,
+			activity VARCHAR(255) NOT NULL,
+			start_date timestamptz,
+			end_date timestamptz
+		);`,
+	);
+};
+
+export {
+	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteTableFromTestDatabase, createTestGamblingCommissionTables,
+};

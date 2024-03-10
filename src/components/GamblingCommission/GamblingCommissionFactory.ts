@@ -13,9 +13,9 @@ const build = async (): Promise<GamblingCommission> => {
 /**
  * Creates the tables that will hold the Gambling Commission CSVs if they do not already exist.
  *
- * The business licenses CSV files rows tend to share a lot of the same column values. In the worst
+ * The business licences CSV files rows tend to share a lot of the same column values. In the worst
  * case I have seen that the only unique column values were the ones relating to the start and
- * end date of the license.
+ * end date of the licence.
  *
  * You can't simply include the start_date and end_date values to a composite primary key as
  * these values can be null by the nature of the dataset.
@@ -26,17 +26,17 @@ const build = async (): Promise<GamblingCommission> => {
 const createGamblingCommissionTables = async () => {
 	// Table definitions match the current format used for the required gambling commission CSVs.
 	await pool.query(`
-		CREATE TABLE IF NOT EXISTS registration_schema.business_license_register_businesses (
+		CREATE TABLE IF NOT EXISTS registration_schema.business_licence_register_businesses (
 			account_number BIGINT PRIMARY KEY,
-			licence_account_name VARCHAR(255)
+			licence_account_name VARCHAR(255) NOT NULL
 		);
 		
 		CREATE TABLE IF NOT EXISTS registration_schema.business_licence_register_licences (
-			account_number BIGINT,
-			licence_number VARCHAR(255),
+			account_number BIGINT NOT NULL,
+			licence_number VARCHAR(255) NOT NULL,
 			status VARCHAR(255) NOT NULL,
-			type VARCHAR(255),
-			activity VARCHAR(255),
+			type VARCHAR(255) NOT NULL,
+			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
 		);`,
