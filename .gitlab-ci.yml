@@ -36,6 +36,7 @@ install_dependencies:
   stage: install
   script:
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
 
 build:
   extends:
@@ -43,6 +44,7 @@ build:
   stage: build
   script:
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run build
 
 lint:
@@ -64,6 +66,7 @@ test_submit:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SUBMIT
 
@@ -77,6 +80,7 @@ test_approved:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t APPROVED
 
@@ -90,6 +94,7 @@ test_upload:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t UPLOAD
 
@@ -115,6 +120,7 @@ test_database:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t DATABASE
 
 test_authentication:
@@ -127,6 +133,7 @@ test_authentication:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t AUTHENTICATION
 
 deploy_staging:
