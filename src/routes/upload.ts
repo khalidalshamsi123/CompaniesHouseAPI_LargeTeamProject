@@ -3,11 +3,9 @@ import path from 'path';
 
 const router = Router();
 
-
 router.get('/', (req, res) => {
 	res.send('Success').status(404);
 });
-
 
 // This router handles both the upload post for HMRC and Gambling Commission CSVs.
 // !!! The Gambling commission upload functionality is yet to be implemented. !!!
@@ -37,10 +35,12 @@ router.post('/', async (req, res) => {
 
 			try {
 				if (fileName === 'HMRC_CSV') {
-					//await handleHMRCCSV(file.path);
+					// Assuming we will have some implementation here we feed the CSV into to insert into database
+					// await handleHMRCCSV(file.path);
 					successfulUploads.push(`${file.originalname} (HMRC CSV)`);
 				} else if (fileName.includes('Gambling_Commission_')) {
-					//await handleGamblingCommissionCSVs(file.path);
+					// Assuming we will have some implementation here we feed the CSV into to insert into database
+					// await handleGamblingCommissionCSVs(file.path);
 					successfulUploads.push(`${file.originalname} (Gambling Commission CSV)`);
 				} else {
 					failedUploads.push(`${file.originalname} (Invalid file name)`);
