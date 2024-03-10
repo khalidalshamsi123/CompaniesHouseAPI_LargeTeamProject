@@ -6,30 +6,29 @@ import app from '../app';
 import path from 'path';
 
 describe('GIVEN an HMRC CSV is uploaded', () => {
-    describe('WHEN it is a correct CSV', () => {
-        it('THEN it should upload HMRC CSV successfully', async () => {
-            const filePath = path.join(__dirname, 'test-files', 'HMRC_CSV.csv');
-            const response = await request(app)
-                .post('/upload')
-                .attach('file', filePath);
+	describe('WHEN it is a correct CSV', () => {
+		it('THEN it should upload HMRC CSV successfully', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'HMRC_CSV.csv');
+			const response = await request(app)
+				.post('/upload')
+				.attach('file', filePath);
 
-            expect(response.status).toBe(200);
-            expect(response.body.successfulUploads).toContain('HMRC_CSV.csv (HMRC CSV)');
-            expect(response.body.failedUploads).toHaveLength(0);
-        });
-    });
+			expect(response.status).toBe(200);
+			expect(response.body.successfulUploads).toContain('HMRC_CSV.csv (HMRC CSV)');
+			expect(response.body.failedUploads).toHaveLength(0);
+		});
+	});
 
-    describe('WHEN it is an incorrect file type', () => {
-        it('THEN it should fail to upload non-CSV file', async () => {
-            const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
-            const response = await request(app)
-                .post('/upload')
-                .attach('file', filePath);
+	describe('WHEN it is an incorrect file type', () => {
+		it('THEN it should fail to upload non-CSV file', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
+			const response = await request(app)
+				.post('/upload')
+				.attach('file', filePath);
 
-            expect(response.status).toBe(207);
-            expect(response.body.successfulUploads).toHaveLength(0);
-            expect(response.body.failedUploads).toContain('invalid.txt (Invalid file type)');
-        });
-    });
-
+			expect(response.status).toBe(207);
+			expect(response.body.successfulUploads).toHaveLength(0);
+			expect(response.body.failedUploads).toContain('invalid.txt (Invalid file type)');
+		});
+	});
 });

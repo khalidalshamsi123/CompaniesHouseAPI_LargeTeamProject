@@ -6,30 +6,29 @@ import app from '../app';
 import path from 'path';
 
 describe('GIVEN a Gambling Commission CSV is uploaded', () => {
-    describe('WHEN it is a correct CSV', () => {
-        it('THEN it should upload Gambling Commission CSV successfully', async () => {
-            const filePath = path.join(__dirname, 'test-files', 'Gambling_Commission_Data.csv');
-            const response = await request(app)
-                .post('/upload')
-                .attach('file', filePath);
+	describe('WHEN it is a correct CSV', () => {
+		it('THEN it should upload Gambling Commission CSV successfully', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'Gambling_Commission_Data.csv');
+			const response = await request(app)
+				.post('/upload')
+				.attach('file', filePath);
 
-            expect(response.status).toBe(200);
-            expect(response.body.successfulUploads).toContain('Gambling_Commission_Data.csv (Gambling Commission CSV)');
-            expect(response.body.failedUploads).toHaveLength(0);
-        });
-    });
+			expect(response.status).toBe(200);
+			expect(response.body.successfulUploads).toContain('Gambling_Commission_Data.csv (Gambling Commission CSV)');
+			expect(response.body.failedUploads).toHaveLength(0);
+		});
+	});
 
-    describe('WHEN it is an incorrect file name', () => {
-        it('THEN it should fail to upload file with invalid name', async () => {
-            const filePath = path.join(__dirname, 'test-files', 'invalid.csv');
-            const response = await request(app)
-                .post('/upload')
-                .attach('file', filePath);
+	describe('WHEN it is an incorrect file name', () => {
+		it('THEN it should fail to upload file with invalid name', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'invalid.csv');
+			const response = await request(app)
+				.post('/upload')
+				.attach('file', filePath);
 
-            expect(response.status).toBe(207);
-            expect(response.body.successfulUploads).toHaveLength(0);
-            expect(response.body.failedUploads).toContain('invalid.csv (Invalid file name)');
-        });
-    });
-
+			expect(response.status).toBe(207);
+			expect(response.body.successfulUploads).toHaveLength(0);
+			expect(response.body.failedUploads).toContain('invalid.csv (Invalid file name)');
+		});
+	});
 });
