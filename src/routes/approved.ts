@@ -1,15 +1,12 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
-import isAuthorised from '../middleware/authentication';
-import {findAllApprovedByRegId} from '../database/queries';
-import {fcaGetApprovalStatus} from '../components/fcaQuerier';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
 
 const router = Router();
 
-router.get('/', isAuthorised, async (req, res) => {
+router.get('/', async (req, res) => {
 	try {
 		const {registrationId} = req.query;
 		const {businessName} = req.query;
