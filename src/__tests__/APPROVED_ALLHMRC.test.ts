@@ -7,8 +7,9 @@ describe('Given Companies House wants to retrieve the approval status of HARRY S
 	// When.
 	describe('When Companies House sends a request to the /approved/allhmrc endpoint.', () => {
 		it('Then it would return the business name and the status false.', async () => {
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			// Make the request and wait for the response and expect status code 200
-			const response = await request(app).get('/approved/allhmrc').expect(200);
+			const response = await request(app).get('/approved/allhmrc').set(headers).expect(200);
 			// Assert the response
 			expect(response.body[1]).toHaveProperty('status');
 			expect(response.body[1].name).toBe('HARRY SMITH AND SONS');
@@ -23,8 +24,9 @@ describe('Given Companies House wants to retrieve the approval status of FRANK S
 	// When.
 	describe('When Companies House sends a request to the /approved/allhmrc endpoint.', () => {
 		it('Then it would return the business name and the status true.', async () => {
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			// Make the request and wait for the response and expect status code 200
-			const response = await request(app).get('/approved/allhmrc').expect(200);
+			const response = await request(app).get('/approved/allhmrc').set(headers).expect(200);
 			// Assert the response
 			expect(response.body[3]).toHaveProperty('status');
 			expect(response.body[3].name).toBe('FRANK SIMONS AND SONS');

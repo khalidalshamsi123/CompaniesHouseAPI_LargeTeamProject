@@ -5,5 +5,7 @@ module.exports = {
     transform: {
         '^.+\\.jsx?$': 'babel-jest',
     },
-
+    testMatch: [
+            "**/?(*.)+(spec|test).[t]s?(x)"
+        ]
 };
