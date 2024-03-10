@@ -3,6 +3,7 @@ import {queryAggregator} from '../components/aggregator';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
+import isAuthorised from "../middleware/authentication";
 
 const router = Router();
 
