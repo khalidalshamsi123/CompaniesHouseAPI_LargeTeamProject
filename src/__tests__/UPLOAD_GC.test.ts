@@ -9,9 +9,11 @@ describe('GIVEN a Gambling Commission CSV is uploaded', () => {
 	describe('WHEN it is a correct CSV', () => {
 		it('THEN it should upload Gambling Commission CSV successfully', async () => {
 			const filePath = path.join(__dirname, 'test-files', 'Gambling_Commission_Data.csv');
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
-				.post('/upload')
-				.attach('file', filePath);
+				.put('/upload')
+				.set(headers)
+				.attach('files', filePath);
 
 			expect(response.status).toBe(200);
 			expect(response.body.successfulUploads).toContain('Gambling_Commission_Data.csv (Gambling Commission CSV)');
@@ -22,9 +24,11 @@ describe('GIVEN a Gambling Commission CSV is uploaded', () => {
 	describe('WHEN it is an incorrect file name', () => {
 		it('THEN it should fail to upload file with invalid name', async () => {
 			const filePath = path.join(__dirname, 'test-files', 'invalid.csv');
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
-				.post('/upload')
-				.attach('file', filePath);
+				.put('/upload')
+				.set(headers)
+				.attach('files', filePath);
 
 			expect(response.status).toBe(207);
 			expect(response.body.successfulUploads).toHaveLength(0);

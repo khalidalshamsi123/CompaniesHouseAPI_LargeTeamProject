@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 
 // This router handles both the upload post for HMRC and Gambling Commission CSVs.
 // !!! The Gambling commission upload functionality is yet to be implemented. !!!
-router.post('/', async (req, res) => {
+router.put('/', async (req, res) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).send('No files uploaded');

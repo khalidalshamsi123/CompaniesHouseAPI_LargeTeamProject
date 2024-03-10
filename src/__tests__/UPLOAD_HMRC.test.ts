@@ -9,9 +9,11 @@ describe('GIVEN an HMRC CSV is uploaded', () => {
 	describe('WHEN it is a correct CSV', () => {
 		it('THEN it should upload HMRC CSV successfully', async () => {
 			const filePath = path.join(__dirname, 'test-files', 'HMRC_CSV.csv');
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
-				.post('/upload')
-				.attach('file', filePath);
+				.put('/upload')
+				.set(headers)
+				.attach('files', filePath);
 
 			expect(response.status).toBe(200);
 			expect(response.body.successfulUploads).toContain('HMRC_CSV.csv (HMRC CSV)');
@@ -22,9 +24,11 @@ describe('GIVEN an HMRC CSV is uploaded', () => {
 	describe('WHEN it is an incorrect file type', () => {
 		it('THEN it should fail to upload non-CSV file', async () => {
 			const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
+			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
-				.post('/upload')
-				.attach('file', filePath);
+				.put('/upload')
+				.set(headers)
+				.attach('files', filePath);
 
 			expect(response.status).toBe(207);
 			expect(response.body.successfulUploads).toHaveLength(0);
