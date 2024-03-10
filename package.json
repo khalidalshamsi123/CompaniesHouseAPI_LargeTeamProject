@@ -30,7 +30,8 @@
     "fs": "^0.0.1-security",
     "helmet": "^7.1.0",
     "nodejs-polars": "^0.8.4",
-    "pg": "^8.7.1"
+    "pg": "^8.7.1",
+    "polars": "^0.0.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
