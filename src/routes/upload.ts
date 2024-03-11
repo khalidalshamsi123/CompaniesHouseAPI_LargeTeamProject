@@ -14,7 +14,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 
 	try {
 		// Pass req, which is a Readable stream to upload method.
-		await gamblingCommission.uploadCsvWithStream(req, 'registration_schema');
+		await gamblingCommission.uploadCsv(req, 'registration_schema');
 		res.sendStatus(200);
 	} catch (err) {
 		console.error(err);
@@ -26,7 +26,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 // 	const gamblingCommission = await build();
 
 // 	try {
-// 		await gamblingCommission.updateFromLocalFile('businessesCsv');
+// 		await gamblingCommission.uploadCsv('businessesCsv');
 // 	} catch (error) {
 // 		console.error(error);
 // 	}

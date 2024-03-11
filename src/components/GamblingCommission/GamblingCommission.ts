@@ -38,6 +38,7 @@ export default class GamblingCommission {
 		],
 	};
 
+	/* Overload signatures. */
 	/**
      * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
 	 * Useful for when receiving the data as part of a POST request.
@@ -47,7 +48,35 @@ export default class GamblingCommission {
      * @param {Request} request A Readable stream.
 	 * @param schema What schema should the upload take place in.
      */
-	async uploadCsvWithStream(request: Request, schema: string) {
+	async uploadCsv(request: Request, schema: string): Promise<void>;
+	/**
+     * Creates a new table in the production schema based on the data from the local CSV file associated with the key provided.
+     * @param csvKey Key for a CSV available locally. E.g., giving 'businessesCsv' - would trigger an update using the 'business_licence_register_businesses.csv' file.
+	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
+     */
+	async uploadCsv(csvKey: string, schema: string): Promise<void>;
+
+	async uploadCsv(data: string | Request, schema: string): Promise<void> {
+		if (typeof data === 'string') {
+			const csvKey = data;
+			// Handle the case where the first argument is a string (csvKey).
+			await this.updateFromLocalFile(csvKey, schema);
+		} else {
+			// Handle the case where the first argument is a Request object
+			await this.uploadCsvWithStream(data, schema);
+		}
+	}
+
+	/**
+     * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
+	 * Useful for when receiving the data as part of a POST request.
+	 *
+	 * As this method uses streams, the CSV will not be loaded into memory all at once. Instead portions of it will be streamed, processed and then
+	 * uploaded to the database. Thereby making this solution highly scalable. Being able to handle very large CSVs.
+     * @param {Request} request A Readable stream.
+	 * @param schema What schema should the upload take place in.
+     */
+	private async uploadCsvWithStream(request: Request, schema: string) {
 		const busBoyInstance = busBoy({
 			headers: request.headers,
 		});
@@ -141,7 +170,7 @@ export default class GamblingCommission {
      * @param csvKey Key for a CSV available locally. E.g., giving 'businessesCsv' - would trigger an update using the 'business_licence_register_businesses.csv' file.
 	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
      */
-	async updateFromLocalFile(csvKey: string, schema: string) {
+	private async updateFromLocalFile(csvKey: string, schema: string) {
 		/* We manually request a client from the pool in this instance.
 		   As this library requires us run the queries within a transaction, which is not
 		   possible if using the pool.query() method.
@@ -162,8 +191,6 @@ export default class GamblingCommission {
 			if (!tableName) {
 				throw new Error('Table name is undefined.');
 			}
-
-			console.log(tableName);
 
 			// Start transaction.
 			await client.query('BEGIN');
