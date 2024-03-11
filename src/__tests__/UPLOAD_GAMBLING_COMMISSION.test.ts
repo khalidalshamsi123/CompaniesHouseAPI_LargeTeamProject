@@ -62,7 +62,7 @@ describe('Given Gambling Commission CSV data is in expected format. Given the CS
 			const gcInstance = new gamblingCommission();
 			// Call the classes method, this should create a table called business_licence_register_businesses.
 			// And populate it with the mocked CSV data.
-			await gcInstance.updateFromLocalFile('businessesCsv', 'test_schema');
+			await gcInstance.uploadCsv('businessesCsv', 'test_schema');
 
 			const result = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');
 			// Check that the CSV data has been succesfully uploaded.
