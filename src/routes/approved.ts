@@ -6,6 +6,7 @@ import {fcaGetApprovalStatus} from '../components/fcaQuerier';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
+import {scrapeHmrcWebsite} from '../scraping/fetchingHmrcFile';
 
 const router = Router();
 
@@ -35,8 +36,9 @@ router.get('/', isAuthorised, async (req, res) => {
 });
 
 // All hmrc data router.
-router.get('/allhmrc', (req, res) => {
-	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
+router.get('/allhmrc', async (req, res) => {
+	await scrapeHmrcWebsite();
+	res.sendStatus(404);
 });
 
 export default router;
