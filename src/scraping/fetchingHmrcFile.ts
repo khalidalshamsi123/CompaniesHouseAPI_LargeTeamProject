@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, {type AxiosResponse} from 'axios';
 import * as cheerio from 'cheerio';
 // Loading the hmrc website
 
@@ -11,11 +11,20 @@ import * as cheerio from 'cheerio';
 // 		console.log($(element));
 // 	});
 
-async function scrapeHmrcWebsite() { 
-	const hmrcResponse: AxiosResponse<string | Buffer> = await axios.get('https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register');
+async function scrapeHmrcWebsite() {
+	try {
+	// eslint-disable-next-line @typescript-eslint/ban-types
+		const hmrcResponse: AxiosResponse<string | Buffer> = await axios.get('https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register');
 
-	const $ = cheerio.load(hmrcResponse.data);
-	console.log($('body').text());
+		const $ = cheerio.load(hmrcResponse.data);
+
+		$('body #wrapper #content .govuk-grid-row .govuk-grid-column-two-thirds #contents .gem-c-govspeak.govuk-govspeak .govspeak p .gem-c-attachment-link')
+			.each((index, element) => {
+				console.log($(element).text());
+			});
+	} catch (error) {
+		console.error('Error occurred during scraping:', error);
+	}
 }
 
 export {scrapeHmrcWebsite};
