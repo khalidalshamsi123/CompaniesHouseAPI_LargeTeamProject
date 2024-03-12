@@ -44,9 +44,6 @@ const clearTestDatabase = async () => {
 		await pool.query(`
             DROP SCHEMA IF EXISTS test_schema CASCADE;
         `);
-
-		// End the database connection pool
-		await pool.end();
 	} catch (error) {
 		console.error('Error clearing test database:', error);
 		throw error; // Rethrow the error to propagate it to the caller
@@ -77,7 +74,8 @@ const createTestGamblingCommissionTables = async () => {
 			account_number BIGINT PRIMARY KEY,
 			licence_account_name VARCHAR(255) NOT NULL
 		);
-		
+	`);
+	await pool.query(`
 		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_licences (
 			account_number BIGINT NOT NULL,
 			licence_number VARCHAR(255) NOT NULL,
@@ -86,8 +84,8 @@ const createTestGamblingCommissionTables = async () => {
 			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
-		);`,
-	);
+		);
+	`);
 };
 
 export {
