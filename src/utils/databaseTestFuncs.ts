@@ -38,10 +38,6 @@ const setupTestDatabase = async () => {
 const clearTestDatabase = async () => {
 	try {
 		await pool.query(`
-            DROP TABLE IF EXISTS test_schema.business_registry;
-        `);
-
-		await pool.query(`
             DROP SCHEMA IF EXISTS test_schema CASCADE;
         `);
 	} catch (error) {
@@ -73,8 +69,7 @@ const createTestGamblingCommissionTables = async () => {
 		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_businesses (
 			account_number BIGINT PRIMARY KEY,
 			licence_account_name VARCHAR(255) NOT NULL
-		);
-	`);
+		);`);
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_licences (
 			account_number BIGINT NOT NULL,
@@ -84,8 +79,7 @@ const createTestGamblingCommissionTables = async () => {
 			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
-		);
-	`);
+		);`);
 };
 
 export {

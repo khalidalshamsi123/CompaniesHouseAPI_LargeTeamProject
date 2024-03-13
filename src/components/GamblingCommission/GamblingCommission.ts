@@ -132,8 +132,10 @@ export default class GamblingCommission {
 				await client.query('BEGIN');
 
 				/* Delete rows from table we plan to add the new CSV data to. I make sure to use the same client instance. If I don't
-				   the query is not run within the same transaction. */
-				await client.query(`DELETE FROM ${schema}.${tableName}`);
+				   the query is not run within the same transaction.
+
+				   Truncate is faster than the standard DELETE FROM query.  */
+				await client.query(`TRUNCATE ${schema}.${tableName}`);
 
 				// Use the pg-copy-streams library to stream the CSV data into the database efficiently.
 				const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv)`));
