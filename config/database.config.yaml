@@ -1,0 +1,67 @@
+database_transfer:
+  source:
+    type: localhost
+    database_name: postgres
+    username: postgres
+    password: postgres
+    port: 5432
+  destination:
+    type: openstack
+    server: db-server
+    ssh_username: centos
+    ssh_key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      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
+      -----END RSA PRIVATE KEY-----
+    database_name: postgres
+    username: postgres
+    password: postgres
+    port: 5432

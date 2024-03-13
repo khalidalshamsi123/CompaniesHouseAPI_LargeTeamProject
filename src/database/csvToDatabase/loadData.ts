@@ -1,4 +1,4 @@
-import pool from '../databasePool';
+import {pool} from '../databasePool';
 import {type PoolClient} from 'pg';
 import {processCsv} from './csvProcessor';
 

@@ -1,4 +1,4 @@
-import pool from '../database/databasePool';
+import {pool} from '../database/databasePool';
 
 // Function to create database schema and insert test data
 export async function setupTestDatabase() {

@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon ./src/index.ts",
-    "build": "tsc -p . --outDir dist",
-    "database-setup": "node dist/database/setupDatabase.js",
+    "build": "tsc -p . --outDir dist && node copy-file.js",
+    "database-setup": "node dist/database/databasePool.js",
     "load-CSV-data-into-DB": "node ./dist/database/csvToDatabase/loadData.js",
     "check-database-table-content": "node ./dist/database/checkTableContents.js",
     "lint": "eslint src/**/*.ts",
@@ -27,10 +27,11 @@
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.2",
     "express": "^4.18.2",
+    "fs": "^0.0.1-security",
     "helmet": "^7.1.0",
     "nodejs-polars": "^0.8.4",
     "pg": "^8.7.1",
-    "fs": "^0.0.1-security"
+    "ssh2": "^1.15.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.23.9",
@@ -40,9 +41,11 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.17",
     "@types/pg": "^8.11.0",
+    "@types/ssh2": "^1.15.0",
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.56.0",
     "eslint-config-xo": "^0.44.0",
     "eslint-config-xo-typescript": "^2.0.0",

@@ -1,8 +1,6 @@
 import request from 'supertest';
 import app from '../app';
 
-import {createSchema} from '../database/setupDatabase';
-
 jest.mock('../database/queries', () => ({
 	findAllApprovedByRegId: jest.fn(),
 }));

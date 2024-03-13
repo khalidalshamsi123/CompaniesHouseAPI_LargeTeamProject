@@ -1,7 +1,7 @@
 import {hmrcStatusRetriever, hmrcCsvReader} from '../components/HmrcProcessing';
 import {fcaGetApprovalStatus} from './fcaQuerier';
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
-import {findAllApprovedByRegId} from '../database/queries';
+import {findAllApprovedByRegId} from "../database/queries";
 
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
