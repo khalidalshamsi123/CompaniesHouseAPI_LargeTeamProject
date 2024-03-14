@@ -37,8 +37,8 @@ router.get('/', isAuthorised, async (req, res) => {
 
 // All hmrc data router.
 router.get('/allhmrc', async (req, res) => {
-	await scrapeHmrcWebsite();
-	res.sendStatus(404);
+	await scrapeHmrcWebsite('#contents > div.gem-c-govspeak.govuk-govspeak > div > p:nth-child(13) > span > a');
+	res.sendStatus(200);
 });
 
 export default router;
