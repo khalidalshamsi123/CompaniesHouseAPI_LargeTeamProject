@@ -47,7 +47,11 @@ const clearTestDatabase = async () => {
 };
 
 const deleteTableFromTestDatabase = async (tableName: string) => {
-	await pool.query(`DROP TABLE IF EXISTS test_schema.${tableName};`);
+	try {
+		await pool.query(`TRUNCATE test_schema.${tableName};`);
+	} catch (e) {
+		console.error('Failed to delete rows in the test table. It\'s likely that the table doesn\'t exist.');
+	}
 };
 
 const selectFromTestDatabase = async (registrationId: string): Promise<BusinessData | undefined> => {

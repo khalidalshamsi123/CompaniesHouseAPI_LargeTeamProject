@@ -17,8 +17,9 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 		await gamblingCommission.uploadCsv(req, 'registration_schema');
 		res.sendStatus(200);
 	} catch (err) {
-		console.error(err);
-		res.sendStatus(500);
+		/* Unprocessable entity code. A user story can be dedicated towards providing proper response codes
+		   based on the particular circumstance. */
+		res.sendStatus(422);
 	}
 });
 

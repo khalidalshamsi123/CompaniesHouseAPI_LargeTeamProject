@@ -3,89 +3,35 @@ import pool from '../database/databasePool';
 import fs, {type ReadStream} from 'node:fs';
 
 import {
-	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables,
+	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteTableFromTestDatabase,
 } from '../utils/databaseTestFuncs';
-
-import {decorateMockRequest} from '../utils/MockRequestBodyStream';
 
 import {Readable} from 'node:stream';
 
 import GamblingCommission from '../components/GamblingCommission/GamblingCommission';
 import build from '../components/GamblingCommission/GamblingCommissionFactory';
 
-import FormData from 'form-data';
-import httpMocks, {type MockRequest} from 'node-mocks-http';
-import {type Request} from 'express-serve-static-core';
 import request from 'supertest';
 import app from '../app';
 
 const uploadGamblingCommissionEndpoint = '/upload/gambling-commission';
 
-// // Instance will be used by a test and then reset. Improving the isolation between tests.
-// let gcInstance: GamblingCommission;
-
-// beforeAll(async () => {
-// 	await setupTestDatabase();
-// 	await deleteTableFromTestDatabase('business_licence_register_businesses');
-// 	await deleteTableFromTestDatabase('business_licence_register_licences');
-// 	// Delete the Gambling Commission test tables before all tests are run. Methods should be able to account for this.
-// 	gcInstance = new GamblingCommission();
-// });
-
-// beforeEach(async () => {
-// 	/* Mock factory method.
-// 	---------------------
-// 	Follow exact same logic as the factories original build() method besides running a different
-// 	function to create tables.
-// 	We want the gambling commission tables to be created within the test_schema, not production. */
-// 	jest.spyOn(gamblingCommissionFactory, 'default').mockImplementationOnce(async () => {
-// 		/* I tried to directly mock the createGamblingCommissionTables() method which is called by the original build()
-// 		implementation. However, as it's a private and unexported meaning I couldn't mock it.
-
-// 		And I didn't want to make it a public method since I feel it should only be called by the factory. So I am
-// 		using this approach. */
-// 		try {
-// 			await createTestGamblingCommissionTables();
-// 			return gcInstance;
-// 		} catch (e) {
-// 			console.error(e);
-// 		}
-
-// 		return gcInstance;
-// 	});
-
-// 	// Mock the uploadCsv() method so that it targets the test_schema instead of the one for production.
-
-// 	/* Using mockImplementation over the 'Once' version will cause this to infinitely loop.
-// 	   I originally had this logic outside of the beforeEach clause, moving it within here and opting to
-// 	   use the Once version since it gives the same intended behaviour but without the infinite loop. */
-// 	jest.spyOn(gcInstance, 'uploadCsv').mockImplementationOnce(async (data, _schema: string) => {
-// 		// Intercept the function call, and re-call the method, providing the test_schema instead.
-// 		await gcInstance.uploadCsv(data, 'test_schema');
-// 	});
-// });
-
-// afterEach(async () => {
-// 	// Create new instance of GamblingCommission, overwrite existing instance.
-// 	gcInstance = new GamblingCommission();
-// 	// Delete table contents.
-// 	await deleteTableFromTestDatabase('business_licence_register_businesses');
-// 	await deleteTableFromTestDatabase('business_licence_register_licences');
-// 	// Reset jest mocks.
-// 	jest.resetAllMocks();
-// 	jest.restoreAllMocks();
-// });
-
-// afterAll(async () => {
-// 	await clearTestDatabase();
-// 	jest.resetAllMocks();
-// 	jest.restoreAllMocks();
-// });
+const apiKey = process.env.API_KEY!;
 
 beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();
 	await createTestGamblingCommissionTables();
+});
+
+// Before each test delete the contents added by the previous from the tables.
+beforeEach(async () => {
+	await deleteTableFromTestDatabase('business_licence_register_businesses');
+	await deleteTableFromTestDatabase('business_licence_register_licences');
+});
+
+afterAll(async () => {
+	await pool.end(); // Make sure to close the database pool
 });
 
 // Create a readable stream from provided mock CSV data.
@@ -98,6 +44,9 @@ const createMockReadStream = (mockCsvData: string) => {
 	});
 	return mockReadStream;
 };
+
+// Obtain a reference to the original method, ensuring it's properly typed.
+const originalUploadCsv: typeof GamblingCommission.prototype.uploadCsv = GamblingCommission.prototype.uploadCsv;
 
 // Scenario: Store valid Gambling Commission CSV data (from file).
 
@@ -138,34 +87,6 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 	describe('When I upload the file to the /upload/gambling-commission endpoint, specifying what Gambling Commission CSV it is.', () => {
 		// Then.
 		it('Then the data should be successfully stored in the database under the relevant table.', async () => {
-			// I know that I can safely cast Readable to ReadStream. It may be missing a few fields. But it won't matter for this test.
-
-			// Create a form with your CSV data
-			// const form = new FormData();
-
-			// form.append('businessesCsv', createMockCsvBuffer(mockBusinessesCsvData), {
-			// 	filename: 'businesses.csv',
-			// 	contentType: 'text/csv',
-			// });
-
-			// form.append('licencesCsv', createMockCsvBuffer(mockLicencesCsvData), {
-			// 	filename: 'licences.csv',
-			// 	contentType: 'text/csv',
-			// });
-
-			// let mockRequest = httpMocks.createRequest({
-			// 	method: 'POST',
-			// 	url: uploadGamblingCommissionEndpoint,
-			// });
-
-			// mockRequest._setBody(form.getBuffer());
-			// mockRequest.headers = form.getHeaders();
-
-			// mockRequest = decorateMockRequest(mockRequest) as MockRequest<Request>;
-
-			// Const gcInstance = await build();
-			// await gcInstance.uploadCsv(mockRequest, 'test_schema');
-
 			// Dummy data.
 			const mockBusinessesCsvData
 			= `Account Number,Licence Account Name
@@ -176,22 +97,13 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 			500,010129-N-103064-001,Active,Non-Remote,General Betting Limited,2002-02-03T00:00:00+00:00,
 			330,012179-N-105324-221,Surrendered,Remote,General Betting Limited,2002-02-03T00:00:00+00:00,2023-11-28T00:00:00+00:00`;
 
-			/* Using mockImplementation over the 'Once' version will cause this to infinitely loop.
-			   I originally had this logic outside of the beforeEach clause, moving it within here and opting to
-			   use the Once version since it gives the same intended behaviour but without the infinite loop. */
-			jest.spyOn(GamblingCommission.prototype, 'uploadCsv').mockImplementationOnce(async (data, _schema: string) => {
-				const gcInstance = new GamblingCommission();
-				// Intercept the function call, and re-call the method, providing the test_schema instead.
-				await gcInstance.uploadCsv(data, 'test_schema');
-			});
+			/* Mock the methods implementation once in a way that doesn't risk incurring a infinite loop through referencing the same mock object. */
+			jest.spyOn(GamblingCommission.prototype, 'uploadCsv')
+				.mockImplementationOnce(async function (this: GamblingCommission, data, _schema: string) {
+					// Intercept the function call, and re-call the method, providing the test_schema instead.
+					return originalUploadCsv.call(this, data, 'test_schema');
+				});
 
-			jest.mock('../components/GamblingCommission/GamblingCommissionFactory', () => ({
-				__esModule: true, // This property makes the mocked module compatible with ES6 imports.
-				// eslint-disable-next-line max-nested-callbacks
-				default: jest.fn(() => new GamblingCommission()),
-			}));
-
-			const apiKey = process.env.API_KEY!;
 			await request(app)
 				.post(uploadGamblingCommissionEndpoint)
 				.set('x-api-key', apiKey)
@@ -200,7 +112,7 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 					contentType: 'text/csv',
 				})
 				.attach('licencesCsv', createMockReadStream(mockLicencesCsvData) as unknown as ReadStream, {
-					filename: 'licensesCsv.csv',
+					filename: 'licencesCsv.csv',
 					contentType: 'text/csv',
 				});
 
@@ -246,3 +158,219 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 });
 
 // Scenario: Missing or mismatching columns.
+
+// Given.
+describe('Given I have a CSV file with differing columns to that of the Gambling Commission CSVs.', () => {
+	// When.
+	describe('When I upload the file to the /upload/gambling-commission endpoint, specifying what Gambling Commission file it is.', () => {
+		// Then.
+		it('Then an error should be thrown. And no changes should be made to the database.', async () => {
+			// Inserting some existing data. Will showcase how using a transaction will result in original data not being compromised.
+			const insertQuery = 'INSERT INTO test_schema.business_licence_register_businesses(account_number, licence_account_name) VALUES ($1, $2)';
+			const insertValues = ['8842', 'Khalid Entertainment Limited'];
+
+			await pool.query(insertQuery, insertValues);
+
+			// Dummy data - invalid format (missing or mismatching columns).
+			const mockBusinessesCsvData
+			= `Licence Account Name
+			12051,Hamed Solutions Limited`;
+
+			const mockLicencesCsvData
+			= `Account Number,Licence Number,Status,Type,Activity,Start Date,End Date
+			wrongdatatype,010129-N-103064-001,Active,Non-Remote,General Betting Limited,2002-02-03T00:00:00+00:00,
+			330,012179-N-105324-221,Surrendered,Remote,General Betting Limited,2002-02-03T00:00:00+00:00,2023-11-28T00:00:00+00:00`;
+
+			/* Mock the methods implementation once in a way that doesn't risk incurring a infinite loop through referencing the same mock object. */
+			jest.spyOn(GamblingCommission.prototype, 'uploadCsv')
+				.mockImplementationOnce(async function (this: GamblingCommission, data, _schema: string) {
+					// Intercept the function call, and re-call the method, providing the test_schema instead.
+					return originalUploadCsv.call(this, data, 'test_schema');
+				});
+
+			await request(app)
+				.post(uploadGamblingCommissionEndpoint)
+				.set('x-api-key', apiKey)
+				.attach('businessesCsv', createMockReadStream(mockBusinessesCsvData) as unknown as ReadStream, {
+					filename: 'businessesCsv.csv',
+					contentType: 'text/csv',
+				})
+				.attach('licencesCsv', createMockReadStream(mockLicencesCsvData) as unknown as ReadStream, {
+					filename: 'licencesCsv.csv',
+					contentType: 'text/csv',
+				// Unproccessable entity.
+				}).expect(422);
+
+			// Test that business_licence_register_businesses table has been left in its original state.
+			const businessesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');
+
+			// Test that business_licence_register_licences table has been left in its original state.
+			const licencesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_licences');
+
+			// Existng data should not be replaced, or deleted. As the request and by extension transaction should have failed.
+			expect(businessesResults.rows[0].account_number).toBe('8842');
+			expect(businessesResults.rows[0].licence_account_name).toBe('Khalid Entertainment Limited');
+			// No data should be added, as it's invalid.
+			expect(licencesResults.rows).toStrictEqual([]);
+		});
+	});
+});
+
+// Scenario: Handle invalid MIME type.
+
+// Given.
+describe('Given I have a file that does not have the MIME type text/csv.', () => {
+	// When.
+	describe('When I upload the file to the /upload/gambling-commission endpoint, specifying what Gambling Commission file it is.', () => {
+		// Then.
+		it('Then an error should be thrown. And no changes should be made to the database.', async () => {
+			// Inserting some existing data. Will showcase how using a transaction will result in original data not being compromised.
+			const insertQuery = 'INSERT INTO test_schema.business_licence_register_businesses(account_number, licence_account_name) VALUES ($1, $2)';
+			const insertValues = ['4321', 'Jack of All Trades PLC'];
+
+			await pool.query(insertQuery, insertValues);
+
+			// Dummy data - invalid mimetype.
+			const mockBadMimeTypeData
+			= 'hello';
+
+			/* Mock the methods implementation once in a way that doesn't risk incurring a infinite loop through referencing the same mock object. */
+			jest.spyOn(GamblingCommission.prototype, 'uploadCsv')
+				.mockImplementationOnce(async function (this: GamblingCommission, data, _schema: string) {
+					// Intercept the function call, and re-call the method, providing the test_schema instead.
+					return originalUploadCsv.call(this, data, 'test_schema');
+				});
+
+			await request(app)
+				.post(uploadGamblingCommissionEndpoint)
+				.set('x-api-key', apiKey)
+				.attach('businessesCsv', createMockReadStream(mockBadMimeTypeData) as unknown as ReadStream, {
+					filename: 'businessesCsv',
+					// Invalid mimetype.
+					contentType: 'text',
+				// Unproccessable entity.
+				}).expect(422);
+
+			// Test that business_licence_register_businesses table has been left in its original state.
+			const businessesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');
+
+			// Test that business_licence_register_licences table has been left in its original state.
+			const licencesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_licences');
+
+			// Existng data should not be replaced, or deleted. As the request and by extension transaction should have failed.
+			expect(businessesResults.rows[0].account_number).toBe('4321');
+			expect(businessesResults.rows[0].licence_account_name).toBe('Jack of All Trades PLC');
+			// No data should be added, as it's invalid.
+			expect(licencesResults.rows).toStrictEqual([]);
+		});
+	});
+});
+
+// Scenario: File given not recognised.
+
+// Given.
+describe('Given I have a CSV file.', () => {
+	// When.
+	describe('When I attempt to upload the CSV data without specifying what file it is properly.', () => {
+		// Then.
+		it('Then an error should be thrown. And no changes should be made to the database.', async () => {
+			// Inserting some existing data. Will showcase how using a transaction will result in original data not being compromised.
+			const insertQuery = 'INSERT INTO test_schema.business_licence_register_businesses(account_number, licence_account_name) VALUES ($1, $2)';
+			const insertValues = ['7892', 'Isaac Just Eat Ltd'];
+
+			await pool.query(insertQuery, insertValues);
+
+			// Mock data.
+			const mockLicencesCsvData
+			= `Account Number,Licence Number,Status,Type,Activity,Start Date,End Date
+			500,010129-N-103064-001,Active,Non-Remote,General Betting Limited,2002-02-03T00:00:00+00:00,
+			330,012179-N-105324-221,Surrendered,Remote,General Betting Limited,2002-02-03T00:00:00+00:00,2023-11-28T00:00:00+00:00`;
+
+			/* Mock the methods implementation once in a way that doesn't risk incurring a infinite loop through referencing the same mock object. */
+			jest.spyOn(GamblingCommission.prototype, 'uploadCsv')
+				.mockImplementationOnce(async function (this: GamblingCommission, data, _schema: string) {
+					// Intercept the function call, and re-call the method, providing the test_schema instead.
+					return originalUploadCsv.call(this, data, 'test_schema');
+				});
+
+			await request(app)
+				.post(uploadGamblingCommissionEndpoint)
+				.set('x-api-key', apiKey)
+				.attach('invalid-key', createMockReadStream(mockLicencesCsvData) as unknown as ReadStream, {
+					filename: 'licencesCsv',
+					// Valid mimetype.
+					contentType: 'text/csv',
+				// Unproccessable entity.
+				}).expect(422);
+
+			// Test that business_licence_register_businesses table has been left in its original state.
+			const businessesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');
+
+			// Test that business_licence_register_licences table has been left in its original state.
+			const licencesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_licences');
+
+			// Existng data should not be replaced, or deleted.
+			expect(businessesResults.rows[0].account_number).toBe('7892');
+			expect(businessesResults.rows[0].licence_account_name).toBe('Isaac Just Eat Ltd');
+			// No data should be added, as it's invalid.
+			expect(licencesResults.rows).toStrictEqual([]);
+		});
+	});
+});
+
+// Scenario: Ensure the existence of required database tables.
+
+// Given.
+describe('Given the database tables for the Gambling Commission data do not exist.', () => {
+	beforeAll(async () => {
+		// Delete test database entirely, in process deleting the Gambling Commission tables.
+		await clearTestDatabase();
+		// Set-up the needed test database schema again.
+		await setupTestDatabase();
+		// We leave the Gambling Commission tables uncreated.
+	});
+	// When.
+	describe('When I upload my CSV data.', () => {
+		// Then.
+		it('Then the required tables should be created in the database.', async () => {
+			// Mock data.
+			const mockCsvData
+			= `Account Number,Licence Account Name
+			853,Rhiannon Database Solutions Plc`;
+
+			/* Mock uploadCsv method so it returns a resolved promise. We are only testing if the database tables
+			   are created properly by the factory. */
+			jest.spyOn(GamblingCommission.prototype, 'uploadCsv').mockImplementation(async () => Promise.resolve());
+
+			await request(app)
+				.post(uploadGamblingCommissionEndpoint)
+				.set('x-api-key', apiKey)
+				.attach('businessesCsv', createMockReadStream(mockCsvData) as unknown as ReadStream, {
+					filename: 'businessesCsv',
+					// Valid mimetype.
+					contentType: 'text/csv',
+				// Success.
+				}).expect(200);
+
+			// GIVEN that the environment variable NODE_ENV has been set to 'test'. We should see that the tables have
+			// been created successfully within the test_schema.
+
+			/** Credit to https://stackoverflow.com/a/24089729 for the query. */
+			const businessInformationTable = await pool.query(
+				`SELECT EXISTS (
+					SELECT * FROM information_schema.tables
+					WHERE table_schema = 'test_schema'
+					AND table_name = 'business_licence_register_businesses'
+				);`);
+			expect(businessInformationTable.rows[0].exists).toBe(true);
+
+			const businessLicenceTable = await pool.query(
+				`SELECT EXISTS (
+					SELECT * FROM information_schema.tables
+					WHERE table_schema = 'test_schema'
+					AND table_name = 'business_licence_register_licences'
+				);`);
+			expect(businessLicenceTable.rows[0].exists).toBe(true);
+		});
+	});
+});

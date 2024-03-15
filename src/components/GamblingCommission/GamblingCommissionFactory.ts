@@ -22,16 +22,30 @@ const build = async (): Promise<GamblingCommission> => {
  *
  * So, sadly there's no way purely via the schema to ensure some sort of uniqueness between rows.
  * This issue will instead have to be tackled progromatically when needed.
+ *
+ * I have decided to make this method public, to allow it to be easily tested. There's no harm
+ * in allowing other components to call this utility method as it only creates the tables if they
+ * don't exist already.
 */
-const createGamblingCommissionTables = async () => {
+export const createGamblingCommissionTables = async () => {
+	// Determine what environment the application is running in.
+	const environment = process.env.NODE_ENV;
+	// By default will use the production schema.
+	let schema = 'registration_schema';
+	// Which schema the tables will be created in depends on the environment.
+	// Production or test.
+	if (environment === 'test') {
+		schema = 'test_schema';
+	}
+
 	// Table definitions match the current format used for the required gambling commission CSVs.
 	await pool.query(`
-		CREATE TABLE IF NOT EXISTS registration_schema.business_licence_register_businesses (
+		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_businesses (
 			account_number BIGINT PRIMARY KEY,
 			licence_account_name VARCHAR(255) NOT NULL
 		);
 		
-		CREATE TABLE IF NOT EXISTS registration_schema.business_licence_register_licences (
+		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_licences (
 			account_number BIGINT NOT NULL,
 			licence_number VARCHAR(255) NOT NULL,
 			status VARCHAR(255) NOT NULL,
