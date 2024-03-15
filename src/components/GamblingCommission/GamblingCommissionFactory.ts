@@ -28,18 +28,19 @@ const build = async (): Promise<GamblingCommission> => {
  * don't exist already.
 */
 export const createGamblingCommissionTables = async () => {
+	try {
 	// Determine what environment the application is running in.
-	const environment = process.env.NODE_ENV;
-	// By default will use the production schema.
-	let schema = 'registration_schema';
-	// Which schema the tables will be created in depends on the environment.
-	// Production or test.
-	if (environment === 'test') {
-		schema = 'test_schema';
-	}
+		const environment = process.env.NODE_ENV;
+		// By default will use the production schema.
+		let schema = 'registration_schema';
+		// Which schema the tables will be created in depends on the environment.
+		// Production or test.
+		if (environment === 'test') {
+			schema = 'test_schema';
+		}
 
-	// Table definitions match the current format used for the required gambling commission CSVs.
-	await pool.query(`
+		// Table definitions match the current format used for the required gambling commission CSVs.
+		await pool.query(`
 		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_businesses (
 			account_number BIGINT PRIMARY KEY,
 			licence_account_name VARCHAR(255) NOT NULL
@@ -54,7 +55,11 @@ export const createGamblingCommissionTables = async () => {
 			start_date timestamptz,
 			end_date timestamptz
 		);`,
-	);
+		);
+	} catch (e) {
+		console.error(e);
+		console.error('You have most likely forgotten to set your NODE_ENV variable within .env');
+	}
 };
 
 export default build;
