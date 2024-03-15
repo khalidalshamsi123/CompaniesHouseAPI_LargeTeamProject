@@ -3,6 +3,8 @@ import build from '../components/GamblingCommission/GamblingCommissionFactory';
 import {Router} from 'express';
 import isAuthorised from '../middleware/authentication';
 import path from 'path';
+import multer from 'multer';
+const upload = multer({dest: 'uploads/'});
 
 const router = Router();
 
@@ -10,7 +12,7 @@ router.get('/', (req, res) => {
 	res.send('Success').status(404);
 });
 
-router.post('/gambling-commission', isAuthorised, async (req, res) => {
+router.post('/gambling-commission', async (req, res) => {
 	// Use the factory method to get a ready-to-use instance of the Gambling Commission class.
 	const gamblingCommission = await build();
 
@@ -37,7 +39,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 
 // This router handles both the upload post for HMRC and Gambling Commission CSVs.
 // !!! The Gambling commission upload functionality is yet to be implemented. !!!
-router.put('/', async (req, res) => {
+router.put('/', upload.array('files'), async (req, res) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).send('No files uploaded');
