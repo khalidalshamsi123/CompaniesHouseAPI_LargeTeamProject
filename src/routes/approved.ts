@@ -1,9 +1,10 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
-import isAuthorised from '../middleware/authentication';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
+
+import isAuthorised from '../middleware/authentication';
 
 const router = Router();
 
