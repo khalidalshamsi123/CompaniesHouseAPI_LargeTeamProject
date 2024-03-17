@@ -26,19 +26,18 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 		let returnedHref = 'empty';
 
 		// Traversing through the html elements using css selectors
-		$(elementsPath)
+		$('#contents > div.gem-c-govspeak.govuk-govspeak > div > p:nth-child(13) > span > a')
 			.each(async (index, element) => {
 				// Find the href
 				const href = $(element).attr('href');
 				// Check if the file is of type csv
-				if (href && href.endsWith('.csv')) {
+				if (href && (href.endsWith('.csv') || href.endsWith('.ods'))) {
 					// Console.log(href);
 					returnedHref = href;
 					console.log(returnedHref);
 					await downloadCsvFile(href);
 				}
 			});
-		console.log(returnedHref);
 		return returnedHref;
 	} catch (error) {
 		console.error('Error occurred during scraping:', error);
