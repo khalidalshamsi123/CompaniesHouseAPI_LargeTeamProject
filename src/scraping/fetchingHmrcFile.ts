@@ -26,7 +26,7 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 		let returnedHref = 'empty';
 
 		// Traversing through the html elements using css selectors
-		$('#contents > div.gem-c-govspeak.govuk-govspeak > div > p:nth-child(13) > span > a')
+		$(elementsPath)
 			.each(async (index, element) => {
 				// Find the href
 				const href = $(element).attr('href');
