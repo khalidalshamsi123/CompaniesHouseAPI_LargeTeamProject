@@ -4,8 +4,6 @@ import helmet from 'helmet';
 import multer from 'multer';
 import isAuthorised from './middleware/authentication';
 
-const upload = multer({dest: 'uploads/'});
-
 const app = express();
 
 // Import and use routes.
@@ -16,6 +14,6 @@ import submitRoute from './routes/submit';
 app.use('/submit', submitRoute);
 
 import uploadRoute from './routes/upload';
-app.use('/upload', isAuthorised, upload.array('files'), uploadRoute);
+app.use('/upload', isAuthorised, uploadRoute);
 
 export default app;

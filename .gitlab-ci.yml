@@ -92,6 +92,7 @@ test_upload:
     - >
       echo -e "API_KEY_FCA=${FCA_API_KEY}\n
       API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
       CI=${CI}" >> ".env"
     - npm install
     - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines

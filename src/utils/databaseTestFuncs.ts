@@ -38,18 +38,19 @@ const setupTestDatabase = async () => {
 const clearTestDatabase = async () => {
 	try {
 		await pool.query(`
-            DROP TABLE IF EXISTS test_schema.business_registry;
+            DROP SCHEMA IF EXISTS test_schema CASCADE;
         `);
-
-		await pool.query(`
-            DROP SCHEMA IF EXISTS test_schema;
-        `);
-
-		// End the database connection pool
-		await pool.end();
 	} catch (error) {
 		console.error('Error clearing test database:', error);
 		throw error; // Rethrow the error to propagate it to the caller
+	}
+};
+
+const deleteTableFromTestDatabase = async (tableName: string) => {
+	try {
+		await pool.query(`TRUNCATE test_schema.${tableName};`);
+	} catch (e) {
+		console.error('Failed to delete rows in the test table. It\'s likely that the table doesn\'t exist.');
 	}
 };
 
@@ -66,4 +67,25 @@ const selectFromTestDatabase = async (registrationId: string): Promise<BusinessD
 	return businessData;
 };
 
-export {clearTestDatabase, setupTestDatabase, selectFromTestDatabase};
+const createTestGamblingCommissionTables = async () => {
+	// Table definitions match the current format used for the required gambling commission CSVs.
+	await pool.query(`
+		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_businesses (
+			account_number BIGINT PRIMARY KEY,
+			licence_account_name VARCHAR(255) NOT NULL
+		);`);
+	await pool.query(`
+		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_licences (
+			account_number BIGINT NOT NULL,
+			licence_number VARCHAR(255) NOT NULL,
+			status VARCHAR(255) NOT NULL,
+			type VARCHAR(255) NOT NULL,
+			activity VARCHAR(255) NOT NULL,
+			start_date timestamptz,
+			end_date timestamptz
+		);`);
+};
+
+export {
+	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteTableFromTestDatabase, createTestGamblingCommissionTables,
+};
