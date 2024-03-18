@@ -20,6 +20,7 @@ const axiosConfig: AxiosRequestConfig = {
 // I have removed the try-catch as we want it to throw an error that can be handled by the method caller.
 // Since if we handle it, we would need to return a boolean which would be incorrect. As just because
 // the API request may have failed, that doesn't mean the business itself is unapproved.
+// The code does not include a try...catch block within the fcaGetApprovalStatus function itself. Instead, it relies on the caller to handle the thrown errors
 async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthorised: boolean}> {
 	// Check if registrationId contains only numerical characters
 	if (!/^\d+$/.test(registrationId)) {
