@@ -36,6 +36,7 @@ async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthoris
 
 	const fcaResponse = await axios.get(`https://register.fca.org.uk/services/V0.1/Firm/${registrationId}`, axiosConfig);
 
+	// Error message responding for accound not found.
 	if (fcaResponse.data.Message === 'ERROR : Account Not Found') {
 		// Respond with a specific error message for account not found
 		throw new Error('FSR-API-02-01-21: ERROR : Account Not Found');
