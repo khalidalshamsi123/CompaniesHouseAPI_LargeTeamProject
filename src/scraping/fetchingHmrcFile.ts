@@ -2,6 +2,7 @@ import axios, {type AxiosResponse} from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import {hrtime} from 'process';
+import {convertToCsv} from './odsToCsv';
 
 async function downloadCsvFile(hrefLink: string) {
 	try {
@@ -9,7 +10,7 @@ async function downloadCsvFile(hrefLink: string) {
 
 		const fileData = Buffer.from(hrefResponse.data);
 		// Save as a CSV file
-		fs.writeFile('./testhmrcfile.csv', fileData, () => {
+		fs.writeFile('./temphmrcfile.ods', fileData, () => {
 			// Console.log('csv file downloaded!');
 		});
 	} catch (error) {
@@ -36,6 +37,7 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 					returnedHref = href;
 					console.log(returnedHref);
 					await downloadCsvFile(href);
+					convertToCsv();
 				}
 			});
 		return returnedHref;
