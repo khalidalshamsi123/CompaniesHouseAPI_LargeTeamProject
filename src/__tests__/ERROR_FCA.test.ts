@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import axios from 'axios';
 import * as fcaQuerier from '../components/fcaQuerier';
 
@@ -49,7 +50,7 @@ describe('when a request is sent through the API and is missing:', () => {
 				},
 				Message: 'ERROR : Account Not Found',
 				Data: [
-			  {
+					{
 						Name: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Names',
 						Individuals: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Individuals',
 						Requirements: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Requirements',
@@ -63,25 +64,25 @@ describe('when a request is sent through the API and is missing:', () => {
 						DisciplinaryHistory: 'https://register.fca.org.uk/services/V0.1/Firm/401805/DisciplinaryHistory',
 						'System Timestamp': '2018-10-24 09:49:29',
 						'Exceptional Info Details': [
-				  {
+							{
 								'Exceptional Info Title': 'CAUTION',
-				  },
-				  {
+							},
+							{
 								'Exceptional Info Title': 'ATTENTION - Firm in a compromise arrangement',
-				  },
+							},
 						],
 						'Status Effective Date': 'Wed Sep 01 00:00:00 GMT 2004',
-			  },
+					},
 				],
-		  },
+			},
 		};
-	
+
 		// Mock the axios.get function to return the mock response
 		mockedAxios.get.mockResolvedValueOnce(mockResponse);
-	
+
 		// Act and Assert
 		await expect(fcaQuerier.fcaGetApprovalStatus(registrationId)).rejects.toThrow(
-		  'FSR-API-02-01-21: ERROR : Account Not Found',
+			'FSR-API-02-01-21: ERROR : Account Not Found',
 		);
 	});
 });
