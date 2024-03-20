@@ -104,6 +104,11 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 					return originalUploadCsv.call(this, data, 'test_schema');
 				});
 
+			// Mock out the call for the next step of processing.
+			// For this test case we are only seeing if the data provided is properly added to the temporary tables.
+			// Not that they behave properly with the upcoming JOIN etc.
+			jest.spyOn(GamblingCommission.prototype as any, 'aggregateTemporaryTableData').mockReturnThis();
+
 			await request(app)
 				.post(uploadGamblingCommissionEndpoint)
 				.set('x-api-key', apiKey)
@@ -114,7 +119,7 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 				.attach('licencesCsv', createMockReadStream(mockLicencesCsvData) as unknown as ReadStream, {
 					filename: 'licencesCsv.csv',
 					contentType: 'text/csv',
-				});
+				}).expect(200);
 
 			// Test that business_licence_register_businesses table has been updated successfully.
 			const businessesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');

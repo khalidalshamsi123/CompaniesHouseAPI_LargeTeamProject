@@ -10,6 +10,10 @@ import {parse, format} from 'fast-csv';
 import busBoy from 'busboy';
 import {type Request} from 'express-serve-static-core';
 
+import Cursor from 'pg-cursor';
+import {insertGamblingCommissionBatch} from '../../database/csvToDatabase/dataProcessor';
+import {type PoolClient} from 'pg';
+
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
  */
@@ -128,7 +132,7 @@ export default class GamblingCommission {
 			}
 		});
 
-		/* Manually define a promise here. The benefit of this is that we get to decide exactly
+		/* Manually define a promise. The benefit of this is that we get to decide exactly
 		   when it will be resolved or rejected.
 		   Meanwhile with an async function it tries to infer by itself when its 'complete'.
 
@@ -163,6 +167,9 @@ export default class GamblingCommission {
 
 						reject(new Error(`Errors occurred during file processing: ${errorMessages}`));
 					} else {
+						console.log('No errors.');
+						// Start and wait for process to use newly formed tables to update main database table.
+						await this.aggregateTemporaryTableData(schema);
 						resolve('Successfully updated database using files provided.');
 					}
 				} catch (e) {
@@ -170,6 +177,89 @@ export default class GamblingCommission {
 				}
 			});
 		});
+	}
+
+	/**
+	 * Performs a INNER JOIN on the two temporary tables created using the CSV data previously uploaded.
+	 * Aggregates the results, determining the licence approval status for each business.
+	 * Calls methods that will use this data to update the main database table.
+	 * Which is used for ascertaining licence statuses by the API.
+	 * @param schema Database schema the method should apply to. E.g., test_schema or registration_schema.
+	 */
+	private async aggregateTemporaryTableData(schema: string) {
+		/* I use two clients, one for the read operations (cursor) and one for writing to the database.
+		   This lowers the risk of locking issues, which I had experienced when attempting to run the actions
+		   all on one client. */
+		const insertClient = await pool.connect();
+		const cursorClient = await pool.connect();
+
+		try {
+			// Begin database transaction.
+			await insertClient.query('BEGIN');
+
+			/* Joins the two temporary tables on account id.
+			   Creates a cursor which will be used to read the results of said query. */
+			const cursor = cursorClient.query(new Cursor(`
+				SELECT DISTINCT ON (rb.account_number) rb.*, rl.*
+				FROM ${schema}.business_licence_register_businesses rb
+				JOIN ${schema}.business_licence_register_licences rl
+				ON rb.account_number = rl.account_number
+				ORDER BY rb.account_number, rl.start_date DESC;
+			`));
+			// Reads from the cursor and performs upsert. Batches of 50 till completion.
+			await this.readBatchAndInsert(cursor, insertClient);
+			// If no errors have occured, commit the changes to the database.
+			await insertClient.query('COMMIT');
+			console.log('Successfully updated businesses in main database table with latest Gambling Commission statuses.');
+		} catch (e) {
+			// Error has occured, rollback database changes.
+			await insertClient.query('ROLLBACK');
+			throw e;
+		} finally {
+			// Release client back to the pool.
+			insertClient.release();
+			cursorClient.release();
+		}
+	}
+
+	/**
+	 * Reads rows from given cursor in batches of 50. Processing them to ascertain approval status with the Gambling Commission for each business.
+	 * Passing this data to a function that handles perfoming a upsert to the main database table using these values.
+	 * Memory efficient as it only loads 50 rows at one time, not the entire tables contents at once.
+	 * @param cursor Cursor wrapping an INNER JOIN query between the two temporary tables. Which were created from the previously uploaded CSV data.
+	 * @param insertClient Database client retrieved from the postgres pool.
+	 */
+	private async readBatchAndInsert(cursor: Cursor, insertClient: PoolClient) {
+		// Initial read from cursor.
+		let rows = await cursor.read(50);
+
+		/* One of, or both of the tables involved in the JOIN operation are empty.
+		   This can happen if only one CSV was provided by the uploader.
+		   And the other CSV had never been provided before. */
+		if (rows.length === 0) {
+			throw new Error('No changes were made. Please provide both Gambling Commission CSV files.');
+		}
+
+		while (rows.length > 0) {
+			/* Put needed column values for each row in batch into separate arrays.
+			   It's safe to assume that this value will exist. */
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
+			const businessNames = rows.map(row => row.licence_account_name);
+			// If status is 'Active' i.e., approved. Then we set that records approval status as true.
+			// Otherwise, it will be set to false.
+			const gamblingApprovalStatuses = rows.map(row => row.status === 'Active');
+
+			/* Insert batch of rows.
+			   ignore eslint rule as we need to sequentially process rows here to maintain data
+			   integrity and ensure that we only process 50 rows at a time. */
+			// eslint-disable-next-line no-await-in-loop
+			await insertGamblingCommissionBatch(businessNames, gamblingApprovalStatuses, insertClient);
+			// eslint-disable-next-line no-await-in-loop
+			rows = await cursor.read(50);
+		}
+
+		// Once all rows have been read, close the cursor.
+		await cursor.close();
 	}
 
 	private async csvStreamParseAndCopy(tableName: string, schema: string, file: Readable, expectedHeaders: string[]) {

@@ -10,11 +10,13 @@ const setupTestDatabase = async () => {
 
 		await pool.query(`
             CREATE TABLE IF NOT EXISTS test_schema.business_registry (
-                registrationid VARCHAR(8) PRIMARY KEY,
-                businessname VARCHAR(255),
+                registrationid VARCHAR,
+                businessname VARCHAR,
                 fca_approved BOOLEAN,
                 hmrc_approved BOOLEAN,
-                gambling_approved BOOLEAN
+                gambling_approved BOOLEAN,
+				PRIMARY KEY (businessname),
+				UNIQUE (registrationid)
             );
         `);
 

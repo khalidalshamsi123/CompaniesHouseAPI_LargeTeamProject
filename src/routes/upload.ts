@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
 	res.send('Success').status(404);
 });
 
-router.post('/gambling-commission', async (req, res) => {
+router.post('/gambling-commission', isAuthorised, async (req, res) => {
 	// Use the factory method to get a ready-to-use instance of the Gambling Commission class.
 	const gamblingCommission = await build();
 
