@@ -35,4 +35,54 @@ describe('when a request is sent through the API and is missing:', () => {
 	});
 
 	// Add more test cases as needed
+
+	it('should throw an error when account is not found', async () => {
+		// Arrange
+		const registrationId = '401805';
+		const mockResponse = {
+			data: {
+				Status: 'FSR-API-02-01-21',
+				ResultInfo: {
+					page: '1',
+					per_page: '1',
+					total_count: '1',
+				},
+				Message: 'ERROR : Account Not Found',
+				Data: [
+			  {
+						Name: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Names',
+						Individuals: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Individuals',
+						Requirements: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Requirements',
+						Permissions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Permissions',
+						Passport: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Passports',
+						Regulators: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Regulators',
+						'Appointed Representative': 'https://register.fca.org.uk/services/V0.1/Firm/401805/AR',
+						Address: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Address',
+						Waivers: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Waivers',
+						Exclusions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Exclusions',
+						DisciplinaryHistory: 'https://register.fca.org.uk/services/V0.1/Firm/401805/DisciplinaryHistory',
+						'System Timestamp': '2018-10-24 09:49:29',
+						'Exceptional Info Details': [
+				  {
+								'Exceptional Info Title': 'CAUTION',
+				  },
+				  {
+								'Exceptional Info Title': 'ATTENTION - Firm in a compromise arrangement',
+				  },
+						],
+						'Status Effective Date': 'Wed Sep 01 00:00:00 GMT 2004',
+			  },
+				],
+		  },
+		};
+	
+		// Mock the axios.get function to return the mock response
+		mockedAxios.get.mockResolvedValueOnce(mockResponse);
+	
+		// Act and Assert
+		await expect(fcaQuerier.fcaGetApprovalStatus(registrationId)).rejects.toThrow(
+		  'FSR-API-02-01-21: ERROR : Account Not Found',
+		);
+	});
 });
+
