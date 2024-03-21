@@ -4,13 +4,13 @@ import * as fs from 'fs';
 import {hrtime} from 'process';
 import {convertToCsv} from './odsToCsv';
 
-async function downloadCsvFile(hrefLink: string) {
+async function downloadCsvFile(hrefLink: string, fileName: string) {
 	try {
 		const hrefResponse: AxiosResponse<ArrayBuffer> = await axios.get(hrefLink, {responseType: 'arraybuffer'});
 
 		const fileData = Buffer.from(hrefResponse.data);
-		// Save as a CSV file
-		fs.writeFile('./temphmrcfile.ods', fileData, () => {
+		// Download the file
+		fs.writeFile(fileName, fileData, () => {
 			// Console.log('csv file downloaded!');
 		});
 	} catch (error) {
@@ -31,15 +31,18 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 			.each(async (index, element) => {
 				// Find the href
 				const href = $(element).attr('href');
-				// Check if the file is of type csv
-				if (href && (href.endsWith('.csv') || href.endsWith('.ods'))) {
-					// Console.log(href);
+				// Check if the file is of type csv or ods
+				if (href && href.endsWith('.csv')) {
 					returnedHref = href;
 					console.log(returnedHref);
-					await downloadCsvFile(href);
-					convertToCsv();
+					await downloadCsvFile(href, './newHmrcFile.csv');
+				} else if (href && href.endsWith('.ods')) {
+					returnedHref = href;
+					console.log(returnedHref);
+					await downloadCsvFile(href, './temphmrcfile.ods');
 				}
 			});
+		convertToCsv();
 		return returnedHref;
 	} catch (error) {
 		console.error('Error occurred during scraping:', error);
