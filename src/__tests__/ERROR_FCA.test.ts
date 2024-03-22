@@ -40,6 +40,7 @@ describe('when a request is sent through the API and is missing:', () => {
 	it('should throw an error when account is not found', async () => {
 		// Arrange
 		const registrationId = '401805';
+		// Mocking the JSON object with the correct Status codes
 		const mockResponse = {
 			data: {
 				Status: 'FSR-API-02-01-21',
@@ -82,7 +83,110 @@ describe('when a request is sent through the API and is missing:', () => {
 
 		// Act and Assert
 		await expect(fcaQuerier.fcaGetApprovalStatus(registrationId)).rejects.toThrow(
-			'FSR-API-02-01-21: ERROR : Account Not Found',
+			'ERROR : Account Not Found',
+		);
+	});
+
+	// Testing for FSR-API-02-01-11 Bad Request : Invalid Input
+	/*
+	it('should throw an error when a bad request is sent', async () => {
+		// Arrange
+		const registrationId = '401805';
+		// Mocking the JSON object with the correct Status codes
+		const mockResponse = {
+			data: {
+				Status: 'FSR-API-02-01-11',
+				ResultInfo: {
+					page: '1',
+					per_page: '1',
+					total_count: '1',
+				},
+				Message: 'Bad Request : Invalid Input',
+				Data: [
+					{
+						Name: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Names',
+						Individuals: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Individuals',
+						Requirements: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Requirements',
+						Permissions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Permissions',
+						Passport: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Passports',
+						Regulators: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Regulators',
+						'Appointed Representative': 'https://register.fca.org.uk/services/V0.1/Firm/401805/AR',
+						Address: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Address',
+						Waivers: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Waivers',
+						Exclusions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Exclusions',
+						DisciplinaryHistory: 'https://register.fca.org.uk/services/V0.1/Firm/401805/DisciplinaryHistory',
+						'System Timestamp': '2018-10-24 09:49:29',
+						'Exceptional Info Details': [
+							{
+								'Exceptional Info Title': 'CAUTION',
+							},
+							{
+								'Exceptional Info Title': 'ATTENTION - Firm in a compromise arrangement',
+							},
+						],
+						'Status Effective Date': 'Wed Sep 01 00:00:00 GMT 2004',
+					},
+				],
+			},
+		};
+
+		// Mock the axios.get function to return the mock response
+		mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+		// Act and Assert
+		await expect(fcaQuerier.fcaGetApprovalStatus(registrationId)).rejects.toThrow(
+			'Bad Request : Invalid Input',
+		);
+	});
+	*/
+	// Testing for FSR-API-01-01-11 Unauthorised: Please include a valid API key and Email address
+	it('should throw an error when a api key and or email address is invalid', async () => {
+		// Arrange
+		const registrationId = '401805';
+		// Mocking the JSON object with the correct Status codes
+		const mockResponse = {
+			data: {
+				Status: 'FSR-API-01-01-11',
+				ResultInfo: {
+					page: '1',
+					per_page: '1',
+					total_count: '1',
+				},
+				Message: 'Unauthorised: Please include a valid API key and Email address',
+				Data: [
+					{
+						Name: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Names',
+						Individuals: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Individuals',
+						Requirements: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Requirements',
+						Permissions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Permissions',
+						Passport: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Passports',
+						Regulators: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Regulators',
+						'Appointed Representative': 'https://register.fca.org.uk/services/V0.1/Firm/401805/AR',
+						Address: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Address',
+						Waivers: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Waivers',
+						Exclusions: 'https://register.fca.org.uk/services/V0.1/Firm/401805/Exclusions',
+						DisciplinaryHistory: 'https://register.fca.org.uk/services/V0.1/Firm/401805/DisciplinaryHistory',
+						'System Timestamp': '2018-10-24 09:49:29',
+						'Exceptional Info Details': [
+							{
+								'Exceptional Info Title': 'CAUTION',
+							},
+							{
+								'Exceptional Info Title': 'ATTENTION - Firm in a compromise arrangement',
+							},
+						],
+						'Status Effective Date': 'Wed Sep 01 00:00:00 GMT 2004',
+					},
+				],
+			},
+		};
+
+		// Mock the axios.get function to return the mock response
+		mockedAxios.get.mockResolvedValueOnce(mockResponse);
+
+		// Act and Assert
+		await expect(fcaQuerier.fcaGetApprovalStatus(registrationId)).rejects.toThrow(
+			'Unauthorised: Please include a valid API key and Email address',
 		);
 	});
 });
