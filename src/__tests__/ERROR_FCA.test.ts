@@ -88,7 +88,6 @@ describe('when a request is sent through the API and is missing:', () => {
 	});
 
 	// Testing for FSR-API-02-01-11 Bad Request : Invalid Input
-	/*
 	it('should throw an error when a bad request is sent', async () => {
 		// Arrange
 		const registrationId = '401805';
@@ -138,7 +137,7 @@ describe('when a request is sent through the API and is missing:', () => {
 			'Bad Request : Invalid Input',
 		);
 	});
-	*/
+
 	// Testing for FSR-API-01-01-11 Unauthorised: Please include a valid API key and Email address
 	it('should throw an error when a api key and or email address is invalid', async () => {
 		// Arrange

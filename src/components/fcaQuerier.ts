@@ -42,13 +42,12 @@ async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthoris
 		// Respond with a specific error message for account not found
 		throw new Error('ERROR : Account Not Found');
 	}
-	/*
+
 	// Error for Bad Request (external)
 	if (fcaResponse.data.Status === 'FSR-API-02-01-11') {
 		// Respond with a specific error message for Bad request
 		throw new Error('Bad Request : Invalid Input');
 	}
-	*/
 
 	// Error for missing and or unauthrised API key and email address (external)
 	if (fcaResponse.data.Status === 'FSR-API-01-01-11') {
