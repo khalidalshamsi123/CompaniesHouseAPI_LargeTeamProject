@@ -35,6 +35,7 @@ async function queryAggregator(registrationId: string, businessName: string) {
 		return responseObj;
 	} catch (error) {
 		console.error(error);
+		// Error hadnling needs working on.
 	}
 }
 
