@@ -3,7 +3,7 @@ import pool from '../database/databasePool';
 import fs, {type ReadStream} from 'node:fs';
 
 import {
-	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteTableFromTestDatabase,
+	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteRowsFromTestTable,
 } from '../utils/databaseTestFuncs';
 
 import {Readable} from 'node:stream';
@@ -22,16 +22,21 @@ beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();
 	await createTestGamblingCommissionTables();
+
+	// Mock out the call for the next step of processing - aggregation of temporary tables.
+	// Within this test suite we are only testing the uploading of CSV data to temporary tables.
+	jest.spyOn(GamblingCommission.prototype as any, 'aggregateTemporaryTableData').mockReturnThis();
 });
 
 // Before each test delete the contents added by the previous from the tables.
 beforeEach(async () => {
-	await deleteTableFromTestDatabase('business_licence_register_businesses');
-	await deleteTableFromTestDatabase('business_licence_register_licences');
+	await deleteRowsFromTestTable('business_licence_register_businesses');
+	await deleteRowsFromTestTable('business_licence_register_licences');
 });
 
 afterAll(async () => {
 	await pool.end(); // Make sure to close the database pool
+	jest.clearAllMocks();
 });
 
 // Create a readable stream from provided mock CSV data.
@@ -103,11 +108,6 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 					// Intercept the function call, and re-call the method, providing the test_schema instead.
 					return originalUploadCsv.call(this, data, 'test_schema');
 				});
-
-			// Mock out the call for the next step of processing.
-			// For this test case we are only seeing if the data provided is properly added to the temporary tables.
-			// Not that they behave properly with the upcoming JOIN etc.
-			jest.spyOn(GamblingCommission.prototype as any, 'aggregateTemporaryTableData').mockReturnThis();
 
 			await request(app)
 				.post(uploadGamblingCommissionEndpoint)

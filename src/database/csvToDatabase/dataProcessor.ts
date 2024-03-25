@@ -60,11 +60,12 @@ export async function processDataRow({row, regIdIndex, status1Index, cache, clie
  * @param businessNames An array of legal business names. Known as a `Licence Account Name` within `business-licence-register-businesses.csv`
  * @param gamblingApprovalStatuses An array of approval statuses for each business (row).
  * @param insertClient Database client retrieved from the Postgres pool.
+ * @param schema Determines whether the changes should be made to a different schemas table. E.g., for testing provide 'test_schema'.
  */
-export async function insertGamblingCommissionBatch(businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient) {
+export async function insertGamblingCommissionBatch(businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient, schema: string) {
 	try {
 		// Inserts gambling commission rows in batches.
-		const query = `INSERT INTO registration_schema.business_registry (businessname, gambling_approved)
+		const query = `INSERT INTO ${schema}.business_registry (businessname, gambling_approved)
 		SELECT * FROM UNNEST($1::text[], $2::boolean[])
 		ON CONFLICT (businessname) DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved`;
 		const values = [

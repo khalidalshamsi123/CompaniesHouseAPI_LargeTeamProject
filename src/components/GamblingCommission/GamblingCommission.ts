@@ -167,7 +167,6 @@ export default class GamblingCommission {
 
 						reject(new Error(`Errors occurred during file processing: ${errorMessages}`));
 					} else {
-						console.log('No errors.');
 						// Start and wait for process to use newly formed tables to update main database table.
 						await this.aggregateTemporaryTableData(schema);
 						resolve('Successfully updated database using files provided.');
@@ -207,7 +206,7 @@ export default class GamblingCommission {
 				ORDER BY rb.account_number, rl.start_date DESC;
 			`));
 			// Reads from the cursor and performs upsert. Batches of 50 till completion.
-			await this.readBatchAndInsert(cursor, insertClient);
+			await this.readBatchAndInsert(cursor, insertClient, schema);
 			// If no errors have occured, commit the changes to the database.
 			await insertClient.query('COMMIT');
 			console.log('Successfully updated businesses in main database table with latest Gambling Commission statuses.');
@@ -223,13 +222,14 @@ export default class GamblingCommission {
 	}
 
 	/**
-	 * Reads rows from given cursor in batches of 50. Processing them to ascertain approval status with the Gambling Commission for each business.
+	 * Reads rows from given cursor in batches of up-to 50. Processing them to ascertain approval status with the Gambling Commission for each business.
 	 * Passing this data to a function that handles perfoming a upsert to the main database table using these values.
 	 * Memory efficient as it only loads 50 rows at one time, not the entire tables contents at once.
 	 * @param cursor Cursor wrapping an INNER JOIN query between the two temporary tables. Which were created from the previously uploaded CSV data.
 	 * @param insertClient Database client retrieved from the postgres pool.
+	 * @param schema Determines whether the changes should be made to a different schemas table. E.g., for testing provide 'test_schema'.
 	 */
-	private async readBatchAndInsert(cursor: Cursor, insertClient: PoolClient) {
+	private async readBatchAndInsert(cursor: Cursor, insertClient: PoolClient, schema: string) {
 		// Initial read from cursor.
 		let rows = await cursor.read(50);
 
@@ -242,9 +242,8 @@ export default class GamblingCommission {
 
 		while (rows.length > 0) {
 			/* Put needed column values for each row in batch into separate arrays.
-			   It's safe to assume that this value will exist. */
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-			const businessNames = rows.map(row => row.licence_account_name);
+			   It's safe to assume that this value will be a string. */
+			const businessNames = rows.map(row => row.licence_account_name as string);
 			// If status is 'Active' i.e., approved. Then we set that records approval status as true.
 			// Otherwise, it will be set to false.
 			const gamblingApprovalStatuses = rows.map(row => row.status === 'Active');
@@ -253,7 +252,7 @@ export default class GamblingCommission {
 			   ignore eslint rule as we need to sequentially process rows here to maintain data
 			   integrity and ensure that we only process 50 rows at a time. */
 			// eslint-disable-next-line no-await-in-loop
-			await insertGamblingCommissionBatch(businessNames, gamblingApprovalStatuses, insertClient);
+			await insertGamblingCommissionBatch(businessNames, gamblingApprovalStatuses, insertClient, schema);
 			// eslint-disable-next-line no-await-in-loop
 			rows = await cursor.read(50);
 		}
@@ -416,9 +415,20 @@ export default class GamblingCommission {
 			/* If an error has occured, we rollback the changes.
 			Ensuring that the application keeps the original contents of the table. */
 			await client.query('ROLLBACK');
+			// Return so aggregate process doesn't start.
+			return;
 		} finally {
 			// Release client back to pool.
 			client.release();
+		}
+
+		// If all went well uploading the local CSV to the relevant temp database table.
+		try {
+			await this.aggregateTemporaryTableData(schema);
+		} catch (e) {
+			console.error(e);
+			// On error, implicitly let the method 'return' for now.
+			// This can be adjusted if the callers logically need to recieve a thrown error if anything went wrong.
 		}
 	}
 

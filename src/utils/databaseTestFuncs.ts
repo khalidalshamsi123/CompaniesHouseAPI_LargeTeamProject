@@ -48,7 +48,7 @@ const clearTestDatabase = async () => {
 	}
 };
 
-const deleteTableFromTestDatabase = async (tableName: string) => {
+const deleteRowsFromTestTable = async (tableName: string) => {
 	try {
 		await pool.query(`TRUNCATE test_schema.${tableName};`);
 	} catch (e) {
@@ -89,5 +89,5 @@ const createTestGamblingCommissionTables = async () => {
 };
 
 export {
-	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteTableFromTestDatabase, createTestGamblingCommissionTables,
+	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteRowsFromTestTable, createTestGamblingCommissionTables,
 };
