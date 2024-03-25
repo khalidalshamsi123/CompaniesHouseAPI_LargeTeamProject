@@ -1,5 +1,4 @@
-import request from 'supertest';
-import app from '../app';
+import * as fs from 'fs';
 import axios from 'axios';
 import {scrapeHmrcWebsite} from '../scraping/fetchingHmrcFile';
 
@@ -40,6 +39,10 @@ const invalidHtmlData = `
     </div>
 `;
 jest.mock('axios');
+
+jest.mock('fs', () => ({
+	writeFile: jest.fn(),
+}));
 
 describe('Given the hmrc website is up and running', () => {
 	describe('When the function scrapeHmrcWebsite is called', () => {

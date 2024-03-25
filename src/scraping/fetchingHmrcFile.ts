@@ -50,4 +50,4 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 	}
 }
 
-export {scrapeHmrcWebsite};
+export {scrapeHmrcWebsite, downloadCsvFile};
