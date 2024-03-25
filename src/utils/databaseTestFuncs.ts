@@ -1,5 +1,5 @@
-import pool from '../database/databasePool';
-import {type BusinessData} from '../database/queries';
+import {pool} from '../database/setup/databasePool';
+import {type BusinessData} from '../database/setup/queries';
 
 // Function to create database schema and insert test data
 const setupTestDatabase = async () => {

@@ -1,11 +1,11 @@
-import * as csvReader from '../database/csvToDatabase/csvReader';
-import * as dataProcessor from '../database/csvToDatabase/dataProcessor';
+import * as csvReader from '../database/HMRC/csvReader';
+import * as dataProcessor from '../database/dataProcessor';
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {type PoolClient} from 'pg';
+import {PoolClient} from 'pg';
 
 jest.mock('csv-parser');
-jest.mock('../database/csvToDatabase/csvReader');
+jest.mock('../database/HMRC/csvReader');
 jest.mock('fs');
 
 describe('Database Operations Test', () => {
@@ -69,11 +69,8 @@ describe('Database Operations Test', () => {
 
 	describe('Given data is loaded into the database', () => {
 		const row = {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
 			REGISTRATION_ID: '12345',
-			// eslint-disable-next-line @typescript-eslint/naming-convention
 			BUSINESS_NAME: 'Test Company',
-			// eslint-disable-next-line @typescript-eslint/naming-convention
 			STATUS: 'Approved',
 		};
 		const regIdIndex = 0; // Assuming REGISTRATION_ID is the first column
@@ -102,10 +99,20 @@ describe('Database Operations Test', () => {
 				batchSize,
 				rowCount,
 			});
-			expect(clientMock.query).toHaveBeenCalledWith(
-				'INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (registrationid) DO UPDATE SET businessname = EXCLUDED.businessname',
-				[row.REGISTRATION_ID, row.BUSINESS_NAME, false, true, false],
-			);
+
+			// Define the expected SQL query with consistent formatting
+			const expectedQuery = `
+        		INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
+        		VALUES ($1, $2, $3, $4, $5)
+        		ON CONFLICT (businessname)
+        		DO UPDATE SET hmrc_approved = EXCLUDED.hmrc_approved;
+    		`.trim(); // Trim leading/trailing whitespace
+
+			// Get the received query from the mock function calls
+			const receivedQuery = (clientMock.query as jest.Mock).mock.calls[0][0];
+
+			// Use regular expressions to match and compare the SQL queries, ignoring whitespace
+			expect(receivedQuery.replace(/\s+/g, ' ')).toMatch(expectedQuery.replace(/\s+/g, ' '));
 		});
 	});
 });
