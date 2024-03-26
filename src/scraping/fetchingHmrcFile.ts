@@ -1,7 +1,6 @@
 import axios, {type AxiosResponse} from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
-import {hrtime} from 'process';
 import {convertToCsv} from './odsToCsv';
 
 async function downloadCsvFile(hrefLink: string, fileName: string) {
