@@ -44,9 +44,9 @@ export const createGamblingCommissionTables = async () => {
 		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_businesses (
 			account_number BIGINT PRIMARY KEY,
 			licence_account_name VARCHAR(255) NOT NULL
-		);
-		
-		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_licences (
+		);`);
+
+		await pool.query(`CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_licences (
 			account_number BIGINT NOT NULL,
 			licence_number VARCHAR(255) NOT NULL,
 			status VARCHAR(255) NOT NULL,
@@ -54,8 +54,7 @@ export const createGamblingCommissionTables = async () => {
 			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
-		);`,
-		);
+		);`);
 	} catch (e) {
 		console.error(e);
 		console.error('You have most likely forgotten to set your NODE_ENV variable within .env');

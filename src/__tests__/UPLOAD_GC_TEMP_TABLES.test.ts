@@ -3,7 +3,7 @@ import pool from '../database/databasePool';
 import fs, {type ReadStream} from 'node:fs';
 
 import {
-	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteTableFromTestDatabase,
+	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteRowsFromTestTable,
 } from '../utils/databaseTestFuncs';
 
 import {Readable} from 'node:stream';
@@ -22,16 +22,21 @@ beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();
 	await createTestGamblingCommissionTables();
+
+	// Mock out the call for the next step of processing - aggregation of temporary tables.
+	// Within this test suite we are only testing the uploading of CSV data to temporary tables.
+	jest.spyOn(GamblingCommission.prototype as any, 'aggregateTemporaryTableData').mockReturnThis();
 });
 
 // Before each test delete the contents added by the previous from the tables.
 beforeEach(async () => {
-	await deleteTableFromTestDatabase('business_licence_register_businesses');
-	await deleteTableFromTestDatabase('business_licence_register_licences');
+	await deleteRowsFromTestTable('business_licence_register_businesses');
+	await deleteRowsFromTestTable('business_licence_register_licences');
 });
 
 afterAll(async () => {
 	await pool.end(); // Make sure to close the database pool
+	jest.clearAllMocks();
 });
 
 // Create a readable stream from provided mock CSV data.
@@ -114,7 +119,7 @@ describe('Given I have valid CSV data from the Gambling Commission available.', 
 				.attach('licencesCsv', createMockReadStream(mockLicencesCsvData) as unknown as ReadStream, {
 					filename: 'licencesCsv.csv',
 					contentType: 'text/csv',
-				});
+				}).expect(200);
 
 			// Test that business_licence_register_businesses table has been updated successfully.
 			const businessesResults = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');

@@ -10,11 +10,13 @@ const setupTestDatabase = async () => {
 
 		await pool.query(`
             CREATE TABLE IF NOT EXISTS test_schema.business_registry (
-                registrationid VARCHAR(8) PRIMARY KEY,
-                businessname VARCHAR(255),
+                registrationid VARCHAR,
+                businessname VARCHAR,
                 fca_approved BOOLEAN,
                 hmrc_approved BOOLEAN,
-                gambling_approved BOOLEAN
+                gambling_approved BOOLEAN,
+				PRIMARY KEY (businessname),
+				UNIQUE (registrationid)
             );
         `);
 
@@ -46,7 +48,7 @@ const clearTestDatabase = async () => {
 	}
 };
 
-const deleteTableFromTestDatabase = async (tableName: string) => {
+const deleteRowsFromTestTable = async (tableName: string) => {
 	try {
 		await pool.query(`TRUNCATE test_schema.${tableName};`);
 	} catch (e) {
@@ -87,5 +89,5 @@ const createTestGamblingCommissionTables = async () => {
 };
 
 export {
-	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteTableFromTestDatabase, createTestGamblingCommissionTables,
+	clearTestDatabase, setupTestDatabase, selectFromTestDatabase, deleteRowsFromTestTable, createTestGamblingCommissionTables,
 };
