@@ -1,4 +1,4 @@
-import {pool} from './databasePool';
+import {pool} from './setup/databasePool';
 
 // These need to be spelt to match the column names in database so when we read it maps it correctly to this type.
 export type BusinessData = {

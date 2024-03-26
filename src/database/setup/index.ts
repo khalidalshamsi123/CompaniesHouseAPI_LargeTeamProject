@@ -1,6 +1,6 @@
 import {createSchema as setupDatabase} from './setupDatabase';
-import {insertBusinessData} from './queries';
-import type {BusinessData} from './queries';
+import {insertBusinessData} from '../queries';
+import type {BusinessData} from '../queries';
 
 export async function main() {
 	try {

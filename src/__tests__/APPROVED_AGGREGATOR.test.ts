@@ -1,6 +1,6 @@
 import {queryAggregator} from '../components/aggregator';
 import * as fcaQuerier from '../components/fcaQuerier';
-import * as productionQueries from '../database/setup/queries';
+import * as productionQueries from '../database/queries';
 
 // Scenario: Approved by at least one regulatory body.
 

@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '../app';
 
 import {clearTestDatabase, setupTestDatabase, selectFromTestDatabase} from '../utils/databaseTestFuncs';
-import * as productionQueries from '../database/setup/queries';
+import * as productionQueries from '../database/queries';
 
 beforeAll(async () => {
 	// Replace the implementation for the findAllApprovedByRegId() method with the one
