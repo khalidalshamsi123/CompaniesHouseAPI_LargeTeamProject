@@ -91,9 +91,6 @@ class StandardiserInterface {
         this.standardisers.set('hmrc', hmrcStandardiser)
     }
 
-    private handleCSVKeyInput(data: string | string[]){
-
-    }
     private async buildGamblingCommissionStandardiser() {
         await this.createGamblingCommissionTables();
         const standardiser = new GamblingCommission();

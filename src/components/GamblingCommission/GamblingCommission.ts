@@ -69,7 +69,7 @@ export default class GamblingCommission {
 			// Handle the case where the first argument is a string (csvKey).
 			await this.updateFromLocalFile(csvKey, schema);
 		}
-		else if (isArray(data)) {
+		else if (Array.isArray(data)) {
 
 		}
 		else {
@@ -495,7 +495,7 @@ export default class GamblingCommission {
 			// Handle the case where the first argument is a string (csvKey).
 			this.uploadCsv(csvKey,schema);
 		}
-		else if (isArray(data)) {
+		else if (Array.isArray(data)) {
 
 		}
 		else {
