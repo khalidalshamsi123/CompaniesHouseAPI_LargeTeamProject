@@ -1,5 +1,5 @@
 import build from '../components/GamblingCommission/GamblingCommissionFactory';
-
+import {type Request} from 'express-serve-static-core';
 import {Router} from 'express';
 import isAuthorised from '../middleware/authentication';
 import path from 'path';
@@ -39,7 +39,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 // });
 
 // This router handles both the upload post for HMRC and Gambling Commission CSVs.
-router.put('/', upload.array('files'), async (req, res) => {
+router.put('/', upload.array('files'), async (req: Request, res) => {
 	try {
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).send('No files uploaded');
@@ -47,7 +47,7 @@ router.put('/', upload.array('files'), async (req, res) => {
 
 		const standardiser = new standardiserInterface();
 		// You need to await the async call to processInput
-		const response = await standardiser.processInput(req, "");
+		const response = await standardiser.processInput(req as Request, "");
 
 		// Since you are now awaiting, response should be the actual result and not a Promise.
 		if (response && response.failedUploads.length === 0) {

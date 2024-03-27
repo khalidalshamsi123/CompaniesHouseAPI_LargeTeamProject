@@ -1,9 +1,9 @@
-import { Request } from 'express';
 import path from 'path';
 import GamblingCommission from "./GamblingCommission/GamblingCommission";
 import pool from "../database/databasePool";
 import hmrcStandardiser from "./hmrc/hmrcStandardiser";
 import { CsvKeys } from "../types/GamblingCommissionTypes";
+import {type Request} from 'express-serve-static-core';
 
 /**
  * Enum for standardiser keys.
@@ -37,14 +37,14 @@ class StandardiserInterface {
      * @param {string} schema - The database schema to be used.
      * @returns {Promise<void | { successfulUploads: string[], failedUploads: string[] }>} - The result of the processing.
      */
-    public async processInput(data: CsvKeys[] | Request, schema: string): Promise<void | { successfulUploads: string[], failedUploads: string[] }> {
+    public async processInput(data: Request, schema: string): Promise<void | { successfulUploads: string[]; failedUploads: string[] }> {
         try {
-            if (Array.isArray(data)) {
-                await this.processCsvKeys(data, schema);
-            } else if (data instanceof Request) {
-                return await this.processRequest(data, schema);
+            if (data.headers) {
+                return await this.processRequest(data as Request, schema);
+            } else if (Array.isArray(data)) {
+                return await this.processCsvKeys(data as CsvKeys[], schema);
             } else {
-                throw new Error('Invalid data type supplied to processInput');
+                throw new Error('Invalid data type supplied to processInput: ' + data);
             }
         } catch (error) {
             console.error('Error in processInput: ', error);
@@ -139,6 +139,7 @@ class StandardiserInterface {
                         await standardiser!.standardise(request, schema);
                         successfulUploads.push(`${file.originalname} (HMRC CSV)`);
                     } else if (fileName.includes('business-licence-register-businesses')) {
+                        await this.buildGamblingCommissionStandardiser();
                         const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
                         await standardiser!.standardise(request, schema);
                         successfulUploads.push(`${file.originalname} (Gambling Commission CSV)`);
