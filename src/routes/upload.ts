@@ -4,7 +4,7 @@ import {Router} from 'express';
 import isAuthorised from '../middleware/authentication';
 import path from 'path';
 import multer from 'multer';
-import standardiserInterface from "../components/standardiserInterface";
+import standardiserInterface from '../components/standardiserInterface';
 const upload = multer({dest: 'uploads/'});
 
 const router = Router();
@@ -47,7 +47,7 @@ router.put('/', upload.array('files'), async (req: Request, res) => {
 
 		const standardiser = new standardiserInterface();
 		// You need to await the async call to processInput
-		const response = await standardiser.processInput(req as Request, "");
+		const response = await standardiser.processInput(req, '');
 
 		// Since you are now awaiting, response should be the actual result and not a Promise.
 		if (response && response.failedUploads.length === 0) {
