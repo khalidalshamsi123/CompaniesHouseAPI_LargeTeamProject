@@ -480,5 +480,11 @@ export default class GamblingCommission {
 			return 'business-licence-register-businesses';
 		}
 	};
+
+	// This should contain the logic to take the group of files uploaded and perform the operations on them
+	public async standardise(...files: File[]): Promise<void> {
+
+	}
+
 }
 
