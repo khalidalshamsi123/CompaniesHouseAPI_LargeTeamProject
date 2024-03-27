@@ -32,19 +32,17 @@ class StandardiserInterface {
     }
 
     /**
-     * Process input data using the appropriate standardiser.
+     * Process input data using the appropriate standardiser. This is the function that should be called externally always.
      * @param {CsvKeys[] | Request} data - The data to be processed.
      * @param {string} schema - The database schema to be used.
      * @returns {Promise<void | { successfulUploads: string[], failedUploads: string[] }>} - The result of the processing.
      */
-    public async processInput(data: Request, schema: string): Promise<void | { successfulUploads: string[]; failedUploads: string[] }> {
+    public async processInput(data: Request | CsvKeys[], schema: string): Promise<void | { successfulUploads: string[]; failedUploads: string[] }> {
         try {
-            if (data.headers) {
-                return await this.processRequest(data as Request, schema);
-            } else if (Array.isArray(data)) {
+            if (data instanceof Array) {
                 return await this.processCsvKeys(data as CsvKeys[], schema);
             } else {
-                throw new Error('Invalid data type supplied to processInput: ' + data);
+                return await this.processRequest(data as Request, schema);
             }
         } catch (error) {
             console.error('Error in processInput: ', error);
