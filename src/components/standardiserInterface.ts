@@ -53,7 +53,8 @@ class StandardiserInterface {
     /**
      * Set up the standardiser functions in hashmap.
      */
-    private async setupStandardiserMaps(): Promise<void> {
+    // Made this public for testing purposes and there is no real affect of it being public so it should be fine.
+    async setupStandardiserMaps(): Promise<void> {
         this.standardisers.set(StandardiserKey.HMRC, new hmrcStandardiser);
     }
 
