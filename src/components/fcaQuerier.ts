@@ -70,10 +70,11 @@ async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthoris
 	// This if checks to see for if the Firm returns back as false then it would check for the individual using the IRN.
 	// As of now we do not have access to someones IRN therefore I have a mock/ test IRN provided by FCA's websites
 	// Thats why we dont pass it as{registrationId} instead we have <IRN> which is JOB01749
+	// Check if the firm is not authorized
 	if (runFcaCheck && !isAuthorised) {
 		// This route dose not handle the registrationId because it should check for IRN instead of FRN
 		const fcaResponseInd = await axios.get('https://register.fca.org.uk/services/V0.1/Individuals/JOB01749', axiosConfig);
-		const data = fcaResponse.data as Record<string, unknown>;
+		const data = fcaResponseInd.data as Record<string, unknown>;
 		const status = data.Status;
 		isCertified = status === 'FSR-API-03-01-00';
 	}
