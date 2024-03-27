@@ -3,7 +3,7 @@ import pool from '../../database/databasePool';
 import {pipeline} from 'node:stream/promises';
 import fs, {type ReadStream} from 'node:fs';
 import {type CopyStreamQuery, from as copyFrom} from 'pg-copy-streams';
-import {type GamblingCommissionFileDetails, type GamblingCommissionColumns} from '../../types/GamblingCommissionTypes';
+import {type GamblingCommissionFileDetails, type GamblingCommissionColumns, type CsvKeys} from '../../types/GamblingCommissionTypes';
 import {Transform, type Readable} from 'node:stream';
 import {parse, format} from 'fast-csv';
 
@@ -13,6 +13,7 @@ import {type Request} from 'express-serve-static-core';
 import Cursor from 'pg-cursor';
 import {insertGamblingCommissionBatch} from '../../database/csvToDatabase/dataProcessor';
 import {type PoolClient} from 'pg';
+import {sortStringToFrontOfArray} from '../../utils/utils';
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
@@ -54,17 +55,17 @@ export default class GamblingCommission {
      */
 	async uploadCsv(request: Request, schema: string): Promise<void | Error>;
 	/**
-     * Creates a new table in the production schema based on the data from the local CSV file associated with the key provided.
-     * @param csvKey Key for a CSV available locally. E.g., giving 'businessesCsv' - would trigger an update using the 'business_licence_register_businesses.csv' file.
+     * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
+     * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
 	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
      */
-	async uploadCsv(csvKey: string, schema: string): Promise<void>;
+	async uploadCsv(csvKeys: CsvKeys[], schema: string): Promise<void>;
 
-	async uploadCsv(data: string | Request, schema: string): Promise<void | Error> {
-		if (typeof data === 'string') {
-			const csvKey = data;
-			// Handle the case where the first argument is a string (csvKey).
-			await this.updateFromLocalFile(csvKey, schema);
+	async uploadCsv(data: CsvKeys[] | Request, schema: string): Promise<void | Error> {
+		if (data instanceof Array) {
+			const csvKeys = data;
+			// Handle the case where the first argument is an array of valid CSV keys.
+			await this.updateFromLocalFile(csvKeys, schema);
 		} else {
 			// Handle the case where the first argument is a Request object.
 			await this.uploadCsvWithStream(data, schema);
@@ -369,57 +370,63 @@ export default class GamblingCommission {
 	}
 
 	/**
-     * Creates a new table in the production schema based on the data from the local CSV file associated with the key provided.
-     * @param csvKey Key for a CSV available locally. E.g., giving 'businessesCsv' - would trigger an update using the 'business_licence_register_businesses.csv' file.
+     * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
+     * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
 	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
      */
-	private async updateFromLocalFile(csvKey: string, schema: string) {
-		/* We manually request a client from the pool in this instance.
+	private async updateFromLocalFile(csvKeys: CsvKeys[], schema: string) {
+		// Loop through csvKeys, processing each file given. Will update using the businessesCsv first.
+		// It is safe to cast csvKeys to string[], since csvKeys can only contain string values.
+		const sortedArray = sortStringToFrontOfArray(csvKeys as string[], this.csvAllowList[1]);
+
+		for await (const csvKey of sortedArray) {
+			/* We manually request a client from the pool in this instance.
 		   As this library requires us run the queries within a transaction, which is not
 		   possible if using the pool.query() method.
 
 		   A down-side to this is that we have to manually release the client
 		   back to the pool when finished querying the database. */
-		const client = await pool.connect();
-		try {
-			// Checks if the key is associated with a known CSV in our allow-list.
-			if (!this.csvAllowList.includes(csvKey)) {
-				throw new Error('Invalid CSV key provided.');
-			}
+			const client = await pool.connect();
+			try {
+				// Checks if the key is associated with a known CSV in our allow-list.
+				if (!this.csvAllowList.includes(csvKey)) {
+					throw new Error('Invalid CSV key provided.');
+				}
 
-			const tableName = this.getTableNameFromKey(csvKey);
-			const fileName = this.getFileNameFromKey(csvKey);
+				const tableName = this.getTableNameFromKey(csvKey);
+				const fileName = this.getFileNameFromKey(csvKey);
 
-			// Should never trigger but included as a safeguard.
-			if (!tableName) {
-				throw new Error('Table name is undefined.');
-			}
+				// Should never trigger but included as a safeguard.
+				if (!tableName) {
+					throw new Error('Table name is undefined.');
+				}
 
-			// Start transaction.
-			await client.query('BEGIN');
+				// Start transaction.
+				await client.query('BEGIN');
 
-			/* Delete rows from table we plan to add the new CSV data to. I make sure to use the same client instance. If I don't
+				/* Delete rows from table we plan to add the new CSV data to. I make sure to use the same client instance. If I don't
 			   the query is not run within the same transaction. */
-			await client.query(`DELETE FROM ${schema}.${tableName}`);
-			// The CSV keyword tells postgres that the data is being provided in a CSV format. HEADER is used to skip the first line of the CSV as it contains the column names.
-			const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv, HEADER)`));
+				await client.query(`DELETE FROM ${schema}.${tableName}`);
+				// The CSV keyword tells postgres that the data is being provided in a CSV format. HEADER is used to skip the first line of the CSV as it contains the column names.
+				const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv, HEADER)`));
 
-			// Might be a good idea to create an ENV variable for where the CSVs are stored, more customisable.
-			const sourceStream: ReadStream = fs.createReadStream(`./files/${fileName}.csv`);
-			await pipeline(sourceStream, ingestStream);
+				// Might be a good idea to create an ENV variable for where the CSVs are stored, more customisable.
+				const sourceStream: ReadStream = fs.createReadStream(`./files/${fileName}.csv`);
+				await pipeline(sourceStream, ingestStream);
 
-			// If no errors occur, we commit the changes.
-			await client.query('COMMIT');
-		} catch (e) {
-			console.error(e);
-			/* If an error has occured, we rollback the changes.
-			Ensuring that the application keeps the original contents of the table. */
-			await client.query('ROLLBACK');
-			// Return so aggregate process doesn't start.
-			return;
-		} finally {
+				// If no errors occur, we commit the changes.
+				await client.query('COMMIT');
+			} catch (e) {
+				console.error(e);
+				/* If an error has occured, we rollback the changes.
+				   Ensuring that the application keeps the original contents of the table. */
+				await client.query('ROLLBACK');
+				// Return so aggregate process doesn't start.
+				return;
+			} finally {
 			// Release client back to pool.
-			client.release();
+				client.release();
+			}
 		}
 
 		// If all went well uploading the local CSV to the relevant temp database table.
@@ -473,7 +480,7 @@ export default class GamblingCommission {
 	 */
 	private readonly getFileNameFromKey = (key: string) => {
 		if (key === 'licencesCsv') {
-			return 'business-licence-register-businesses';
+			return 'business-licence-register-licences';
 		}
 
 		if (key === 'businessesCsv') {
