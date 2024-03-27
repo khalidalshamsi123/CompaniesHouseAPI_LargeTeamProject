@@ -4,9 +4,10 @@ import GamblingCommission from "./GamblingCommission/GamblingCommission";
 import pool from "../database/databasePool";
 import hmrcStandardiser from "./hmrc/hmrcStandardiser";
 import path from "path";
+import {CsvKeys} from "../types/GamblingCommissionTypes";
 
 interface Standardiser {
-    standardise(data: string | string[] | Request, schema: string): Promise<void | Error>;
+    standardise(data: CsvKeys[] | Request, schema: string): Promise<void | Error>;
 }
 
 class StandardiserInterface {
@@ -17,17 +18,12 @@ class StandardiserInterface {
         this.setupStandardiserMaps();
     }
 
-    public async processInput(data: string | string[] | Request, schema: string) {
+    public async processInput(data: CsvKeys[] | Request, schema: string) {
         // Set to the csvKey(s) data if we are working with csv keys and set false if not so we can treat data as request to pass it to correct function
-        const csvKeys = typeof data === 'string' || Array.isArray(data) ? data : false;
+        const csvKeys = Array.isArray(data) ? data : false;
 
         // This means we are using csv keys so we can find which standardiser to use based on the csvkey information
         if (csvKeys !== false) {
-            if (csvKeys.includes('unknown')) {
-                console.error('Unsupported file type');
-                // Handle unsupported file type
-                return;
-            }
 
             if (csvKeys.includes('businessesCsv') || csvKeys.includes('licensesCsv')) {
                 await this.buildGamblingCommissionStandardiser();
@@ -67,7 +63,7 @@ class StandardiserInterface {
                     if (fileName.includes('hmrc-supervised-data')) {
 
                         // @ts-ignore
-                        await this.standardisers.get('hmrc').standardise(data,'');
+                        await this.standardisers.get('hmrc').standardise(data,schema);
                         successfulUploads.push(`${file.originalname} (HMRC CSV)`);
                     } else if (fileName.includes('business-licence-register-businesses')) {
                         // @ts-ignore

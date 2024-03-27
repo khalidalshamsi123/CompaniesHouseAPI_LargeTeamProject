@@ -10,6 +10,7 @@ import {Readable} from 'node:stream';
 
 import GamblingCommission from '../components/GamblingCommission/GamblingCommission';
 import build from '../components/GamblingCommission/GamblingCommissionFactory';
+import {type CsvKeys} from '../types/GamblingCommissionTypes';
 
 import request from 'supertest';
 import app from '../app';
@@ -74,7 +75,8 @@ describe('Given I have provided a valid Gambling Commission CSV file locally to 
 			const gcInstance = await build();
 			// Call the classes method, this should create a table called business_licence_register_businesses.
 			// And populate it with the mocked CSV data.
-			await gcInstance.uploadCsv('businessesCsv', 'test_schema');
+			const csvKeys: CsvKeys[] = ['businessesCsv'];
+			await gcInstance.uploadCsv(csvKeys, 'test_schema');
 
 			const result = await pool.query('SELECT * FROM test_schema.business_licence_register_businesses');
 			// Check that the CSV data has been succesfully uploaded.
