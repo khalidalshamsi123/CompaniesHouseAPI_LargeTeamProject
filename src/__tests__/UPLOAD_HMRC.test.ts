@@ -8,7 +8,7 @@ import path from 'path';
 describe('GIVEN an HMRC CSV is uploaded', () => {
 	describe('WHEN it is a correct CSV', () => {
 		it('THEN it should upload HMRC CSV successfully', async () => {
-			const filePath = path.join(__dirname, 'test-files', 'HMRC_CSV.csv');
+			const filePath = path.join(__dirname, 'test-files', 'hmrc-supervised-data.csv');
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
 				.put('/upload')
@@ -16,7 +16,7 @@ describe('GIVEN an HMRC CSV is uploaded', () => {
 				.attach('files', filePath);
 
 			expect(response.status).toBe(200);
-			expect(response.body.successfulUploads).toContain('HMRC_CSV.csv (HMRC CSV)');
+			expect(response.body.successfulUploads).toContain('hmrc-supervised-data.csv (HMRC CSV)');
 			expect(response.body.failedUploads).toHaveLength(0);
 		});
 	});

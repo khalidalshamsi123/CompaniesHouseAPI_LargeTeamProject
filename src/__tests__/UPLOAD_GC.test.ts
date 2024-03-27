@@ -8,7 +8,7 @@ import path from 'path';
 describe('GIVEN a Gambling Commission CSV is uploaded', () => {
 	describe('WHEN it is a correct CSV', () => {
 		it('THEN it should upload Gambling Commission CSV successfully', async () => {
-			const filePath = path.join(__dirname, 'test-files', 'Gambling_Commission_Data.csv');
+			const filePath = path.join(__dirname, 'test-files', 'business-licence-register-businesses.csv');
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app)
 				.put('/upload')
@@ -16,7 +16,7 @@ describe('GIVEN a Gambling Commission CSV is uploaded', () => {
 				.attach('files', filePath);
 
 			expect(response.status).toBe(200);
-			expect(response.body.successfulUploads).toContain('Gambling_Commission_Data.csv (Gambling Commission CSV)');
+			expect(response.body.successfulUploads).toContain('business-licence-register-businesses.csv (Gambling Commission CSV)');
 			expect(response.body.failedUploads).toHaveLength(0);
 		});
 	});
