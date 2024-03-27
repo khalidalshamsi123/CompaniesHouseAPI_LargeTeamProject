@@ -12,6 +12,7 @@ async function downloadCsvFile(hrefLink: string, fileName: string) {
 		fs.writeFile(fileName, fileData, () => {
 			// Console.log('csv file downloaded!');
 		});
+		return fileData;
 	} catch (error) {
 		console.error('Error occurred while downloading:', error);
 	}
@@ -38,10 +39,10 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 				} else if (href && href.endsWith('.ods')) {
 					returnedHref = href;
 					console.log(returnedHref);
-					await downloadCsvFile(href, './temphmrcfile.ods');
+					const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
+					await convertToCsv(downloadedOdsFile);
 				}
 			});
-		convertToCsv();
 		return returnedHref;
 	} catch (error) {
 		console.error('Error occurred during scraping:', error);

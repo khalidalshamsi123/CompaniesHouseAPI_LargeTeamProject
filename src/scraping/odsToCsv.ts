@@ -1,9 +1,9 @@
 import * as XSLX from 'xlsx';
 import * as fs from 'fs';
 
-function convertToCsv() {
+async function convertToCsv(odsFileData: any) {
 	try {
-		const odsFile = XSLX.readFile('temphmrcfile.ods');
+		const odsFile = XSLX.read(odsFileData, {type: 'buffer'});
 
 		/* This is a fail safe. Just in case the scraped ods file is empty
 		it would not overwrite the csv file
