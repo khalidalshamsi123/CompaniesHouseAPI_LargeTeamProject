@@ -13,6 +13,7 @@ import {type Request} from 'express-serve-static-core';
 import Cursor from 'pg-cursor';
 import {insertGamblingCommissionBatch} from '../../database/csvToDatabase/dataProcessor';
 import {type PoolClient} from 'pg';
+import {isArray} from "util";
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
@@ -60,12 +61,18 @@ export default class GamblingCommission {
      */
 	async uploadCsv(csvKey: string, schema: string): Promise<void>;
 
-	async uploadCsv(data: string | Request, schema: string): Promise<void | Error> {
+	async uploadCsv(csvKeys: string[], schema: string): Promise<void>;
+
+	async uploadCsv(data: string | string[] | Request, schema: string): Promise<void | Error> {
 		if (typeof data === 'string') {
 			const csvKey = data;
 			// Handle the case where the first argument is a string (csvKey).
 			await this.updateFromLocalFile(csvKey, schema);
-		} else {
+		}
+		else if (isArray(data)) {
+
+		}
+		else {
 			// Handle the case where the first argument is a Request object.
 			await this.uploadCsvWithStream(data, schema);
 		}
@@ -482,8 +489,19 @@ export default class GamblingCommission {
 	};
 
 	// This should contain the logic to take the group of files uploaded and perform the operations on them
-	public async standardise(...files: File[]): Promise<void> {
+	public async standardise(data: Request | string | string[] , schema: string): Promise<void> {
+		if (typeof data === 'string') {
+			const csvKey = data;
+			// Handle the case where the first argument is a string (csvKey).
+			this.uploadCsv(csvKey,schema);
+		}
+		else if (isArray(data)) {
 
+		}
+		else {
+			// Handle the case where the first argument is a Request object.
+			await this.uploadCsvWithStream(data, schema);
+		}
 	}
 
 }

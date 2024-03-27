@@ -1,11 +1,12 @@
+import { Request } from 'express';
 import { hmrcCsvReader } from "./HmrcProcessing";
 import GamblingCommission from "./GamblingCommission/GamblingCommission";
 import pool from "../database/databasePool";
 import hmrcStandardiser from "./hmrc/hmrcStandardiser";
-// Import other Standardiser classes as needed
+import path from "path";
 
 interface Standardiser {
-    standardise(...files: File[]): Promise<void>;
+    standardise(data: string | string[] | Request, schema: string): Promise<void | Error>;
 }
 
 class StandardiserInterface {
@@ -13,36 +14,86 @@ class StandardiserInterface {
 
     constructor() {
         this.standardisers = new Map();
-        // @ts-ignore It has type standardise defined in the class so not sure why it says it does not.
-        // Currently a psuedo class since specific standardiser class has not been created yet
-        this.standardisers.set('hmrc', hmrcStandardiser);
+        this.setupStandardiserMaps();
     }
 
-    public async processFiles(...files: File[]) {
-        const csvKeys = files.map(file => this.getFileType(file));
+    public async processInput(data: string | string[] | Request, schema: string) {
+        // Set to the csvKey(s) data if we are working with csv keys and set false if not so we can treat data as request to pass it to correct function
+        const csvKeys = typeof data === 'string' || Array.isArray(data) ? data : false;
 
-        if (csvKeys.includes('unknown')) {
-            console.error('Unsupported file type');
-            // Handle unsupported file type
+        // This means we are using csv keys so we can find which standardiser to use based on the csvkey information
+        if (csvKeys !== false) {
+            if (csvKeys.includes('unknown')) {
+                console.error('Unsupported file type');
+                // Handle unsupported file type
+                return;
+            }
+
+            if (csvKeys.includes('businessesCsv') || csvKeys.includes('licensesCsv')) {
+                await this.buildGamblingCommissionStandardiser();
+                const standardiser = this.standardisers.get('gambling_commission');
+                // @ts-ignore
+                await standardiser.standardise(csvKeys,schema);
+            } else if (csvKeys.includes('hmrcCsv')) {
+                const standardiser = this.standardisers.get('hmrc');
+                // @ts-ignore
+                await standardiser.standardise(csvKeys,schema);
+            } else {
+                console.error('Invalid combination of files');
+                // Invalid combination of files since for gambling commission both files are needed
+            }
             return;
         }
+        else if (data instanceof Request) {
+            // Let's now treat the data as a request so to find out which CSV has been given in this request we need following logic
+            // @ts-ignore
+            const files = data.files;
 
-        // We want to make sure we only have both CSVs if we try to update the database with new gambling commission information.
-        if (csvKeys.includes('businessesCsv') && csvKeys.includes('licensesCsv')) {
-            await this.buildGamblingCommissionStandardiser();
-            const standardiser = this.standardisers.get('gambling_commission');
-            // @ts-ignore
-            await standardiser.standardise(...files);
-        } else if (csvKeys.includes('hmrcCsv')) {
-            const standardiser = this.standardisers.get('hmrc');
-            // @ts-ignore
-            await standardiser.standardise(...files);
-        } else {
-            console.error('Invalid combination of files');
-            // Invalid combination of files since for gambling commission both files are needed
+            // We want to log all the successful and failed upload to provide a detailed feedback to the uploader (companies house employee)
+            const successfulUploads = [];
+            const failedUploads = [];
+
+            for (const file of files) {
+                const fileExtension = path.extname(file.originalname);
+                // Think this might need to be changed after they changed their file ext to odb?
+                if (fileExtension !== '.csv') {
+                    failedUploads.push(`${file.originalname} (Invalid file type)`);
+                    continue;
+                }
+
+                const fileName = path.basename(file.originalname, fileExtension);
+
+                try {
+                    if (fileName.includes('hmrc-supervised-data')) {
+
+                        // @ts-ignore
+                        await this.standardisers.get('hmrc').standardise(data,'');
+                        successfulUploads.push(`${file.originalname} (HMRC CSV)`);
+                    } else if (fileName.includes('business-licence-register-businesses')) {
+                        // @ts-ignore
+                        await this.standardisers.get('gambling_commission').standardise(data,schema);
+                        successfulUploads.push(`${file.originalname} (Gambling Commission CSV)`);
+                    } else {
+                        failedUploads.push(`${file.originalname} (Invalid file name)`);
+                    }
+                } catch (error) {
+                    console.error(`Error processing ${file.originalname}:`, error);
+                    failedUploads.push(`${file.originalname} (Error occurred)`);
+                }
+            }
+            return {successfulUploads, failedUploads};
         }
     }
 
+    // Set up standardisers that dont require preproccessing like gambling commission here
+    private async setupStandardiserMaps(){
+        // @ts-ignore
+        this.standardisers.set('hmrc', hmrcStandardiser)
+    }
+
+    private handleCSVKeyInput(data: string | string[]){
+
+    }
     private async buildGamblingCommissionStandardiser() {
         await this.createGamblingCommissionTables();
         const standardiser = new GamblingCommission();
@@ -81,17 +132,18 @@ class StandardiserInterface {
         }
     }
 
-    private getFileType(file: File): string {
-        const fileName = file.name.toLowerCase();
-        switch (true) {
-            case fileName.includes('business-licence-register-licences'):
-                return 'licensesCsv';
-            case fileName.includes('business-licence-register-businesses'):
-                return 'businessesCsv';
-            case fileName.includes('hmrc'):
-                return 'hmrcCsv';
-            default:
-                return 'unknown';
+    private getCsvKeysFromInput(input: string | string[] | Request): string[] {
+        if (typeof input === 'string') {
+            return [input];
+        } else if (Array.isArray(input)) {
+            return input;
+        } else {
+            const csvKeys = input.body.csvKeys; // Assuming the csvKeys are sent in the request body
+            if (Array.isArray(csvKeys)) {
+                return csvKeys;
+            } else {
+                return [csvKeys];
+            }
         }
     }
 }
