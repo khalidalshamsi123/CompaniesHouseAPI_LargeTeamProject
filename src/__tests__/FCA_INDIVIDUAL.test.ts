@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import axios from 'axios';
 import * as fcaQuerier from '../components/fcaQuerier';
 import {fcaGetApprovalStatus} from '../components/fcaQuerier';
