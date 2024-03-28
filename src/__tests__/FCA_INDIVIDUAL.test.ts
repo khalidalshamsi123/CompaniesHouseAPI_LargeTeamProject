@@ -32,7 +32,25 @@ describe('fcaGetApprovalStatus', () => {
 
 	const mockIndividualResponse = {
 		data: {
+
 			Status: 'FSR-API-03-01-00',
+			ResultInfo: {
+				page: '1',
+				per_page: '1',
+				total_count: '1',
+			},
+			Message: 'Ok. Individual found',
+			Data: [
+				{
+					Details: {
+						'Controlled Functions': 'https://register.fca.org.uk/services/V0.1/Individuals/JOB01749/CF',
+						IRN: 'JOB01749',
+						'Commonly Used Name': 'null',
+						'Individual Status': 'Active',
+						'Full Name': 'Brian Abdelhadi',
+					},
+				},
+			],
 		},
 	};
 
