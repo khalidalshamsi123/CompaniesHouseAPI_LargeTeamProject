@@ -40,7 +40,7 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 					returnedHref = href;
 					console.log(returnedHref);
 					const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
-					await convertToCsv(downloadedOdsFile);
+					await convertToCsv(downloadedOdsFile, './TheConvertedFile.csv');
 				}
 			});
 		return returnedHref;

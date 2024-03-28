@@ -1,7 +1,7 @@
 import * as XSLX from 'xlsx';
 import * as fs from 'fs';
 
-async function convertToCsv(odsFileData: any) {
+async function convertToCsv(odsFileData: any, convertedFilePath: string) {
 	try {
 		const odsFile = XSLX.read(odsFileData, {type: 'buffer'});
 
@@ -21,13 +21,12 @@ async function convertToCsv(odsFileData: any) {
 		const csvFile = XSLX.utils.sheet_to_csv(odsSheet);
 
 		// Write the csv file
-		fs.writeFileSync('./TheConvertedFile.csv', csvFile, 'utf-8');
+		fs.writeFileSync(convertedFilePath, csvFile, 'utf-8');
 
 		console.log('file has been converted');
 		return true;
 	} catch (error) {
 		console.error('Error occurred while converting:', error);
-		return false;
 	}
 }
 
