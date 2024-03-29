@@ -19,11 +19,12 @@ type CsvDataType = {
  * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
  */
 export async function processDataRow(data: CsvDataType): Promise<void>;
+// eslint-disable-next-line @typescript-eslint/unified-signatures
 export async function processDataRow(data: DataRow): Promise<void>;
 export async function processDataRow(data: DataRow | CsvDataType): Promise<void> {
 	if ('client' in data) {
 		// Data is of type DataRow
-		const { row, regIdIndex, status1Index, client } = data;
+		const {row, regIdIndex, status1Index, client} = data;
 		const registrationId = String(row[Object.keys(row)[regIdIndex]]);
 		const statusIndex = Object.keys(row)[status1Index];
 		const statusValue = String(row[statusIndex]); // Convert status value to string
@@ -45,7 +46,7 @@ export async function processDataRow(data: DataRow | CsvDataType): Promise<void>
  * @param registrationId The registration ID.
  * @param client The database client.
  */
-async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
+export async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
 	const query = `
         INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
         VALUES ($1, $2, $3, $4, $5)
