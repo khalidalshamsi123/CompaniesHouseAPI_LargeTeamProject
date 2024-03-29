@@ -32,11 +32,11 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 				// Find the href
 				const href = $(element).attr('href');
 				// Check if the file is of type csv or ods
-				if (href && href.endsWith('.csv')) {
+				if (href?.endsWith('.csv')) {
 					returnedHref = href;
 					console.log(returnedHref);
 					await downloadCsvFile(href, './newHmrcFile.csv');
-				} else if (href && href.endsWith('.ods')) {
+				} else if (href?.endsWith('.ods')) {
 					returnedHref = href;
 					console.log(returnedHref);
 					const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
