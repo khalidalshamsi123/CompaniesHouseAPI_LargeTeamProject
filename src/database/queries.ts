@@ -52,14 +52,4 @@ async function findAllApprovedByRegId(registrationId: string): Promise<BusinessD
 	}
 }
 
-/**
- * Deletes the rows within the specified table.
- * @param tableName Name of table to delete rows from.
- */
-const deleteTableRows = async (tableName: string) => {
-	/* I don't use try-catch deliberately. If an error occurs I think the caller
-	   should handle the error and decide what to do next. */
-	await pool.query(`DELETE FROM registration_schema.${tableName}`);
-};
-
-export {findAllApprovedByRegId, insertBusinessData, deleteTableRows};
+export {findAllApprovedByRegId, insertBusinessData};

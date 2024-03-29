@@ -1,23 +1,20 @@
 import request from 'supertest';
 import app from '../app';
-import * as fcaQuerier from '../components/fcaQuerier';
 
 import {clearTestDatabase, setupTestDatabase, selectFromTestDatabase} from '../utils/databaseTestFuncs';
 import * as productionQueries from '../database/queries';
 
 beforeAll(async () => {
-	// Clearing in the afterAll section causes issues with test suites following this one.
-	await clearTestDatabase();
 	// Replace the implementation for the findAllApprovedByRegId() method with the one
 	// that interacts with the test database, for the duration of this test suite.
 	jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockImplementation(selectFromTestDatabase);
-	jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 	await setupTestDatabase();
 });
 
 afterAll(async () => {
 	// Clears all the spy mocks.
 	jest.clearAllMocks();
+	await clearTestDatabase();
 });
 
 // Given.
