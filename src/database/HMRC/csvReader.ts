@@ -32,15 +32,11 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 						return;
 					}
 					// Process the current row of data
-
 					await processDataRow({
 						row,
 						regIdIndex,
 						status1Index,
-						cache,
 						client,
-						batchSize,
-						rowCount,
 					});
 				} catch (error) {
 					console.error('Error processing row:', error);

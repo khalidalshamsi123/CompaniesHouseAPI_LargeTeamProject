@@ -4,30 +4,38 @@ type DataRow = {
 	row: Record<string, any>;
 	regIdIndex: number;
 	status1Index: number;
-	cache: Record<string, boolean>;
 	client: PoolClient;
-	batchSize: number;
-	rowCount: number;
 };
+
+type CsvDataType = {
+	businessNames: string[];
+	gamblingApprovalStatuses: boolean;
+	insertClient: PoolClient;
+	schema: string;
+};
+
 /**
  * Process a single row of CSV data.
  * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
  */
-export async function processDataRow({row, regIdIndex, status1Index, cache, client, batchSize, rowCount}: DataRow) {
-	const registrationId = String(row[Object.keys(row)[regIdIndex]]);
-	const status1Value = String(row[Object.keys(row)[status1Index]]).toLowerCase().replace(/[\W_]/g, '');
-
-	// Determine the query and values based on the status1Value
-	if (status1Value === 'approved') {
-		await hmrcProcess(row, registrationId, client);
-	} else if (status1Value === 'active') {
-		await gamblingCommissionProcess(row, registrationId, client);
-	}
-
-	// Commit transaction every batchSize rows
-	if (rowCount % batchSize === 0) {
-		await client.query('COMMIT');
-		await client.query('BEGIN');
+export async function processDataRow(data: CsvDataType): Promise<void>;
+export async function processDataRow(data: DataRow): Promise<void>;
+export async function processDataRow(data: DataRow | CsvDataType): Promise<void> {
+	if ('client' in data) {
+		// Data is of type DataRow
+		const { row, regIdIndex, status1Index, client } = data;
+		const registrationId = String(row[Object.keys(row)[regIdIndex]]);
+		const statusIndex = Object.keys(row)[status1Index];
+		const statusValue = String(row[statusIndex]); // Convert status value to string
+		// Determine the boolean value based on the status string
+		const status = statusValue.toLowerCase();
+		if (status === 'approved') {
+			await hmrcProcess(row, registrationId, client);
+		}
+	} else {
+		console.log(data.gamblingApprovalStatuses);
+		// Data is of type CsvDataType
+		await gamblingCommissionInsert(data.businessNames, data.gamblingApprovalStatuses, data.insertClient, data.schema);
 	}
 }
 
@@ -39,11 +47,11 @@ export async function processDataRow({row, regIdIndex, status1Index, cache, clie
  */
 async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
 	const query = `
-	    INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-		VALUES ($1, $2, $3, $4, $5)
-		ON CONFLICT (businessname)
-		DO UPDATE SET hmrc_approved = EXCLUDED.hmrc_approved;
-	`;
+        INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (businessname)
+        DO UPDATE SET hmrc_approved = EXCLUDED.hmrc_approved;
+    `;
 	const values = [
 		registrationId,
 		row.BUSINESS_NAME,
@@ -56,30 +64,18 @@ async function hmrcProcess(row: any, registrationId: string, client: PoolClient)
 
 /**
  * Process data for Gambling Commission approved businesses.
- * @param row The row data.
- * @param registrationId The registration ID.
- * @param client The database client.
+ * @param businessNames The array of business names.
+ * @param gamblingApprovalStatuses The boolean value indicating gambling approval status.
+ * @param insertClient The database client.
+ * @param schema The database schema.
  */
-async function gamblingCommissionProcess(row: any, registrationId: string, client: PoolClient) {
+async function gamblingCommissionInsert(businessNames: string[], gamblingApprovalStatuses: boolean, insertClient: PoolClient, schema: string) {
 	const query = `
-		INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-		VALUES ($1, $2, $3, $4, $5)
-		ON CONFLICT (businessname)
-		DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved;
-	`;
-	const values = [
-		registrationId,
-		row.BUSINESS_NAME,
-		false,
-		false,
-		true,
-	];
-	await client.query(query, values);
+        INSERT INTO ${schema}.business_registry (businessname, gambling_approved)
+        VALUES ($1, $2)
+        ON CONFLICT (businessname)
+        DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved;
+    `;
+	const values = [businessNames, gamblingApprovalStatuses];
+	await insertClient.query(query, values);
 }
-
-// Future developers: To add support for another government regulatory body:
-// 1. Identify the condition for approval in the CSV data (e.g., status column value).
-// 2. Create a new function similar to hmrcProcess and gamblingCommissionProcess.
-// 3. Update the processDataRow function to call the new function based on the identified condition.
-// 4. Update the database schema and queries accordingly to store and update the new approval status.
-// 5. Ensure proper error handling and transaction management for data consistency.

@@ -1,8 +1,6 @@
-import {pool} from '../setup/databasePool'; // Ensure the correct relative path
+import {pool} from '../setup/databasePool';
 import type {PoolClient} from 'pg';
 import {processCsv} from './csvProcessor';
-
-// Your loadData function here...
 
 export async function loadData(filename: string) {
 	let client: PoolClient | undefined;
@@ -27,5 +25,5 @@ export async function loadData(filename: string) {
 	}
 }
 
-// Call the loadData function and handle any errors
+// Call the loadData function for testing purposes
 loadData('Supervised-Business-Register.csv').catch(console.error);
