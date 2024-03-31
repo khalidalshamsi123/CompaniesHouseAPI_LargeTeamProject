@@ -36,6 +36,7 @@ install_dependencies:
   stage: install
   script:
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
 
 build:
   extends:
@@ -43,6 +44,7 @@ build:
   stage: build
   script:
     - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run build
 
 lint:
