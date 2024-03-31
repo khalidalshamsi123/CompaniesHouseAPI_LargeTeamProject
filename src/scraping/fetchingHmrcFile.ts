@@ -26,23 +26,27 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 		const $ = cheerio.load(hmrcResponse.data);
 		let returnedHref = 'empty';
 
+		const elements = $(elementsPath);
+
 		// Traversing through the html elements using css selectors
-		$(elementsPath)
-			.each(async (index, element) => {
-				// Find the href
-				const href = $(element).attr('href');
-				// Check if the file is of type csv or ods
-				if (href?.endsWith('.csv')) {
-					returnedHref = href;
-					console.log(returnedHref);
-					await downloadCsvFile(href, './newHmrcFile.csv');
-				} else if (href?.endsWith('.ods')) {
-					returnedHref = href;
-					console.log(returnedHref);
-					const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
-					await convertToCsv(downloadedOdsFile, './TheConvertedFile.csv');
-				}
-			});
+		const promises = elements.map(async (index, element) => {
+			// Find the href
+			const href = $(element).attr('href');
+			// Check if the file is of type csv or ods
+			if (href?.endsWith('.csv')) {
+				returnedHref = href;
+				console.log(returnedHref);
+				await downloadCsvFile(href, './newHmrcFile.csv');
+			} else if (href?.endsWith('.ods')) {
+				returnedHref = href;
+				console.log(returnedHref);
+				const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
+				await convertToCsv(downloadedOdsFile, './TheConvertedFile.csv');
+			}
+		}).get();
+
+		await Promise.all(promises);
+
 		return returnedHref;
 	} catch (error) {
 		console.error('Error occurred during scraping:', error);
