@@ -1,4 +1,4 @@
-import pl from 'nodejs-polars';
+import pl, {DataFrame, col, readCSV} from 'nodejs-polars';
 
 type JsonValue = {
 	name: string;

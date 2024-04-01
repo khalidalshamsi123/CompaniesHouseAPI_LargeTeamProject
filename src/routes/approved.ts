@@ -1,10 +1,12 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
+import isAuthorised from '../middleware/authentication';
+import {findAllApprovedByRegId} from '../database/queries';
+import {fcaGetApprovalStatus} from '../components/fcaQuerier';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
-
-import isAuthorised from '../middleware/authentication';
+import {scrapeHmrcWebsite} from '../scraping/fetchingHmrcFile';
 
 const router = Router();
 
@@ -32,10 +34,9 @@ router.get('/', isAuthorised, async (req, res) => {
 		res.sendStatus(400);
 	}
 });
-// Checking if my branch works
 
 // All hmrc data router.
-router.get('/allhmrc', (req, res) => {
+router.get('/allhmrc', async (req, res) => {
 	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 

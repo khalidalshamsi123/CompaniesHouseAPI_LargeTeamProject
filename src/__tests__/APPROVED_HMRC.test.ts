@@ -6,8 +6,6 @@ import {clearTestDatabase, setupTestDatabase, selectFromTestDatabase} from '../u
 import * as productionQueries from '../database/queries';
 
 beforeAll(async () => {
-	// Clearing in the afterAll section causes issues with test suites following this one.
-	await clearTestDatabase();
 	// Replace the implementation for the findAllApprovedByRegId() method with the one
 	// that interacts with the test database, for the duration of this test suite.
 	jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockImplementation(selectFromTestDatabase);
@@ -18,6 +16,7 @@ beforeAll(async () => {
 afterAll(async () => {
 	// Clears all the spy mocks.
 	jest.clearAllMocks();
+	await clearTestDatabase();
 });
 
 // Given.
