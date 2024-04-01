@@ -37,6 +37,7 @@
     "pg-copy-streams": "^6.0.6",
     "pg-cursor": "^2.10.3",
     "polars": "^0.0.1",
+    "xlsx": "^0.18.5",
     "xslx": "^1.0.0"
   },
   "devDependencies": {
