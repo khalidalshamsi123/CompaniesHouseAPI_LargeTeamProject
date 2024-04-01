@@ -20,7 +20,8 @@ async function downloadCsvFile(hrefLink: string, fileName: string) {
 
 async function scrapeHmrcWebsite(elementsPath: string) {
 	try {
-	// eslint-disable-next-line @typescript-eslint/ban-types
+		// This is disabled because i need the type to be buffer for it to work.
+		// eslint-disable-next-line @typescript-eslint/ban-types
 		const hmrcResponse: AxiosResponse<string | Buffer> = await axios.get('https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register');
 
 		const $ = cheerio.load(hmrcResponse.data);
