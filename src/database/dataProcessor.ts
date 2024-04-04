@@ -7,9 +7,9 @@ type DataRow = {
 	client: PoolClient;
 };
 
-type CsvDataType = {
+type GamblingCommissionData = {
 	businessNames: string[];
-	gamblingApprovalStatuses: boolean;
+	gamblingApprovalStatuses: boolean[]; // Updated to accept an array of booleans
 	insertClient: PoolClient;
 	schema: string;
 };
@@ -18,11 +18,11 @@ type CsvDataType = {
  * Process a single row of CSV data.
  * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
  */
-export async function processDataRow(data: CsvDataType): Promise<void>;
+export async function insertData(data: GamblingCommissionData): Promise<void>;
 // eslint-disable-next-line @typescript-eslint/unified-signatures
-export async function processDataRow(data: DataRow): Promise<void>;
-export async function processDataRow(data: DataRow | CsvDataType): Promise<void> {
-	if ('client' in data) {
+export async function insertData(data: DataRow): Promise<void>;
+export async function insertData(data: DataRow | GamblingCommissionData): Promise<void> {
+	if (isDataRow(data)) {
 		// Data is of type DataRow
 		const {row, regIdIndex, status1Index, client} = data;
 		const registrationId = String(row[Object.keys(row)[regIdIndex]]);
@@ -33,11 +33,22 @@ export async function processDataRow(data: DataRow | CsvDataType): Promise<void>
 		if (status === 'approved') {
 			await hmrcProcess(row, registrationId, client);
 		}
-	} else {
+	} else if (isGamblingCommissionData(data)) {
 		console.log(data.gamblingApprovalStatuses);
-		// Data is of type CsvDataType
+		// Data is of type GamblingCommissionData
 		await gamblingCommissionInsert(data.businessNames, data.gamblingApprovalStatuses, data.insertClient, data.schema);
+	} else {
+		throw new Error('Invalid type provided.');
 	}
+}
+
+// Type guard functions
+function isDataRow(data: any): data is DataRow {
+	return 'client' in data;
+}
+
+function isGamblingCommissionData(data: any): data is GamblingCommissionData {
+	return 'gamblingApprovalStatuses' in data;
 }
 
 /**
@@ -70,13 +81,18 @@ export async function hmrcProcess(row: any, registrationId: string, client: Pool
  * @param insertClient The database client.
  * @param schema The database schema.
  */
-async function gamblingCommissionInsert(businessNames: string[], gamblingApprovalStatuses: boolean, insertClient: PoolClient, schema: string) {
+async function gamblingCommissionInsert(businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient, schema: string) {
+	// Construct the SQL query to insert data into the business_registry table
 	const query = `
         INSERT INTO ${schema}.business_registry (businessname, gambling_approved)
-        VALUES ($1, $2)
+        -- Unnest the businessNames and gamblingApprovalStatuses arrays to insert multiple rows at once
+        SELECT unnest($1), unnest($2)
         ON CONFLICT (businessname)
         DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved;
     `;
+	// Prepare the array of values to be inserted into the query
 	const values = [businessNames, gamblingApprovalStatuses];
+	// Execute the query using the database client
 	await insertClient.query(query, values);
 }
+

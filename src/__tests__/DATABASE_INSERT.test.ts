@@ -1,4 +1,4 @@
-import {processDataRow, hmrcProcess} from '../database/dataProcessor';
+import {insertData, hmrcProcess} from '../database/dataProcessor';
 import {type PoolClient} from 'pg';
 
 // Mock PoolClient and its methods
@@ -41,7 +41,7 @@ describe('processDataRow function', () => {
 
 		it('should call hmrcProcess function', async () => {
 			// WHEN
-			await processDataRow(mockDataRow);
+			await insertData(mockDataRow);
 
 			// THEN
 			expect(mockClient.query).toHaveBeenCalled();
@@ -52,7 +52,7 @@ describe('processDataRow function', () => {
 	describe('when processing data for Gambling Commission approved businesses', () => {
 		const mockCsvData = {
 			businessNames: ['Test Company'],
-			gamblingApprovalStatuses: true,
+			gamblingApprovalStatuses: [true],
 			insertClient: mockClient,
 			schema: 'test_schema',
 		};
@@ -62,7 +62,7 @@ describe('processDataRow function', () => {
 			// Mock data for Gambling Commission approved businesses
 
 			// WHEN
-			await processDataRow(mockCsvData);
+			await insertData(mockCsvData);
 
 			// THEN
 			expect(mockClient.query).toHaveBeenCalled();

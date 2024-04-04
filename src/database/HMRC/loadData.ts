@@ -15,12 +15,9 @@ export async function loadData(filename: string) {
 	} catch (error) {
 		console.error('Error connecting to database:', error);
 	} finally {
+		// Release the client back to the pool
 		if (client) {
-			// Release the client back to the pool
 			client.release();
-		} else {
-			// If client is not assigned due to an error, release it back to the pool
-			await pool.end(); // End the pool to prevent hanging connections
 		}
 	}
 }

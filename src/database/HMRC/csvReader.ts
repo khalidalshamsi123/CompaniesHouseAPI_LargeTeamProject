@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {processDataRow} from '../dataProcessor';
+import {insertData} from '../dataProcessor';
 import {type PoolClient} from 'pg';
 
 /**
@@ -31,8 +31,9 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 						regIdIndex = Object.keys(row).findIndex(key => key.toLowerCase().includes('licence number') || key.toLowerCase().includes('reg'));
 						return;
 					}
+
 					// Process the current row of data
-					await processDataRow({
+					await insertData({
 						row,
 						regIdIndex,
 						status1Index,
