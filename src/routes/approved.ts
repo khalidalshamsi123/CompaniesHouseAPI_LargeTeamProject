@@ -3,11 +3,12 @@ import {queryAggregator} from '../components/aggregator';
 
 import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
+
 import isAuthorised from '../middleware/authentication';
 
 const router = Router();
 
-router.get('/', async (req, res) => {
+router.get('/', isAuthorised, async (req, res) => {
 	try {
 		const {registrationId} = req.query;
 		const {businessName} = req.query;
@@ -31,6 +32,7 @@ router.get('/', async (req, res) => {
 		res.sendStatus(400);
 	}
 });
+// Checking if my branch works
 
 // All hmrc data router.
 router.get('/allhmrc', (req, res) => {
