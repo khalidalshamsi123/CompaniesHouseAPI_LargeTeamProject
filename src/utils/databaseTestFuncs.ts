@@ -1,4 +1,4 @@
-import {pool} from '../database/setup/databasePool';
+import pool from '../database/setup/databasePool';
 import {type BusinessData} from '../database/queries';
 
 // Function to create database schema and insert test data
