@@ -18,7 +18,8 @@ async function createSchema() {
 		throw error;
 	}
 }
-export{createSchema};
+
+export {createSchema};
 // Call the createSchema function
 createSchema()
 	.then(() => {

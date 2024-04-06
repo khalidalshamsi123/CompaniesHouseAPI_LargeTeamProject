@@ -81,4 +81,5 @@ async function gamblingCommissionInsert(businessNames: string[], gamblingApprova
 	// Execute the query using the database client
 	await insertClient.query(query, [businessNames, gamblingApprovalStatuses]);
 }
+
 export {hmrcProcess, insertData};

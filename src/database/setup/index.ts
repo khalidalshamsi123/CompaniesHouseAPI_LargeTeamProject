@@ -31,4 +31,4 @@ async function main() {
 	}
 }
 
-export{main};
+export {main};

@@ -25,4 +25,4 @@ async function hmrcComponent(filename: string) {
 // Call the HMRC function for testing purposes
 hmrcComponent('./files/Supervised-Business-Register.csv').catch(console.error);
 
-export{hmrcComponent};
+export {hmrcComponent};

@@ -64,4 +64,4 @@ async function csvReader(filename: string, client: PoolClient, batchSize: number
 	});
 }
 
-export{csvReader};
+export {csvReader};

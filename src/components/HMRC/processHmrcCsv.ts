@@ -17,5 +17,5 @@ async function processHmrcCsv({filename, client, batchSize}: CsvProcessorOptions
 	return rowCount;
 }
 
-export{processHmrcCsv};
+export {processHmrcCsv};
 
