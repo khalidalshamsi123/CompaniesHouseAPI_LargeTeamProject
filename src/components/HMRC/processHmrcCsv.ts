@@ -12,8 +12,10 @@ type CsvProcessorOptions = {
  * @param options Options including filename, database client, and batch size.
  * @returns The number of rows processed.
  */
-export async function processHmrcCsv({filename, client, batchSize}: CsvProcessorOptions): Promise<number> {
+async function processHmrcCsv({filename, client, batchSize}: CsvProcessorOptions): Promise<number> {
 	const rowCount = await csvReader(filename, client, batchSize);
 	return rowCount;
 }
+
+export{processHmrcCsv};
 

@@ -2,7 +2,7 @@ import pool from '../../database/setup/databasePool';
 import type {PoolClient} from 'pg';
 import {processHmrcCsv} from './processHmrcCsv';
 
-export async function hmrcComponent(filename: string) {
+async function hmrcComponent(filename: string) {
 	let client: PoolClient | undefined;
 	try {
 		// Connect to the database
@@ -24,3 +24,5 @@ export async function hmrcComponent(filename: string) {
 
 // Call the HMRC function for testing purposes
 hmrcComponent('./files/Supervised-Business-Register.csv').catch(console.error);
+
+export{hmrcComponent};

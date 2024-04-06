@@ -1,6 +1,6 @@
 import pool from './databasePool';
 
-export async function createSchema() {
+async function createSchema() {
 	try {
 		console.log('Creating database schema...');
 		await pool.query('CREATE SCHEMA IF NOT EXISTS registration_schema;');
@@ -18,7 +18,7 @@ export async function createSchema() {
 		throw error;
 	}
 }
-
+export{createSchema};
 // Call the createSchema function
 createSchema()
 	.then(() => {
@@ -29,3 +29,4 @@ createSchema()
 		console.error('Schema creation failed:', error);
 		// Handle errors if necessary
 	});
+

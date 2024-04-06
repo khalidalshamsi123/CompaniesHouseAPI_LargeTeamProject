@@ -5,10 +5,10 @@ import {type DataRow, type GamblingCommissionData} from '../types/DatebaseInsert
  * Process a single row of CSV data.
  * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
  */
-export async function insertData(data: GamblingCommissionData): Promise<void>;
+async function insertData(data: GamblingCommissionData): Promise<void>;
 // eslint-disable-next-line @typescript-eslint/unified-signatures
-export async function insertData(data: DataRow): Promise<void>;
-export async function insertData(data: DataRow | GamblingCommissionData): Promise<void> {
+async function insertData(data: DataRow): Promise<void>;
+async function insertData(data: DataRow | GamblingCommissionData): Promise<void> {
 	if (isDataRow(data)) {
 		// Data is of type DataRow
 		const {row, regIdIndex, status1Index, client} = data;
@@ -44,7 +44,7 @@ function isGamblingCommissionData(data: any): data is GamblingCommissionData {
  * @param registrationId The registration ID.
  * @param client The database client.
  */
-export async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
+async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
 	const query = `
         INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
         VALUES ($1, $2, $3, $4, $5)
@@ -82,4 +82,6 @@ async function gamblingCommissionInsert(businessNames: string[], gamblingApprova
 	// Execute the query using the database client
 	await insertClient.query(query, values);
 }
+
+export{hmrcProcess, insertData};
 

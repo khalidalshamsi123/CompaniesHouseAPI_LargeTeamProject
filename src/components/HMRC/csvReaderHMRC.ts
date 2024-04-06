@@ -10,7 +10,7 @@ import {type PoolClient} from 'pg';
  * @param batchSize Size of each batch for database transactions.
  * @returns The number of rows processed.
  */
-export async function csvReader(filename: string, client: PoolClient, batchSize: number): Promise<number> {
+async function csvReader(filename: string, client: PoolClient, batchSize: number): Promise<number> {
 	let rowCount = 0; // Counter for the number of rows processed
 	let status1Index = -1;
 	let regIdIndex = -1;
@@ -63,3 +63,5 @@ export async function csvReader(filename: string, client: PoolClient, batchSize:
 			});
 	});
 }
+
+export{csvReader};
