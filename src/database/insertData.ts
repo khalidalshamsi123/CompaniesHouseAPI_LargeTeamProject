@@ -83,5 +83,4 @@ async function gamblingCommissionInsert(businessNames: string[], gamblingApprova
 	await insertClient.query(query, values);
 }
 
-export{hmrcProcess, insertData};
-
+export {hmrcProcess, insertData};
