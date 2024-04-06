@@ -73,14 +73,12 @@ async function gamblingCommissionInsert(businessNames: string[], gamblingApprova
 	const query = `
         INSERT INTO ${schema}.business_registry (businessname, gambling_approved)
         -- Unnest the businessNames and gamblingApprovalStatuses arrays to insert multiple rows at once
-        SELECT unnest($1), unnest($2)
+        SELECT * FROM UNNEST($1::TEXT[], $2::BOOLEAN[])
+        AS t (businessname, gambling_approved)
         ON CONFLICT (businessname)
         DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved;
     `;
-	// Prepare the array of values to be inserted into the query
-	const values = [businessNames, gamblingApprovalStatuses];
 	// Execute the query using the database client
-	await insertClient.query(query, values);
+	await insertClient.query(query, [businessNames, gamblingApprovalStatuses]);
 }
-
 export {hmrcProcess, insertData};
