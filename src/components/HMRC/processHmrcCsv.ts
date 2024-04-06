@@ -1,4 +1,4 @@
-import {readAndProcessCsv} from './csvReader';
+import {csvReader} from './csvReaderHMRC';
 import {type PoolClient} from 'pg';
 
 type CsvProcessorOptions = {
@@ -12,8 +12,8 @@ type CsvProcessorOptions = {
  * @param options Options including filename, database client, and batch size.
  * @returns The number of rows processed.
  */
-export async function processCsv({filename, client, batchSize}: CsvProcessorOptions): Promise<number> {
-	const rowCount = await readAndProcessCsv(filename, client, batchSize);
+export async function processHmrcCsv({filename, client, batchSize}: CsvProcessorOptions): Promise<number> {
+	const rowCount = await csvReader(filename, client, batchSize);
 	return rowCount;
 }
 

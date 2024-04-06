@@ -1,18 +1,5 @@
 import type {PoolClient} from 'pg';
-
-type DataRow = {
-	row: Record<string, any>;
-	regIdIndex: number;
-	status1Index: number;
-	client: PoolClient;
-};
-
-type GamblingCommissionData = {
-	businessNames: string[];
-	gamblingApprovalStatuses: boolean[]; // Updated to accept an array of booleans
-	insertClient: PoolClient;
-	schema: string;
-};
+import {type DataRow, type GamblingCommissionData} from '../types/DatebaseInsertTypes';
 
 /**
  * Process a single row of CSV data.

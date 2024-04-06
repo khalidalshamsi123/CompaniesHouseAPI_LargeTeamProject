@@ -1,4 +1,4 @@
-import {pool} from './databasePool';
+import pool from './databasePool';
 
 export async function createSchema() {
 	try {

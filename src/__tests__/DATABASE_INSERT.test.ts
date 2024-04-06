@@ -1,4 +1,4 @@
-import {insertData, hmrcProcess} from '../database/dataProcessor';
+import {insertData} from '../database/insertData';
 import {type PoolClient} from 'pg';
 
 // Mock PoolClient and its methods

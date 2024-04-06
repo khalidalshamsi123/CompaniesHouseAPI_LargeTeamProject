@@ -1,9 +1,9 @@
-import pool from '../../database/databasePool';
+import pool from '../../database/setup/databasePool';
 import GamblingCommission from './GamblingCommission';
 
 /**
  * Creates a ready-to-use instance of the Gambling Commission class.
-*/
+ */
 const build = async (): Promise<GamblingCommission> => {
 	// Create database tables for Gambling Commission CSVs if they do not already exist.
 	await createGamblingCommissionTables();
@@ -26,10 +26,10 @@ const build = async (): Promise<GamblingCommission> => {
  * I have decided to make this method public, to allow it to be easily tested. There's no harm
  * in allowing other components to call this utility method as it only creates the tables if they
  * don't exist already.
-*/
+ */
 export const createGamblingCommissionTables = async () => {
 	try {
-	// Determine what environment the application is running in.
+		// Determine what environment the application is running in.
 		const environment = process.env.NODE_ENV;
 		// By default will use the production schema.
 		let schema = 'registration_schema';
@@ -41,10 +41,10 @@ export const createGamblingCommissionTables = async () => {
 
 		// Table definitions match the current format used for the required gambling commission CSVs.
 		await pool.query(`
-		CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_businesses (
-			account_number BIGINT PRIMARY KEY,
-			licence_account_name VARCHAR(255) NOT NULL
-		);`);
+			CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_businesses (
+				account_number BIGINT PRIMARY KEY,
+				licence_account_name VARCHAR(255) NOT NULL
+			);`);
 
 		await pool.query(`CREATE TABLE IF NOT EXISTS ${schema}.business_licence_register_licences (
 			account_number BIGINT NOT NULL,
@@ -54,7 +54,7 @@ export const createGamblingCommissionTables = async () => {
 			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
-		);`);
+			);`);
 	} catch (e) {
 		console.error(e);
 		console.error('You have most likely forgotten to set your NODE_ENV variable within .env');

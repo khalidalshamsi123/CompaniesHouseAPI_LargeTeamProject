@@ -1,4 +1,4 @@
-import {pool} from './databasePool';
+import pool from './databasePool';
 
 async function printTableContents(schema: string, tableName: string) {
 	const query = `SELECT * FROM "${schema}"."${tableName}"`;

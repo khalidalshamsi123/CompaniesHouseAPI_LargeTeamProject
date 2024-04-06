@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {insertData} from '../dataProcessor';
+import {insertData} from '../../database/insertData';
 import {type PoolClient} from 'pg';
 
 /**
@@ -10,7 +10,7 @@ import {type PoolClient} from 'pg';
  * @param batchSize Size of each batch for database transactions.
  * @returns The number of rows processed.
  */
-export async function readAndProcessCsv(filename: string, client: PoolClient, batchSize: number): Promise<number> {
+export async function csvReader(filename: string, client: PoolClient, batchSize: number): Promise<number> {
 	let rowCount = 0; // Counter for the number of rows processed
 	let status1Index = -1;
 	let regIdIndex = -1;

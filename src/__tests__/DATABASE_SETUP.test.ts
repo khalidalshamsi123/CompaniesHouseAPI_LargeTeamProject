@@ -1,11 +1,10 @@
-import * as csvReader from '../database/HMRC/csvReader';
-import * as dataProcessor from '../database/dataProcessor';
 import fs from 'fs';
 import csvParser from 'csv-parser';
 import type {PoolClient} from 'pg';
+import {csvReader} from '../components/HMRC/csvReaderHMRC';
 
 jest.mock('csv-parser');
-jest.mock('../database/HMRC/csvReader');
+jest.mock('../components/HMRC/csvReaderHMRC');
 jest.mock('fs');
 
 describe('Database Operations Test', () => {
@@ -40,7 +39,7 @@ describe('Database Operations Test', () => {
 		test('When loading data, Then it should load the data successfully', async () => {
 			const expectedRowCount = 2; // Mock the expected row count
 			// Mock the behavior of csvReader.readAndProcessCsv to resolve with the expected row count
-			(csvReader.readAndProcessCsv as jest.Mock).mockResolvedValueOnce(expectedRowCount);
+			(csvReader as jest.Mock).mockResolvedValueOnce(expectedRowCount);
 			// Mock the behavior of fs.createReadStream
 			(fs.createReadStream as jest.Mock).mockReturnValueOnce({
 				pipe: jest.fn().mockReturnThis(),
@@ -61,7 +60,7 @@ describe('Database Operations Test', () => {
 				}),
 			});
 			// WHEN: Loading data
-			const rowCount = await csvReader.readAndProcessCsv(filename, clientMock as PoolClient, batchSize);
+			const rowCount = await csvReader(filename, clientMock as PoolClient, batchSize);
 			// THEN: It should load the data successfully
 			expect(rowCount).toEqual(expectedRowCount); // Expecting 2 rows processed
 		});
