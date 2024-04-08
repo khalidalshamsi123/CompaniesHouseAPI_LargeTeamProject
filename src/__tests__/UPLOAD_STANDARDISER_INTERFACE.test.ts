@@ -8,7 +8,7 @@ import standardiserInterface from '../components/standardiserInterface';
 
 // Mocking dependencies
 jest.mock('../components/GamblingCommission/GamblingCommission');
-jest.mock('../components/hmrc/hmrcStandardiser');
+jest.mock('../components/hmrc/HmrcStandardiser');
 jest.mock('../database/databasePool');
 
 // Set up enums
