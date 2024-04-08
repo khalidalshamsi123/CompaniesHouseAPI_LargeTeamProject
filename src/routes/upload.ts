@@ -39,11 +39,19 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
 // });
 
 // This router handles both the upload post for HMRC and Gambling Commission CSVs.
+/* We are assuming this request will contain custom header "File-Commission" which contains the commission of the uploaded files
+   It was decided that to avoid using multer to conflict with JR implementation of GC standardiser, we would avoid use of multer, so to identify which files
+   are manually uploaded we will need to only allow one commissions file to be uploaded at a time. As this is not main channel of upload this simplified implementation
+   should be fine and not cause major inconvenience to the users. */
 router.put('/', upload.array('files'), async (req: Request, res) => {
 	try {
+		/* We shouldn't need to do any validation here because each standardiser implementation will do this and handle the errors.
+
 		if (!req.files || req.files.length === 0) {
 			return res.status(400).send('No files uploaded');
 		}
+
+		*/
 
 		const standardiser = new standardiserInterface();
 		// You need to await the async call to processInput

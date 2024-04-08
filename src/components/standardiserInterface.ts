@@ -20,6 +20,19 @@ type Standardiser = {
 	standardise(data: CsvKeys[] | Request, schema: string): Promise<void>;
 };
 
+/* Obselete following implementation of custom "File-Commission" header.
+
+interface File {
+	// Since we only want the name to determine which standardiser the file goes to we define our own interface
+	originalname: string;
+
+}
+
+type FileProcessingResult = {
+	originalname: string;
+	status: string;
+}; */
+
 /**
  * Class responsible for managing different data standardisers.
  */
@@ -36,15 +49,14 @@ class StandardiserInterface {
      * @param {string} schema - The database schema to be used.
      * @returns {Promise<void | { successfulUploads: string[], failedUploads: string[] }>} - The result of the processing.
      */
-	public async processInput(data: Request | CsvKeys[], schema: string): Promise<void | {successfulUploads: string[]; failedUploads: string[]}> {
+	public async processInput(data: Request | CsvKeys[], schema: string): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
 		try {
 			await this.setupStandardiserMaps();
 			if (data instanceof Array) {
-				await this.processCsvKeys(data, schema);
-				return;
+				return await this.processCsvKeys(data, schema);
 			}
 
-			return await this.processRequest(data, schema);
+			return await this.processRequest(data);
 		} catch (error) {
 			console.error('Error in processInput: ', error);
 			throw error; // Rethrow the error after logging it.
@@ -64,17 +76,23 @@ class StandardiserInterface {
      * @param {CsvKeys[]} csvKeys - The keys representing CSV data types.
      * @param {string} schema - The database schema to be used.
      */
-	async processCsvKeys(csvKeys: CsvKeys[], schema: string): Promise<void> {
+	async processCsvKeys(csvKeys: CsvKeys[], schema: string): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
+		let successfullyUploaded = false;
+		let errorMsg = '';
 		if (csvKeys.includes('businessesCsv') || csvKeys.includes('licencesCsv')) {
 			await this.buildGamblingCommissionStandardiser();
 			const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
 			await standardiser!.standardise(csvKeys, schema);
+			successfullyUploaded = true;
 		} else if (csvKeys.includes('hmrcCsv')) {
 			const standardiser = this.standardisers.get(StandardiserKey.HMRC);
 			await standardiser!.standardise(csvKeys, schema);
+			successfullyUploaded = true;
 		} else {
 			console.error('Invalid combination of files');
+			errorMsg = 'Invalid combination of files';
 		}
+		return { successfullyUploaded , errorMsg}
 	}
 
 	/**
@@ -83,48 +101,93 @@ class StandardiserInterface {
      * @param {string} schema - The database schema to be used.
      * @returns {Promise<{ successfulUploads: string[], failedUploads: string[] }>} - The result of the file processing.
      */
-	async processRequest(request: Request, schema: string): Promise<{successfulUploads: string[]; failedUploads: string[]}> {
+
+	/* This whole implementation I (IV) wrote is now obselete as we are assuming that the request contains a custom header informing the file(s) commissions
+		so there is no need to use multer. See below for updated implementation.
+
+	async processRequest(request: Request, schema: string): Promise<{ successfulUploads: string[]; failedUploads: string[] }> {
 		try {
-			const files = request.files as Express.Multer.File[] | undefined;
-			const fileProcessingPromises = (files ?? []).map(async file => {
+			// Normalize request.files to an array of File objects
+			let files: File[] = [];
+			const filesData = request.files;
+			if (filesData instanceof Array) { // Single file input or multiple files under one field name
+				files = filesData as File[];
+			} else if (typeof filesData === 'object') { // Multiple file inputs with different field names
+				for (const [fieldname, fileArray] of Object.entries(filesData)) {
+					files = files.concat(fileArray as File[]);
+				}
+			}
+
+			const fileProcessingPromises = files.map(async (file): Promise<FileProcessingResult> => {
 				const fileExtension = path.extname(file.originalname);
 
 				if (fileExtension !== '.csv') {
-					return {originalname: file.originalname, status: 'Invalid file type'};
+					return { originalname: file.originalname, status: 'Invalid file type' };
 				}
 
 				const fileName = path.basename(file.originalname, fileExtension);
 
-				try {
-					if (fileName.includes('hmrc-supervised-data')) {
-						const standardiser = this.standardisers.get(StandardiserKey.HMRC);
-						await standardiser!.standardise(request, schema);
-						return {originalname: file.originalname, status: 'HMRC CSV'};
-					}
-
-					if (fileName.includes('business-licence-register-businesses')) {
-						await this.buildGamblingCommissionStandardiser();
-						const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
-						await standardiser!.standardise(request, schema);
-						return {originalname: file.originalname, status: 'Gambling Commission CSV'};
-					}
-
-					return {originalname: file.originalname, status: 'Invalid file name'};
-				} catch (error) {
-					console.error(`Error processing ${file.originalname}:`, error);
-					return {originalname: file.originalname, status: 'Error occurred'};
+				if (fileName.includes('hmrc-supervised-data') || fileName.includes('business-licence-register-businesses')) {
+					// Since we are not processing the files here, just return the original name and status
+					return { originalname: file.originalname, status: 'CSV' };
 				}
+
+				return { originalname: file.originalname, status: 'Invalid file name' };
 			});
 
 			const results = await Promise.all(fileProcessingPromises);
-			const successfulUploads = results.filter(r => r.status.includes('CSV')).map(r => `${r.originalname} (${r.status})`);
-			const failedUploads = results.filter(r => !r.status.includes('CSV')).map(r => `${r.originalname} (${r.status})`);
+			const successfulUploads = results.filter(r => r.status === 'CSV').map(r => r.originalname);
+			const failedUploads = results.filter(r => r.status !== 'CSV').map(r => r.originalname);
 
-			return {successfulUploads, failedUploads};
+			return { successfulUploads, failedUploads };
 		} catch (error) {
 			console.error('Error processing request:', error);
 			throw error; // Rethrow the error after logging it.
 		}
+	} */
+
+
+	async processRequest(request: Request): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
+		let errorMsg = '';
+		let successfullyUploaded = false;
+		try {
+			// Validate that the "File-Commission" custom header exists
+			const fileCommission = request.headers['file-commission'];
+			if (!fileCommission) {
+				successfullyUploaded = false;
+				errorMsg = 'File-Commission header is missing';
+			}
+
+			// Validate that the "File-Commission" header has a valid string
+			if (typeof fileCommission !== 'string') {
+				successfullyUploaded = false;
+				errorMsg = 'File-Commission value must be a string';
+			}
+
+			// Switch on the file commission to call correct standardiser to run. I did switch instead of chain of if statements feels cleaner/more maintainable
+			// so more commissions could be easier to add. Remembering to always use the ENUMS so any keys can be changed much easier.
+			switch (fileCommission){
+				case StandardiserKey.GAMBLING_COMMISSION:
+					await this.buildGamblingCommissionStandardiser();
+					await this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION)!.standardise(request, '');
+					successfullyUploaded = true;
+					break;
+				case StandardiserKey.HMRC:
+					await this.standardisers.get(StandardiserKey.HMRC)!.standardise(request, '');
+					successfullyUploaded = true;
+					break;
+				default:
+					// always have this last, no keys would've been matched so we just set error msg here for now as its an invalid file commission
+					errorMsg = 'Incorrect File-Commission header: ' + fileCommission;
+
+			}
+
+
+		} catch (error) {
+			console.error('Error processing request:', error);
+			errorMsg = 'Error processing request:' + error;
+		}
+		return { successfullyUploaded, errorMsg };
 	}
 
 	private async buildGamblingCommissionStandardiser(): Promise<void> {
