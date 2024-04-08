@@ -13,7 +13,7 @@ import {type Request} from 'express-serve-static-core';
 import Cursor from 'pg-cursor';
 import {type PoolClient} from 'pg';
 import {sortStringToFrontOfArray} from '../../utils/utils';
-import {insertData} from '../../database/insertData';
+import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type GamblingCommissionData} from '../../types/DatebaseInsertTypes';
 
 /**
@@ -261,7 +261,7 @@ export default class GamblingCommission {
 				schema,
 			};
 			// eslint-disable-next-line no-await-in-loop
-			await insertData(gamblingCommissionData);// eslint-disable-next-line no-await-in-loop
+			await insertDataStandardiser(gamblingCommissionData);// eslint-disable-next-line no-await-in-loop
 			rows = await cursor.read(50);
 		}
 

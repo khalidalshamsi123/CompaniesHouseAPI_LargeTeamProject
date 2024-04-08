@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {insertData} from '../../database/insertData';
+import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type PoolClient} from 'pg';
 
 /**
@@ -33,7 +33,7 @@ async function csvReader(filename: string, client: PoolClient, batchSize: number
 					}
 
 					// Process the current row of data
-					await insertData({
+					await insertDataStandardiser({
 						row,
 						regIdIndex,
 						status1Index,

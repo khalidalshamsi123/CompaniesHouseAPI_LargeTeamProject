@@ -1,4 +1,4 @@
-import {insertData} from '../database/insertData';
+import {insertDataStandardiser} from '../database/insertDataStandardiser';
 import {type PoolClient} from 'pg';
 
 // Mock PoolClient and its methods
@@ -41,7 +41,7 @@ describe('processDataRow function', () => {
 
 		it('should call hmrcProcess function', async () => {
 			// WHEN
-			await insertData(mockDataRow);
+			await insertDataStandardiser(mockDataRow);
 
 			// THEN
 			expect(mockClient.query).toHaveBeenCalled();
@@ -62,7 +62,7 @@ describe('processDataRow function', () => {
 			// Mock data for Gambling Commission approved businesses
 
 			// WHEN
-			await insertData(mockCsvData);
+			await insertDataStandardiser(mockCsvData);
 
 			// THEN
 			expect(mockClient.query).toHaveBeenCalled();

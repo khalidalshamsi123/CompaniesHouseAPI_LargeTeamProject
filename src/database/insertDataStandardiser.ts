@@ -5,10 +5,10 @@ import {type DataRow, type GamblingCommissionData} from '../types/DatebaseInsert
  * Process a single row of CSV data.
  * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
  */
-async function insertData(data: GamblingCommissionData): Promise<void>;
+async function insertDataStandardiser(data: GamblingCommissionData): Promise<void>;
 // eslint-disable-next-line @typescript-eslint/unified-signatures
-async function insertData(data: DataRow): Promise<void>;
-async function insertData(data: DataRow | GamblingCommissionData): Promise<void> {
+async function insertDataStandardiser(data: DataRow): Promise<void>;
+async function insertDataStandardiser(data: DataRow | GamblingCommissionData): Promise<void> {
 	if (isDataRow(data)) {
 		// Data is of type DataRow
 		const {row, regIdIndex, status1Index, client} = data;
@@ -82,4 +82,4 @@ async function gamblingCommissionInsert(businessNames: string[], gamblingApprova
 	await insertClient.query(query, [businessNames, gamblingApprovalStatuses]);
 }
 
-export {hmrcProcess, insertData};
+export {hmrcProcess, insertDataStandardiser};
