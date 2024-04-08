@@ -387,7 +387,6 @@ export default class GamblingCommission {
 		const sortedArray = sortStringToFrontOfArray(csvKeys as string[], this.csvAllowList[1]);
 
 		for await (const csvKey of sortedArray) {
-			console.log(csvKey);
 			/* We manually request a client from the pool in this instance.
 		   As this library requires us run the queries within a transaction, which is not
 		   possible if using the pool.query() method.
@@ -465,8 +464,6 @@ export default class GamblingCommission {
 
 				/* Delete rows from table we plan to add the new CSV data to. I make sure to use the same client instance. If I don't
 			   the query is not run within the same transaction. */
-				console.log(schema);
-				console.log(tableName);
 				await client.query(`DELETE FROM ${schema}.${tableName}`);
 				// The CSV keyword tells postgres that the data is being provided in a CSV format.
 				const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv)`));
