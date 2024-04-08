@@ -409,6 +409,57 @@ export default class GamblingCommission {
 					throw new Error('Table name is undefined.');
 				}
 
+				const csvParseStream = parse({
+					headers: true,
+					delimiter: ',',
+					trim: true,
+					discardUnmappedColumns: true,
+				}).on('data-invalid', (_row, rowNumber, reason) => {
+					console.log(`Invalid row at line ${rowNumber}: ${reason}`);
+				}).on('error', error => {
+					console.error(`Error parsing CSV: ${error.message}`);
+				});
+
+				const typedKey = csvKey as keyof typeof this.columnNames;
+
+				const columns: string[] = this.columnNames[typedKey];
+
+				/**
+					* Specify order columns should have. But do not write them in the resulting csv string.
+					* https://c2fo.github.io/fast-csv/docs/formatting/examples/
+				*/
+				const csvFormatStream = format({
+					headers: columns,
+					writeHeaders: false,
+					delimiter: ',',
+				});
+
+				// Flag to indicate if any data was processed.
+				let hasProcessedData = false;
+
+				// Custom transform stream to check for existence of at least some processed data.
+				// The CSV parser may be unable to determine any rows from the data fed to it.
+				// For example, if our mimetype check is bypassed and an invalid file is passed.
+
+				// We manually check to see if there are any usable chunks (rows/records).
+				// If not we throw an error within the pipeline, stopping the stream from piping to the
+				// next stream. Stopping the pipeline process and rejecting the async function.
+				const checkForDataTransform = new Transform({
+					objectMode: true,
+					transform(chunk, _encoding, callback) {
+						hasProcessedData = true; // Set flag to true when data is processed.
+						this.push(chunk); // Pass data through.
+						callback();
+					},
+					final(callback) {
+						if (hasProcessedData) {
+							callback();
+						} else {
+							callback(new Error('No rows processed. The CSV file is empty or invalid.'));
+						}
+					},
+				});
+
 				// Start transaction.
 				await client.query('BEGIN');
 
@@ -417,12 +468,18 @@ export default class GamblingCommission {
 				console.log(schema);
 				console.log(tableName);
 				await client.query(`DELETE FROM ${schema}.${tableName}`);
-				// The CSV keyword tells postgres that the data is being provided in a CSV format. HEADER is used to skip the first line of the CSV as it contains the column names.
-				const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv, HEADER)`));
+				// The CSV keyword tells postgres that the data is being provided in a CSV format.
+				const ingestStream: CopyStreamQuery = client.query(copyFrom(`COPY ${schema}.${tableName} FROM STDIN WITH (FORMAT csv)`));
 
 				// Might be a good idea to create an ENV variable for where the CSVs are stored, more customisable.
 				const sourceStream: ReadStream = fs.createReadStream(`./files/${fileName}.csv`);
-				await pipeline(sourceStream, ingestStream);
+				await pipeline(
+					sourceStream,
+					csvParseStream,
+					checkForDataTransform,
+					csvFormatStream,
+					ingestStream,
+				);
 
 				// If no errors occur, we commit the changes.
 				await client.query('COMMIT');
