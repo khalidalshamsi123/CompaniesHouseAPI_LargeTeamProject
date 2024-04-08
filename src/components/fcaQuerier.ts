@@ -2,6 +2,7 @@
 import axios, {type AxiosRequestConfig} from 'axios';
 
 import * as dotenv from 'dotenv';
+import {rateLimitedFcaGetApprovalStatus} from './rateLimiter';
 
 dotenv.config();
 
@@ -11,6 +12,11 @@ const axiosConfig: AxiosRequestConfig = {
 		'X-Auth-Key': process.env.API_KEY_FCA,
 		'Content-Type': 'application/json',
 	},
+};
+
+export type FcaApprovalStatusResult = {
+	isAuthorised: boolean;
+	isCertified?: boolean;
 };
 
 // Will query the FCA API for the Barclays firms approval status. Should return true.
