@@ -1,4 +1,4 @@
-import pool from '../database/databasePool';
+import pool from '../database/setup/databasePool';
 
 import fs, {type ReadStream} from 'node:fs';
 

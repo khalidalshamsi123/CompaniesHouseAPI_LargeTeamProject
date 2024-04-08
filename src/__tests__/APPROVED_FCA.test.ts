@@ -17,7 +17,7 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 			const response = await request(app).get('/approved/')
 				.query({registrationId: '122702', businessName: 'Barclays'})
 				.set(headers);
-				// Assert the response
+			// Assert the response
 			expect(response.statusCode).toBe(200);
 			expect(response.body.approvedWith).toHaveProperty('fca');
 			expect(typeof response.body.approvedWith.fca).toBe('boolean');

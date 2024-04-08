@@ -1,6 +1,6 @@
 import {Readable} from 'node:stream';
 import build from '../components/GamblingCommission/GamblingCommissionFactory';
-import pool from '../database/databasePool';
+import pool from '../database/setup/databasePool';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 
 import fs from 'node:fs';

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {processDataRow} from './dataProcessor';
+import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type PoolClient} from 'pg';
 
 /**
@@ -10,12 +10,11 @@ import {type PoolClient} from 'pg';
  * @param batchSize Size of each batch for database transactions.
  * @returns The number of rows processed.
  */
-export async function readAndProcessCsv(filename: string, client: PoolClient, batchSize: number): Promise<number> {
+async function csvReader(filename: string, client: PoolClient, batchSize: number): Promise<number> {
 	let rowCount = 0; // Counter for the number of rows processed
 	let status1Index = -1;
 	let regIdIndex = -1;
 	const cache: Record<string, boolean> = {}; // Cache to store processed registration IDs
-	console.log('Starting to read CSV');
 	return new Promise((resolve, reject) => {
 		// Create a readable stream from the CSV file
 		fs.createReadStream(filename)
@@ -29,19 +28,16 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 					if (rowCount === 1) {
 						// Find the index of the 'STATUS1' and registration ID columns in the header
 						status1Index = Object.keys(row).findIndex(key => key.toLowerCase() === 'status');
-						regIdIndex = Object.keys(row).findIndex(key => key.toLowerCase().includes('reg'));
+						regIdIndex = Object.keys(row).findIndex(key => key.toLowerCase().includes('licence number') || key.toLowerCase().includes('reg'));
 						return;
 					}
-					// Process the current row of data
 
-					await processDataRow({
+					// Process the current row of data
+					await insertDataStandardiser({
 						row,
 						regIdIndex,
 						status1Index,
-						cache,
 						client,
-						batchSize,
-						rowCount,
 					});
 				} catch (error) {
 					console.error('Error processing row:', error);
@@ -67,3 +63,5 @@ export async function readAndProcessCsv(filename: string, client: PoolClient, ba
 			});
 	});
 }
+
+export {csvReader};

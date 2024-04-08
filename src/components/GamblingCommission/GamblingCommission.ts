@@ -1,4 +1,4 @@
-import pool from '../../database/databasePool';
+import pool from '../../database/setup/databasePool';
 
 import {pipeline} from 'node:stream/promises';
 import fs, {type ReadStream} from 'node:fs';
@@ -11,9 +11,10 @@ import busBoy from 'busboy';
 import {type Request} from 'express-serve-static-core';
 
 import Cursor from 'pg-cursor';
-import {insertGamblingCommissionBatch} from '../../database/csvToDatabase/dataProcessor';
 import {type PoolClient} from 'pg';
 import {sortStringToFrontOfArray} from '../../utils/utils';
+import {insertDataStandardiser} from '../../database/insertDataStandardiser';
+import {type GamblingCommissionData} from '../../types/DatebaseInsertTypes';
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
@@ -45,20 +46,20 @@ export default class GamblingCommission {
 
 	/* Overload signatures. */
 	/**
-     * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
+	 * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
 	 * Useful for when receiving the data as part of a POST request.
 	 *
 	 * As this method uses streams, the CSV will not be loaded into memory all at once. Instead portions of it will be streamed, processed and then
 	 * uploaded to the database. Thereby making this solution highly scalable. Being able to handle very large CSVs.
-     * @param {Request} request A Readable stream.
+	 * @param {Request} request A Readable stream.
 	 * @param schema What schema should the upload take place in.
-     */
+	 */
 	async uploadCsv(request: Request, schema: string): Promise<void | Error>;
 	/**
-     * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
-     * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
+	 * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
+	 * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
 	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
-     */
+	 */
 	async uploadCsv(csvKeys: CsvKeys[], schema: string): Promise<void>;
 
 	async uploadCsv(data: CsvKeys[] | Request, schema: string): Promise<void | Error> {
@@ -73,14 +74,14 @@ export default class GamblingCommission {
 	}
 
 	/**
-     * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
+	 * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
 	 * Useful for when receiving the data as part of a POST request.
 	 *
 	 * As this method uses streams, the CSV will not be loaded into memory all at once. Instead portions of it will be streamed, processed and then
 	 * uploaded to the database. Thereby making this solution highly scalable. Being able to handle very large CSVs.
-     * @param {Request} request A Readable stream.
+	 * @param {Request} request A Readable stream.
 	 * @param schema What schema should the upload take place in.
-     */
+	 */
 	private async uploadCsvWithStream(request: Request, schema: string) {
 		const busBoyInstance = busBoy({
 			headers: request.headers,
@@ -202,7 +203,7 @@ export default class GamblingCommission {
 			const cursor = cursorClient.query(new Cursor(`
 				SELECT DISTINCT ON (rb.account_number) rb.*, rl.*
 				FROM ${schema}.business_licence_register_businesses rb
-				JOIN ${schema}.business_licence_register_licences rl
+					JOIN ${schema}.business_licence_register_licences rl
 				ON rb.account_number = rl.account_number
 				ORDER BY rb.account_number, rl.start_date DESC;
 			`));
@@ -252,9 +253,15 @@ export default class GamblingCommission {
 			/* Insert batch of rows.
 			   ignore eslint rule as we need to sequentially process rows here to maintain data
 			   integrity and ensure that we only process 50 rows at a time. */
+
+			const gamblingCommissionData: GamblingCommissionData = {
+				businessNames,
+				gamblingApprovalStatuses,
+				insertClient,
+				schema,
+			};
 			// eslint-disable-next-line no-await-in-loop
-			await insertGamblingCommissionBatch(businessNames, gamblingApprovalStatuses, insertClient, schema);
-			// eslint-disable-next-line no-await-in-loop
+			await insertDataStandardiser(gamblingCommissionData);// eslint-disable-next-line no-await-in-loop
 			rows = await cursor.read(50);
 		}
 
@@ -273,11 +280,11 @@ export default class GamblingCommission {
 
 		try {
 			/**
-			* Parse the given CSV data into JSON objects.
-			* - Removes trailing whitespace from left and right-hand sides of column values.
-			* - Discards unmapped columns. Where the amount of column values exceed the
-			*   expected number of headers, we discard the excess.
-			*/
+			 * Parse the given CSV data into JSON objects.
+			 * - Removes trailing whitespace from left and right-hand sides of column values.
+			 * - Discards unmapped columns. Where the amount of column values exceed the
+			 *   expected number of headers, we discard the excess.
+			 */
 			const csvParseStream = parse({
 				headers: true,
 				delimiter: ',',
@@ -316,9 +323,9 @@ export default class GamblingCommission {
 			});
 
 			/**
-			* Specify order columns should have. But do not write them in the resulting csv string.
-			* https://c2fo.github.io/fast-csv/docs/formatting/examples/
-			*/
+			 * Specify order columns should have. But do not write them in the resulting csv string.
+			 * https://c2fo.github.io/fast-csv/docs/formatting/examples/
+			 */
 			const csvFormatStream = format({
 				headers: expectedHeaders,
 				writeHeaders: false,
@@ -370,10 +377,10 @@ export default class GamblingCommission {
 	}
 
 	/**
-     * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
-     * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
+	 * Creates a new table in the production schema based on the data from the local CSV files associated with the keys provided.
+	 * @param csvKeys Array of keys for the CSVs available locally. E.g., giving 'businessesCsv' as an element would trigger an update using the 'business_licence_register_businesses.csv' file.
 	 * @param schema What schema should the upload be applied to. If testing, can provide the test schema.
-     */
+	 */
 	private async updateFromLocalFile(csvKeys: CsvKeys[], schema: string) {
 		// Loop through csvKeys, processing each file given. Will update using the businessesCsv first.
 		// It is safe to cast csvKeys to string[], since csvKeys can only contain string values.
@@ -545,4 +552,3 @@ export default class GamblingCommission {
 		}
 	};
 }
-

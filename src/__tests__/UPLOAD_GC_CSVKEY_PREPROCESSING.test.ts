@@ -2,7 +2,7 @@ import {Readable} from 'node:stream';
 import {
 	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteRowsFromTestTable,
 } from '../utils/databaseTestFuncs';
-import pool from '../database/databasePool';
+import pool from '../database/setup/databasePool';
 
 import fs from 'node:fs';
 import build from '../components/GamblingCommission/GamblingCommissionFactory';

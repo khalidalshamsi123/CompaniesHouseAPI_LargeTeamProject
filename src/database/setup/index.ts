@@ -1,8 +1,8 @@
 import {createSchema as setupDatabase} from './setupDatabase';
-import {insertBusinessData} from './queries';
-import type {BusinessData} from './queries';
+import {insertBusinessData} from '../queries';
+import type {BusinessData} from '../queries';
 
-export async function main() {
+async function main() {
 	try {
 		// Call the setupDatabase function to create the schema
 		await setupDatabase();
@@ -31,8 +31,4 @@ export async function main() {
 	}
 }
 
-// Call the main function to start the execution
-main().catch(error => {
-	console.error('Unhandled error:', error);
-	process.exit(1); // Exit the process with an error code
-});
+export {main};

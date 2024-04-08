@@ -1,11 +1,10 @@
-import * as csvReader from '../database/csvToDatabase/csvReader';
-import * as dataProcessor from '../database/csvToDatabase/dataProcessor';
 import fs from 'fs';
 import csvParser from 'csv-parser';
-import {type PoolClient} from 'pg';
+import type {PoolClient} from 'pg';
+import {csvReader} from '../components/HMRC/csvReaderHMRC';
 
 jest.mock('csv-parser');
-jest.mock('../database/csvToDatabase/csvReader');
+jest.mock('../components/HMRC/csvReaderHMRC');
 jest.mock('fs');
 
 describe('Database Operations Test', () => {
@@ -40,7 +39,7 @@ describe('Database Operations Test', () => {
 		test('When loading data, Then it should load the data successfully', async () => {
 			const expectedRowCount = 2; // Mock the expected row count
 			// Mock the behavior of csvReader.readAndProcessCsv to resolve with the expected row count
-			(csvReader.readAndProcessCsv as jest.Mock).mockResolvedValueOnce(expectedRowCount);
+			(csvReader as jest.Mock).mockResolvedValueOnce(expectedRowCount);
 			// Mock the behavior of fs.createReadStream
 			(fs.createReadStream as jest.Mock).mockReturnValueOnce({
 				pipe: jest.fn().mockReturnThis(),
@@ -61,51 +60,9 @@ describe('Database Operations Test', () => {
 				}),
 			});
 			// WHEN: Loading data
-			const rowCount = await csvReader.readAndProcessCsv(filename, clientMock as PoolClient, batchSize);
+			const rowCount = await csvReader(filename, clientMock as PoolClient, batchSize);
 			// THEN: It should load the data successfully
 			expect(rowCount).toEqual(expectedRowCount); // Expecting 2 rows processed
-		});
-	});
-
-	describe('Given data is loaded into the database', () => {
-		const row = {
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			REGISTRATION_ID: '12345',
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			BUSINESS_NAME: 'Test Company',
-			// eslint-disable-next-line @typescript-eslint/naming-convention
-			STATUS: 'Approved',
-		};
-		const regIdIndex = 0; // Assuming REGISTRATION_ID is the first column
-		const status1Index = 2; // Assuming STATUS is the third column
-		const cache: Record<string, boolean> = {};
-		const batchSize = 100;
-		const rowCount = 1;
-		let clientMock: Partial<PoolClient>;
-		beforeEach(() => {
-			clientMock = {
-				query: jest.fn(),
-				release: jest.fn(),
-				connect: jest.fn(),
-			};
-		});
-
-		test('When processing a row, Then it should insert the data into the database', async () => {
-			(clientMock.query as jest.Mock).mockResolvedValueOnce(undefined);
-
-			await dataProcessor.processDataRow({
-				row,
-				regIdIndex,
-				status1Index,
-				cache,
-				client: clientMock as PoolClient,
-				batchSize,
-				rowCount,
-			});
-			expect(clientMock.query).toHaveBeenCalledWith(
-				'INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (registrationid) DO UPDATE SET businessname = EXCLUDED.businessname',
-				[row.REGISTRATION_ID, row.BUSINESS_NAME, false, true, false],
-			);
 		});
 	});
 });

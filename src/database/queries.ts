@@ -1,4 +1,4 @@
-import pool from './databasePool';
+import pool from './setup/databasePool';
 
 // These need to be spelt to match the column names in database so when we read it maps it correctly to this type.
 export type BusinessData = {
@@ -14,9 +14,9 @@ async function insertBusinessData(data: BusinessData): Promise<void> {
 	const {registrationid, businessname, fca_approved, hmrc_approved, gambling_approved} = data;
 	try {
 		const query = `
-            INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-            VALUES ($1, $2, $3, $4, $5)
-        `;
+			INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
+			VALUES ($1, $2, $3, $4, $5)
+		`;
 
 		const values = [registrationid, businessname, fca_approved, hmrc_approved, gambling_approved];
 

@@ -53,6 +53,9 @@ web_modules/
 build
 dist/
 
+# Database JavaScript files
+src/database/*.js
+
 # TypeScript cache
 *.tsbuildinfo
 

@@ -1,6 +1,6 @@
 image: node:latest
 
-.standard-rules:     
+.standard-rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -13,10 +13,10 @@ services:
   - postgres:latest
 
 variables:
-    # Configure postgres service (https://hub.docker.com/_/postgres/)
-    POSTGRES_DB: postgres
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres
+  # Configure postgres service (https://hub.docker.com/_/postgres/)
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
 
 
 cache:
@@ -83,7 +83,7 @@ test_approved:
     - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t APPROVED
-  
+
 test_fca_individual:
   extends:
     - .standard-rules
@@ -171,7 +171,7 @@ test_database:
 
 test_authentication:
   extends:
-      - .standard-rules
+    - .standard-rules
   stage: test
   script:
     - >
