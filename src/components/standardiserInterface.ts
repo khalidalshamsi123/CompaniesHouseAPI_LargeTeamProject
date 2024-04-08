@@ -49,7 +49,7 @@ class StandardiserInterface {
      * @param {string} schema - The database schema to be used.
      * @returns {Promise<void | { successfulUploads: string[], failedUploads: string[] }>} - The result of the processing.
      */
-	public async processInput(data: Request | CsvKeys[], schema: string): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
+	public async processInput(data: Request | CsvKeys[], schema: string): Promise<{successfullyUploaded: boolean; errorMsg: string}> {
 		try {
 			await this.setupStandardiserMaps();
 			if (data instanceof Array) {
@@ -76,7 +76,7 @@ class StandardiserInterface {
      * @param {CsvKeys[]} csvKeys - The keys representing CSV data types.
      * @param {string} schema - The database schema to be used.
      */
-	async processCsvKeys(csvKeys: CsvKeys[], schema: string): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
+	async processCsvKeys(csvKeys: CsvKeys[], schema: string): Promise<{successfullyUploaded: boolean; errorMsg: string}> {
 		let successfullyUploaded = false;
 		let errorMsg = '';
 		if (csvKeys.includes('businessesCsv') || csvKeys.includes('licencesCsv')) {
@@ -92,7 +92,8 @@ class StandardiserInterface {
 			console.error('Invalid combination of files');
 			errorMsg = 'Invalid combination of files';
 		}
-		return { successfullyUploaded , errorMsg}
+
+		return {successfullyUploaded, errorMsg};
 	}
 
 	/**
@@ -146,13 +147,14 @@ class StandardiserInterface {
 		}
 	} */
 
-
-	async processRequest(request: Request): Promise<{ successfullyUploaded: boolean; errorMsg: string }> {
+	async processRequest(request: Request): Promise<{successfullyUploaded: boolean; errorMsg: string}> {
 		let errorMsg = '';
 		let successfullyUploaded = false;
 		try {
 			// Validate that the "File-Commission" custom header exists
-			const fileCommission = request.headers['file-commission'];
+			const fileCommission = Array.isArray(request.headers['File-Commission'])
+				? request.headers['File-Commission'][0]
+				: request.headers['File-Commission'];
 			if (!fileCommission) {
 				successfullyUploaded = false;
 				errorMsg = 'File-Commission header is missing';
@@ -166,7 +168,7 @@ class StandardiserInterface {
 
 			// Switch on the file commission to call correct standardiser to run. I did switch instead of chain of if statements feels cleaner/more maintainable
 			// so more commissions could be easier to add. Remembering to always use the ENUMS so any keys can be changed much easier.
-			switch (fileCommission){
+			switch (fileCommission) {
 				case StandardiserKey.GAMBLING_COMMISSION:
 					await this.buildGamblingCommissionStandardiser();
 					await this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION)!.standardise(request, '');
@@ -177,17 +179,15 @@ class StandardiserInterface {
 					successfullyUploaded = true;
 					break;
 				default:
-					// always have this last, no keys would've been matched so we just set error msg here for now as its an invalid file commission
+					// Always have this last, no keys would've been matched so we just set error msg here for now as its an invalid file commission
 					errorMsg = 'Incorrect File-Commission header: ' + fileCommission;
-
 			}
-
-
 		} catch (error) {
 			console.error('Error processing request:', error);
-			errorMsg = 'Error processing request:' + error;
+			errorMsg = 'Error processing request: Unknown error';
 		}
-		return { successfullyUploaded, errorMsg };
+
+		return {successfullyUploaded, errorMsg};
 	}
 
 	private async buildGamblingCommissionStandardiser(): Promise<void> {

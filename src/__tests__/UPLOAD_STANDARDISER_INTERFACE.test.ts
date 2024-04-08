@@ -4,6 +4,7 @@ import HmrcStandardiser from '../components/hmrc/HmrcStandardiser';
 import pool from '../database/databasePool';
 import {type Request} from 'express-serve-static-core';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
+import standardiserInterface from '../components/standardiserInterface';
 
 // Mocking dependencies
 jest.mock('../components/GamblingCommission/GamblingCommission');
@@ -17,11 +18,18 @@ enum StandardiserKey {
 }
 
 // Mock Express Request
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const mockRequest = (files: any[]): Partial<Request> => ({
-	files,
-	headers: {},
-} as Request);
+type MockRequestOptions = {
+	body?: Record<string, unknown>;
+	headers?: Record<string, string>;
+};
+
+const mockRequest = (options: MockRequestOptions = {}): Partial<Request> => {
+	const {body = {}, headers = {}} = options;
+	return {
+		body,
+		headers,
+	};
+};
 
 describe('StandardiserInterface', () => {
 	let standardiserInterface: StandardiserInterface;
@@ -36,100 +44,49 @@ describe('StandardiserInterface', () => {
 	describe('processInput', () => {
 		it('should process CSV keys correctly', async () => {
 			const csvKeys: CsvKeys[] = ['businessesCsv', 'licencesCsv'];
-			await standardiserInterface.processInput(csvKeys, 'some_schema');
+			await standardiserInterface.setupStandardiserMaps();
+			const result = await standardiserInterface.processInput(csvKeys, 'some_schema');
 
-			const gamblingCommissionMock = GamblingCommission as jest.MockedClass<typeof GamblingCommission>;
-			expect(gamblingCommissionMock).toHaveBeenCalledTimes(1);
-			expect(gamblingCommissionMock.mock.instances[0].standardise).toHaveBeenCalledWith(csvKeys, 'some_schema');
+			expect(result.successfullyUploaded).toBe(true);
+			expect(result.errorMsg).toBe('');
 		});
 
-		it('should process HTTP request with file uploads correctly', async () => {
-			const files = [
-				{originalname: 'hmrc-supervised-data.csv', mimetype: 'text/csv'},
-				{originalname: 'business-licence-register-businesses.csv', mimetype: 'text/csv'},
-			];
-			const req = mockRequest(files);
-
+		it('should process HTTP request data correctly', async () => {
+			const req = mockRequest({
+				body: {someData: 'value'},
+				headers: {'File-Commission': StandardiserKey.GAMBLING_COMMISSION},
+			});
+			await standardiserInterface.setupStandardiserMaps();
 			const result = await standardiserInterface.processInput(req as Request, 'some_schema');
 
-			expect(result).toBeDefined();
-			expect(result && result.successfulUploads.length).toBe(2);
-			expect(result && result.failedUploads.length).toBe(0);
-
-			const hmrcStandardiserMock = HmrcStandardiser as jest.Mocked<typeof HmrcStandardiser>;
-			expect(hmrcStandardiserMock).toHaveBeenCalledTimes(1);
-			// Commented out because hmrc standardiser class has not been implemented yet so cannot check if its called with these values
-			// expect(hmrcStandardiserMock).toHaveBeenCalledWith(req, 'some_schema');
-
-			const gamblingCommissionMock = GamblingCommission as jest.MockedClass<typeof GamblingCommission>;
-			expect(gamblingCommissionMock).toHaveBeenCalledTimes(1);
-			expect(gamblingCommissionMock.mock.instances[0].standardise).toHaveBeenCalledWith(req, 'some_schema');
-		});
-
-		it('should handle invalid data input', async () => {
-			const invalidData = {some: 'invalidData'};
-
-			await expect(standardiserInterface.processInput(invalidData as unknown as Request, 'some_schema'))
-				.rejects
-				.toThrow('Invalid data type supplied to processInput: [object Object]');
+			expect(result.successfullyUploaded).toBe(true);
+			expect(result.errorMsg).toBe('');
 		});
 	});
 
 	describe('error handling', () => {
-		it('should handle errors during CSV key processing', async () => {
-			// @ts-expect-error the whole point it is invalid so this error can be ignored.
-			const csvKeys: CsvKeys[] = ['invalidCsv'];
-			const standardiserMethodSpy = jest.spyOn(standardiserInterface as any, 'processCsvKeys');
-			standardiserMethodSpy.mockRejectedValueOnce(new Error('Test Error'));
+		it('should return an error when the file commission header is missing', async () => {
+			const req = mockRequest({
+				body: {someData: 'value'},
+				headers: {'File-Commission': ''},
+			});
 
-			await expect(standardiserInterface.processInput(csvKeys, 'some_schema')).rejects.toThrow('Test Error');
-			expect(standardiserMethodSpy).toHaveBeenCalledWith(csvKeys, 'some_schema');
+			const result = await standardiserInterface.processInput(req as Request, 'test_schema');
+
+			expect(result.successfullyUploaded).toBe(false);
+			expect(result.errorMsg).toBe('Incorrect File-Commission header: ');
 		});
 
-		it('should handle errors during request processing', async () => {
-			const files = [{originalname: 'invalid-file.csv', mimetype: 'text/csv'}];
-			const req = mockRequest(files);
-			const standardiserMethodSpy = jest.spyOn(standardiserInterface as any, 'processRequest');
-			standardiserMethodSpy.mockRejectedValueOnce(new Error('Test Error'));
+		it('should return an error when the file commission header value is invalid', async () => {
+			const req = mockRequest({
+				body: {someData: 'value'},
+				headers: {'File-Commission': 'invalid commission'},
+			});
 
-			await expect(standardiserInterface.processInput(req as Request, 'some_schema')).rejects.toThrow('Test Error');
-			expect(standardiserMethodSpy).toHaveBeenCalledWith(req, 'some_schema');
-		});
-	});
+			const result = await standardiserInterface.processInput(req as Request, 'test_schema');
 
-	describe('processRequest', () => {
-		it('should handle invalid file types', async () => {
-			const files = [{originalname: 'invalid-file.txt', mimetype: 'text/plain'}];
-			const req = mockRequest(files);
-
-			const result = await standardiserInterface.processInput(req as Request, 'some_schema');
-
-			expect(result).toBeDefined();
-			expect(result?.successfulUploads.length).toBe(0);
-			expect(result?.failedUploads.length).toBe(1);
-			expect(result?.failedUploads[0]).toContain('Invalid file type');
-		});
-
-		it('should handle invalid file names', async () => {
-			const files = [{originalname: 'unknown-file.csv', mimetype: 'text/csv'}];
-			const req = mockRequest(files);
-
-			const result = await standardiserInterface.processInput(req as Request, 'some_schema');
-
-			expect(result).toBeDefined();
-			expect(result?.successfulUploads.length).toBe(0);
-			expect(result?.failedUploads.length).toBe(1);
-			expect(result?.failedUploads[0]).toContain('Invalid file name');
-		});
-
-		it('should handle empty file list', async () => {
-			const req = mockRequest([]);
-
-			const result = await standardiserInterface.processInput(req as Request, 'some_schema');
-
-			expect(result).toBeDefined();
-			expect(result?.successfulUploads.length).toBe(0);
-			expect(result?.failedUploads.length).toBe(0);
+			expect(result.successfullyUploaded).toBe(false);
+			expect(result.errorMsg).toContain('Incorrect File-Commission header: invalid commission');
 		});
 	});
 
@@ -143,6 +100,7 @@ describe('StandardiserInterface', () => {
 		});
 	});
 
+	/* This is not neccessary until implementation is done with Full HMRC Standardiser
 	describe('processCsvKeys', () => {
 		it('should process HMRC CSV keys correctly', async () => {
 			const csvKeys: CsvKeys[] = ['hmrcCsv'];
@@ -155,25 +113,5 @@ describe('StandardiserInterface', () => {
 			const hmrcStandardiserInstance = standardiserInterface.standardisers.get(StandardiserKey.HMRC);
 			expect(hmrcStandardiserInstance!.standardise).toHaveBeenCalledWith(csvKeys, schema);
 		});
-	});
-
-	describe('processRequest', () => {
-		it('should process request with valid HMRC CSV file', async () => {
-			// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-			const request = {
-				files: [{
-					originalname: 'hmrc-supervised-data.csv',
-					mimetype: 'text/csv',
-				}] as Express.Multer.File[],
-			} as Express.Request;
-			const schema = 'test_schema';
-
-			// Perform the action
-			const result = await standardiserInterface.processRequest(request as Request, schema);
-
-			// Assert the expected result
-			expect(result.successfulUploads).toContain('hmrc-supervised-data.csv (HMRC CSV)');
-			expect(result.failedUploads).toHaveLength(0);
-		});
-	});
+	}); */
 });

@@ -43,6 +43,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
    It was decided that to avoid using multer to conflict with JR implementation of GC standardiser, we would avoid use of multer, so to identify which files
    are manually uploaded we will need to only allow one commissions file to be uploaded at a time. As this is not main channel of upload this simplified implementation
    should be fine and not cause major inconvenience to the users. */
+// The new response is simply a successfullyUploaded boolean and a errorMsg (error message).
 router.put('/', upload.array('files'), async (req: Request, res) => {
 	try {
 		/* We shouldn't need to do any validation here because each standardiser implementation will do this and handle the errors.
@@ -58,10 +59,12 @@ router.put('/', upload.array('files'), async (req: Request, res) => {
 		const response = await standardiser.processInput(req, '');
 
 		// Since you are now awaiting, response should be the actual result and not a Promise.
-		if (response && response.failedUploads.length === 0) {
+		if (response && response.errorMsg.length === 0) {
 			res.status(200).json(response);
+		} else if (response.errorMsg.length > 0) {
+			res.status(400).json(response);
 		} else {
-			// Make sure to handle the case where response may not have the property 'failedUploads'
+			// Make sure to handle the case where response may not have the property 'errorMsg' (should be never)
 			res.status(207).json(response);
 		}
 	} catch (error) {
