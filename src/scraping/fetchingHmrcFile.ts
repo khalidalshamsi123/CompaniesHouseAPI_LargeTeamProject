@@ -18,13 +18,13 @@ async function downloadCsvFile(hrefLink: string, fileName: string) {
 	}
 }
 
-async function scrapeHmrcWebsite(elementsPath: string) {
+async function scrapeWebsite(elementsPath: string, websiteLink: string) {
 	try {
 		// This is disabled because i need the type to be buffer for it to work.
 		// eslint-disable-next-line @typescript-eslint/ban-types
-		const hmrcResponse: AxiosResponse<string | Buffer> = await axios.get('https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register');
+		const response: AxiosResponse<string | Buffer> = await axios.get(websiteLink);
 
-		const $ = cheerio.load(hmrcResponse.data);
+		const $ = cheerio.load(response.data);
 		let returnedHref = 'empty';
 
 		const elements = $(elementsPath);
@@ -32,17 +32,31 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 		// Traversing through the html elements using css selectors
 		const promises = elements.map(async (index, element) => {
 			// Find the href
-			const href = $(element).attr('href');
-			// Check if the file is of type csv or ods
-			if (href?.endsWith('.csv')) {
+			let href = $(element).attr('href');
+			// Checks if the file ends with businesses.csv, this is exlusive to gambling commission.
+			if (href?.endsWith('businesses.csv')) {
+				href = 'https://www.gamblingcommission.gov.uk' + href;
 				returnedHref = href;
 				console.log(returnedHref);
-				await downloadCsvFile(href, './newHmrcFile.csv');
+				await downloadCsvFile(href, './business-licence-register-businesses.csv');
+			// This checks if the href ends with licences.csv and is exclusive to the license gambling commission file.
+			} else if (href?.endsWith('licences.csv')) {
+				href = 'https://www.gamblingcommission.gov.uk' + href;
+				returnedHref = href;
+				console.log(returnedHref);
+				await downloadCsvFile(href, './business-licence-register-licences.csv');
+			// This checks if the href ends with csv and is exclusive to the HMRC website
+			} else if (href?.endsWith('.csv')) {
+				returnedHref = href;
+				console.log(returnedHref);
+				await downloadCsvFile(href, './HmrcFile.csv');
+			// This checks if the href ends with ods and is exlusive t the HMRC.
+			// This part also converts the ods file to a csv file.
 			} else if (href?.endsWith('.ods')) {
 				returnedHref = href;
 				console.log(returnedHref);
 				const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
-				await convertToCsv(downloadedOdsFile, './TheConvertedFile.csv');
+				await convertToCsv(downloadedOdsFile, './HmrcFile.csv');
 			}
 		}).get();
 
@@ -55,4 +69,4 @@ async function scrapeHmrcWebsite(elementsPath: string) {
 	}
 }
 
-export {scrapeHmrcWebsite, downloadCsvFile};
+export {scrapeWebsite, downloadCsvFile};
