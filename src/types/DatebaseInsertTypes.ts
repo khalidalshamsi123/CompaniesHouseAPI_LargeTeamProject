@@ -2,7 +2,7 @@ import type {PoolClient} from 'pg';
 
 type DataRow = {
 	row: Record<string, any>;
-	regIdIndex: number;
+	refIdIndex: number;
 	status1Index: number;
 	client: PoolClient;
 };

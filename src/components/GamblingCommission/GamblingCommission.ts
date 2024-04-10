@@ -424,9 +424,9 @@ export default class GamblingCommission {
 				const columns: string[] = this.columnNames[typedKey];
 
 				/**
-					* Specify order columns should have. But do not write them in the resulting csv string.
-					* https://c2fo.github.io/fast-csv/docs/formatting/examples/
-				*/
+				 * Specify order columns should have. But do not write them in the resulting csv string.
+				 * https://c2fo.github.io/fast-csv/docs/formatting/examples/
+				 */
 				const csvFormatStream = format({
 					headers: columns,
 					writeHeaders: false,

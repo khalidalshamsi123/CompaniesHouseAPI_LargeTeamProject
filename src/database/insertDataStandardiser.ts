@@ -11,14 +11,14 @@ async function insertDataStandardiser(data: DataRow): Promise<void>;
 async function insertDataStandardiser(data: DataRow | GamblingCommissionData): Promise<void> {
 	if (isDataRow(data)) {
 		// Data is of type DataRow
-		const {row, regIdIndex, status1Index, client} = data;
-		const registrationId = String(row[Object.keys(row)[regIdIndex]]);
+		const {row, refIdIndex, status1Index, client} = data;
+		const referenceId = String(row[Object.keys(row)[refIdIndex]]);
 		const statusIndex = Object.keys(row)[status1Index];
 		const statusValue = String(row[statusIndex]); // Convert status value to string
 		// Determine the boolean value based on the status string
 		const status = statusValue.toLowerCase();
 		if (status === 'approved') {
-			await hmrcProcess(row, registrationId, client);
+			await hmrcProcess(row, referenceId, client);
 		}
 	} else if (isGamblingCommissionData(data)) {
 		console.log(data.gamblingApprovalStatuses);
@@ -44,19 +44,17 @@ function isGamblingCommissionData(data: any): data is GamblingCommissionData {
  * @param registrationId The registration ID.
  * @param client The database client.
  */
-async function hmrcProcess(row: any, registrationId: string, client: PoolClient) {
+async function hmrcProcess(row: any, referenceId: string, client: PoolClient) {
 	const query = `
-        INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-        VALUES ($1, $2, $3, $4, $5)
-        ON CONFLICT (businessname)
+        INSERT INTO registration_schema.hmrc_business_registry (referenceid, businessname, hmrc_approved)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (referenceid)
         DO UPDATE SET hmrc_approved = EXCLUDED.hmrc_approved;
     `;
 	const values = [
-		registrationId,
+		referenceId,
 		row.BUSINESS_NAME,
-		false,
 		true,
-		false,
 	];
 	await client.query(query, values);
 }

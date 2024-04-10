@@ -4,14 +4,19 @@ async function createSchema() {
 	try {
 		console.log('Creating database schema...');
 		await pool.query('CREATE SCHEMA IF NOT EXISTS registration_schema;');
-		await pool.query(`CREATE TABLE IF NOT EXISTS registration_schema.business_registry (
-			registrationid VARCHAR(255),
+		await pool.query(`CREATE TABLE IF NOT EXISTS registration_schema.hmrc_business_registry (
+			referenceid VARCHAR(255),
 			businessname VARCHAR(255),
-			fca_approved BOOLEAN,
 			hmrc_approved BOOLEAN,
+			PRIMARY KEY (referenceId),
+			UNIQUE (referenceId)
+			);`);
+		await pool.query(`CREATE TABLE IF NOT EXISTS registration_schema.gc_business_registry (
+			referenceid VARCHAR(255),
+			businessname VARCHAR(255),
 			gambling_approved BOOLEAN,
-			PRIMARY KEY (businessname),
-			UNIQUE (registrationid)
+			PRIMARY KEY (referenceId),
+			UNIQUE (referenceId)
 			);`);
 	} catch (error) {
 		console.error('Error creating database schema:', error);
