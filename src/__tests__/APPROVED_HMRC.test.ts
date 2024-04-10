@@ -29,7 +29,7 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app).get('/approved/')
 				.set(headers)
-				.query({registrationId: '1241294', businessName: 'ShouldFail LTD'});
+				.query({referenceId: '1241294', businessName: 'ShouldFail LTD'});
 			// Assert the response.
 			expect(response.statusCode).toBe(400);
 		});

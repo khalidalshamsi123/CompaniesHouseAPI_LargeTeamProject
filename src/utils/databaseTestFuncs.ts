@@ -8,28 +8,31 @@ const setupTestDatabase = async () => {
             CREATE SCHEMA IF NOT EXISTS test_schema;
         `);
 
-		await pool.query(`
-            CREATE TABLE IF NOT EXISTS test_schema.business_registry (
-                registrationid VARCHAR,
-                businessname VARCHAR,
-                fca_approved BOOLEAN,
-                hmrc_approved BOOLEAN,
-                gambling_approved BOOLEAN,
-				PRIMARY KEY (businessname),
-				UNIQUE (registrationid)
-            );
-        `);
+		await pool.query(`CREATE TABLE IF NOT EXISTS test_schema.hmrc_business_registry (
+			referenceid VARCHAR(255),
+			businessname VARCHAR(255),
+			hmrc_approved BOOLEAN,
+			PRIMARY KEY (referenceid),
+			UNIQUE (referenceid, businessname)
+			);`);
+		await pool.query(`CREATE TABLE IF NOT EXISTS test_schema.gambling_business_registry (
+			referenceid VARCHAR(255),
+			businessname VARCHAR(255),
+			gambling_approved BOOLEAN,
+			PRIMARY KEY (referenceid),
+			UNIQUE (referenceid, businessname)
+			);`);
 
 		// Avoid duplication of data
 		await pool.query(`
-            DELETE FROM test_schema.business_registry
-            WHERE registrationid = '122702';
+            DELETE FROM test_schema.hmrc_business_registry
+            WHERE referenceid = '122702';
         `);
 
 		// Insert test data
 		await pool.query(`
-            INSERT INTO test_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-            VALUES ('122702', 'Barclays', true, true, false);
+            INSERT INTO test_schema.hmrc_business_registry (referenceid, businessname,hmrc_approved)
+            VALUES ('122702', 'Barclays', true);
         `);
 	} catch (error) {
 		console.error('Error setting up test database:', error);
@@ -56,9 +59,9 @@ const deleteRowsFromTestTable = async (tableName: string) => {
 	}
 };
 
-const selectFromTestDatabase = async (registrationId: string): Promise<BusinessData | undefined> => {
+const selectFromTestDatabase = async (referenceId: string): Promise<BusinessData | undefined> => {
 	// Unlike the original implementation for this method I am not handling any errors as in that implementation it is just re-thrown anyway.
-	const result = await pool.query('SELECT * FROM test_schema.business_registry WHERE registrationid = $1', [registrationId]);
+	const result = await pool.query('SELECT * FROM test_schema.hmrc_business_registry WHERE referenceid = $1', [referenceId]);
 	const businessData: BusinessData = result.rows[0] as BusinessData;
 
 	// Return null if cant find any data

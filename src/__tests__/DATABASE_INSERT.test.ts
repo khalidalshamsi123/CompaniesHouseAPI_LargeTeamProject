@@ -51,6 +51,7 @@ describe('processDataRow function', () => {
 
 	describe('when processing data for Gambling Commission approved businesses', () => {
 		const mockCsvData = {
+			referenceId: ['12345-N-54321'],
 			businessNames: ['Test Company'],
 			gamblingApprovalStatuses: [true],
 			insertClient: mockClient,

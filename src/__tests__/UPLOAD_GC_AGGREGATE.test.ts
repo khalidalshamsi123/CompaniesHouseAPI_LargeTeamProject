@@ -31,7 +31,7 @@ beforeAll(async () => {
 beforeEach(async () => {
 	await deleteRowsFromTestTable('business_licence_register_businesses');
 	await deleteRowsFromTestTable('business_licence_register_licences');
-	await deleteRowsFromTestTable('business_registry');
+	await deleteRowsFromTestTable('gambling_business_registry');
 });
 
 afterAll(async () => {
@@ -39,7 +39,7 @@ afterAll(async () => {
 });
 
 // Can change variables if the table names ever change.
-const mainTable = 'business_registry';
+const mainTable = 'gambling_business_registry';
 const businessTempTable = 'business_licence_register_businesses';
 const licenceTempTable = 'business_licence_register_licences';
 
@@ -52,7 +52,7 @@ describe('Given there are businesses already listed in our main database table.'
 		// Then.
 		it('Then the gambling_approved column for these businesses in the main database should be updated to reflect their current approval status, ensuring accurate compliance records.', async () => {
 			// Insert record to main database table. Record will have gambling licence approval status set to false.
-			await pool.query(`INSERT INTO test_schema.${mainTable} (registrationid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
+			await pool.query(`INSERT INTO test_schema.${mainTable} (referenceid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
 				['2895', 'John Owns a Business Limited', 'false']);
 
 			// Add rows that will be joined to temporary tables.
@@ -128,7 +128,7 @@ describe('Given there is existing data within the main database table.', () => {
 		// Then.
 		it('Then the update should fail, and the completeness of the existing data should be maintained.', async () => {
 			// Insert record to main database table.
-			await pool.query(`INSERT INTO test_schema.${mainTable} (registrationid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
+			await pool.query(`INSERT INTO test_schema.${mainTable} (referenceid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
 				['2895', 'John Owns a Business Limited', 'true']);
 
 			// Add two rows to temporary tables. JOIN will occur on the temporary tables.
