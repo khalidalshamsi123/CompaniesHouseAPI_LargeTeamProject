@@ -2,6 +2,7 @@ import fs from 'fs';
 import csvParser from 'csv-parser';
 import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type PoolClient} from 'pg';
+import path from 'path';
 
 /**
  * Read and process CSV data from the given file.
@@ -10,14 +11,15 @@ import {type PoolClient} from 'pg';
  * @param batchSize Size of each batch for database transactions.
  * @returns The number of rows processed.
  */
-async function csvReader(filename: string, client: PoolClient, batchSize: number): Promise<number> {
+async function csvReader(filePath: string, client: PoolClient, batchSize: number): Promise<number> {
 	let rowCount = 0; // Counter for the number of rows processed
 	let status1Index = -1;
 	let regIdIndex = -1;
-	const cache: Record<string, boolean> = {}; // Cache to store processed registration IDs
 	return new Promise((resolve, reject) => {
+		// Extract the file name from the file path
+		const fileName = path.basename(filePath);
 		// Create a readable stream from the CSV file
-		fs.createReadStream(filename)
+		fs.createReadStream(filePath)
 			// Pipe the stream through the CSV parser
 			.pipe(csvParser())
 			// Event handler for each row of data
@@ -49,7 +51,7 @@ async function csvReader(filename: string, client: PoolClient, batchSize: number
 				try {
 					// Commit any remaining rows in the database
 					await client.query('COMMIT');
-					console.log(`CSV data loaded successfully from file: ${filename}`);
+					console.log(`CSV data loaded successfully from file: ${fileName}`);
 					resolve(rowCount); // Resolve the Promise with the total row count
 				} catch (error) {
 					console.error('Error committing transaction:', error);
