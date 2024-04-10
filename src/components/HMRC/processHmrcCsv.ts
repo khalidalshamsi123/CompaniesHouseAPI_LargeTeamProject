@@ -1,5 +1,4 @@
 import {csvReader} from './csvReaderHMRC';
-import pool from '../../database/setup/databasePool';
 import {type CsvProcessorOptions} from '../../types/HmrcTypes';
 
 /**
