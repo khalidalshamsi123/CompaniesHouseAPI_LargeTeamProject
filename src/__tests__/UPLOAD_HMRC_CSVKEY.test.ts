@@ -1,18 +1,18 @@
-import {hmrcComponent} from '../components/HMRC/HMRC';
+import { hmrcComponent } from '../components/HMRC/HMRC';
 import fs from 'fs';
+import * as processHmrcCsvModule from '../components/HMRC/processHmrcCsv';
 
 // Mocking the dependencies
 jest.mock('fs');
-jest.mock('../components/HMRC/processHmrcCsv');
 
 describe('HMRC Component', () => {
+	// Mock the behavior of the processHmrcCsv function globally
+	jest.mock('../components/HMRC/processHmrcCsv', () => jest.fn());
+
 	describe('Given hmrcComponent function is called with a valid csvKey', () => {
 		it('Then it should process the HMRC CSV data successfully', async () => {
 			// Mock the behavior of fs.existsSync to return true
 			(fs.existsSync as jest.Mock).mockReturnValue(true);
-
-			// Mock the behavior of the processHmrcCsv function
-			jest.mock('../components/HMRC/processHmrcCsv', () => jest.fn());
 
 			// Expect hmrcComponent to resolve without throwing an error
 			await expect(hmrcComponent('hmrcCsv')).resolves.not.toThrow();
