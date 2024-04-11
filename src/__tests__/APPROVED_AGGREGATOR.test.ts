@@ -22,10 +22,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 	describe('Given the business is approved by no regulatory bodies.', () => {
 		describe('When the aggregator requests this information.', () => {
 			it('Then the overall approval status for the business should be returned as false by the aggregator.', async () => {
-				// Const fcaExpectedResult = {
-				// 	isAuthorised: false,
-				// };
-				// const databaseExpectedResult = undefined; // No approvals expected
+
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 
 				// Make the request and wait for the response

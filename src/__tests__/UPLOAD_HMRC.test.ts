@@ -8,6 +8,13 @@ jest.mock('../components/HMRC/processHmrcCsv');
 describe('HMRC Component', () => {
 	describe('Given hmrcComponent function is called with a valid csvKey', () => {
 		it('Then it should process the HMRC CSV data successfully', async () => {
+			// Mock the behavior of fs.existsSync to return true
+			(fs.existsSync as jest.Mock).mockReturnValue(true);
+
+			// Mock the behavior of the processHmrcCsv function
+			jest.mock('../components/HMRC/processHmrcCsv', () => jest.fn());
+
+			// Expect hmrcComponent to resolve without throwing an error
 			await expect(hmrcComponent('hmrcCsv')).resolves.not.toThrow();
 		});
 	});
