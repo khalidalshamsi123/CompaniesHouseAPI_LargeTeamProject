@@ -147,6 +147,20 @@ class StandardiserInterface {
 		}
 	} */
 
+
+	/**
+	 * Processes the incoming request by validating custom headers and
+	 * standardising the file based on the File-Commission type.
+	 * It checks for the presence of a "File-Commission" header and validates its value.
+	 * Depending on the "File-Commission" value, a corresponding standardiser is called.
+	 * If the operation is successful, the `successfullyUploaded` flag is set to true.
+	 * In case of any failure or error, an appropriate error message is set.
+	 *
+	 * @async
+	 * @param {Request} request - The incoming request object to be processed.
+	 * @returns {Promise<{successfullyUploaded: boolean; errorMsg: string}>} An object containing
+	 * a flag indicating whether the upload was successful, and an error message if applicable.
+	 */
 	async processRequest(request: Request): Promise<{successfullyUploaded: boolean; errorMsg: string}> {
 		let errorMsg = '';
 		let successfullyUploaded = false;
