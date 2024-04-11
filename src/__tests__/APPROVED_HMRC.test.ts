@@ -25,6 +25,8 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 	// When.
 	describe('When Companies House sends a request to the /approved endpoint querying for the business.', () => {
 		it('Then it should return a 400 status code.', async () => {
+			// beforeAll does not seem to be allowing the setup properly so trying it here to see if its error with beforeAll
+			await setupTestDatabase();
 			// Make the request and wait for the response and expect status code 400.
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app).get('/approved/')
