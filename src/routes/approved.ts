@@ -43,7 +43,7 @@ router.post('/', isAuthorised, async (req, res) => {
 
 		const responseObj = await queryAggregator(businessName, commissions);
 
-		if (!responseObj) {
+		if (responseObj == undefined) {
 			res.sendStatus(404);
 			return;
 		}
