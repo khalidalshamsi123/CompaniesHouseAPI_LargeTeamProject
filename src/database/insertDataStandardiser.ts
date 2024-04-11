@@ -21,7 +21,7 @@ async function insertDataStandardiser(data: DataRow | GamblingCommissionData): P
 	} else if (isGamblingCommissionData(data)) {
 		console.log(data.gamblingApprovalStatuses);
 		// Data is of type GamblingCommissionData
-		await gamblingCommissionInsert(data.referenceId, data.businessNames, data.gamblingApprovalStatuses, data.insertClient);
+		await gamblingCommissionInsert(data.referenceId, data.businessNames, data.gamblingApprovalStatuses, data.insertClient, data.schema);
 	} else {
 		throw new Error('Invalid type provided.');
 	}
@@ -71,10 +71,11 @@ async function hmrcProcess(row: any, referenceId: string, client: PoolClient, st
  * @param insertClient The database client.
  * @param schema The database schema.
  */
-async function gamblingCommissionInsert(referenceIds: string[], businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient) {
+// eslint-disable-next-line @typescript-eslint/max-params
+async function gamblingCommissionInsert(referenceIds: string[], businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient, schema: string) {
 	// Construct the SQL query to insert data into the business_registry table
 	const query = `
-        INSERT INTO registration_schema.gambling_business_registry (referenceid, businessname, gambling_approved)
+        INSERT INTO ${schema}.gambling_business_registry (referenceid, businessname, gambling_approved)
         -- Unnest the referenceIds, businessNames, and gamblingApprovalStatuses arrays to insert multiple rows at once
         SELECT * FROM UNNEST($1::TEXT[], $2::TEXT[], $3::BOOLEAN[])
         AS t (referenceid, businessname, gambling_approved)

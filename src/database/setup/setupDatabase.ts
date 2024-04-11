@@ -25,14 +25,3 @@ async function createSchema() {
 }
 
 export {createSchema};
-
-// Call the createSchema function
-createSchema()
-	.then(() => {
-		console.log('Schema creation completed successfully.');
-		// Any additional code to run after schema creation
-	})
-	.catch(error => {
-		console.error('Schema creation failed:', error);
-		// Handle errors if necessary
-	});

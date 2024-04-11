@@ -1,5 +1,5 @@
 import pool from '../database/setup/databasePool';
-import {type BusinessData} from '../database/queries';
+import {type HmrcBusinessData} from '../database/queries';
 
 // Function to create database schema and insert test data
 const setupTestDatabase = async () => {
@@ -59,17 +59,23 @@ const deleteRowsFromTestTable = async (tableName: string) => {
 	}
 };
 
-const selectFromTestDatabase = async (referenceId: string): Promise<BusinessData | undefined> => {
-	// Unlike the original implementation for this method I am not handling any errors as in that implementation it is just re-thrown anyway.
-	const result = await pool.query('SELECT * FROM test_schema.hmrc_business_registry WHERE referenceid = $1', [referenceId]);
-	const businessData: BusinessData = result.rows[0] as BusinessData;
+const selectFromTestDatabase = async (referenceId: string): Promise<{hmrcApproved: boolean; gamblingApproved: boolean} | undefined> => {
+	try {
+		const hmrcResult = await pool.query('SELECT * FROM test_schema.hmrc_business_registry WHERE referenceid = $1', [referenceId]);
+		const hmrcBusinessData: HmrcBusinessData = hmrcResult.rows[0] as HmrcBusinessData;
 
-	// Return null if cant find any data
-	if (!businessData) {
-		return undefined;
+		if (!hmrcBusinessData) {
+			return undefined;
+		}
+
+		return {
+			hmrcApproved: hmrcBusinessData.hmrc_approved,
+			gamblingApproved: false,
+		};
+	} catch (error) {
+		console.error('Error retrieving data:', error);
+		throw new Error('Error retrieving data');
 	}
-
-	return businessData;
 };
 
 const createTestGamblingCommissionTables = async () => {

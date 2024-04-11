@@ -259,6 +259,7 @@ export default class GamblingCommission {
 				businessNames,
 				gamblingApprovalStatuses,
 				insertClient,
+				schema,
 			};
 			// eslint-disable-next-line no-await-in-loop
 			await insertDataStandardiser(gamblingCommissionData);// eslint-disable-next-line no-await-in-loop

@@ -10,9 +10,12 @@ async function hmrcComponent(csvKey: string) {
 		throw new Error('Invalid csvKey provided. Expected "hmrcCsv".');
 	}
 
-	let client: PoolClient | undefined;
+	// Let client: PoolClient | undefined;
+	const client: PoolClient = await pool.connect();
 	try {
-		client = await pool.connect();
+		// Client = await pool.connect();
+		// Start transaction
+		await client.query('BEGIN');
 		// Generate file name from csvKey
 		const fileName = getFileNameFromKey(csvKey);
 		if (!fileName) {
@@ -32,6 +35,7 @@ async function hmrcComponent(csvKey: string) {
 		const rowCount = await processHmrcCsv({filePath, client, batchSize});
 		console.log('Total rows processed:', rowCount);
 	} catch (error) {
+		await client.query('ROLLBACK');
 		console.error('Error processing HMRC CSV:', error);
 	} finally {
 		// Release the client back to the pool
@@ -54,3 +58,6 @@ function getFileNameFromKey(key: string) {
 }
 
 export {hmrcComponent};
+
+// Call the HMRC function for testing purposes
+hmrcComponent('hmrcCsv').catch(console.error);

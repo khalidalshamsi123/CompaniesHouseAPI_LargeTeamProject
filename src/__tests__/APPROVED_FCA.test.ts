@@ -15,7 +15,7 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app).get('/approved/')
-				.query({registrationId: '122702', businessName: 'Barclays'})
+				.query({referenceId: '122702', businessName: 'Barclays'})
 				.set(headers);
 			// Assert the response
 			expect(response.statusCode).toBe(200);

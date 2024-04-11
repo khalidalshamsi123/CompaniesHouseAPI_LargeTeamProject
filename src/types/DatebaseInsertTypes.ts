@@ -12,5 +12,6 @@ type GamblingCommissionData = {
 	businessNames: string[];
 	gamblingApprovalStatuses: boolean[]; // Updated to accept an array of booleans
 	insertClient: PoolClient;
+	schema: string;
 };
 export type {GamblingCommissionData, DataRow};
