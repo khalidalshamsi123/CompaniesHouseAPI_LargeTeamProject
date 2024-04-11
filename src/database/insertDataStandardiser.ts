@@ -70,7 +70,7 @@ async function hmrcProcess(row: any, referenceId: string, client: PoolClient, st
  * @param insertClient The database client.
  * @param schema The database schema.
  */
-// eslint-disable-next-line @typescript-eslint/max-params
+
 async function gamblingCommissionInsert(referenceIds: string[], businessNames: string[], gamblingApprovalStatuses: boolean[], insertClient: PoolClient, schema: string) {
 	// Construct the SQL query to insert data into the business_registry table
 	const query = `
