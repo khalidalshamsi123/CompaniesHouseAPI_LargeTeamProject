@@ -59,7 +59,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		return responseObj;
 	} catch (error) {
 		console.error("Error in queryAggregator:", error);
-		// Before we didnt return anything but I think its better practise to promise to return atleast an undefined object so appropriate error handling can be done.
+		// Before we didnt return anything but I think its better practise to promise to return atleast an undefined object so reliable error handling can be done.
 		return undefined;
 	}
 }
