@@ -3,7 +3,7 @@ import * as fcaQuerier from '../components/fcaQuerier';
 import * as productionQueries from '../database/queries';
 
 // Assuming you have a global database connection setup function, let's call it here
-import {clearTestDatabase, selectFromTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
+import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 
 beforeAll(async () => {
 	// Clearing in the afterAll section causes issues with test suites following this one.

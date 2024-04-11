@@ -73,6 +73,16 @@ export default class GamblingCommission {
 		}
 	}
 
+	public async standardise(data: Request | CsvKeys[], schema: string): Promise<void> {
+		if (data instanceof Array) {
+			// Handle the case where the first argument is a string (csvKey).
+			await this.uploadCsv(data, schema);
+		} else {
+			// Handle the case where the first argument is a Request object.
+			await this.uploadCsvWithStream(data, schema);
+		}
+	}
+
 	/**
 	 * Populates relevant Gambling Commission tables in the production schema from a readable stream of CSV data.
 	 * Useful for when receiving the data as part of a POST request.
