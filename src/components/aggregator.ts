@@ -1,41 +1,66 @@
-import {hmrcStatusRetriever, hmrcCsvReader} from '../components/HmrcProcessing';
 import {fcaGetApprovalStatus} from './fcaQuerier';
-import type {ResponseBodyStatus} from '../types/AggregatorTypes';
+import type {CommissionIDs, ResponseBodyStatus} from '../types/AggregatorTypes';
 import {findAllApprovedByRegId} from '../database/queries';
 
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
-async function queryAggregator(registrationId: string, businessName: string) {
+
+/**
+ * Queries various regulatory bodies to determine the approval status of a business
+ * based on given commission IDs. It handles HMRC, Gambling Commission, and FCA.
+ * Avoids unnecessary queries by checking if ID is provided before querying.
+ * This can be easily extended to more commissions by modifying the type in AggregatorTypes.ts
+ *
+ * @param {string} businessName - The name of the business to query.
+ * @param {CommissionIDs} commissionIDs - An object containing IDs for querying
+ *                                        the HMRC, Gambling Commission, and FCA.
+ * @returns {Promise<ResponseBodyStatus | undefined>} A promise that resolves to the status object
+ *                                                    or undefined in case of an error.
+ */
+async function queryAggregator(businessName: string, commissionIDs: CommissionIDs): Promise<ResponseBodyStatus | undefined> {
 	try {
-		// This will only be used for the HMRC and gambling status
-		const businessData = await findAllApprovedByRegId(registrationId);
+		const { gamblingCommission, hmrc, fca } = commissionIDs;
 
-		// Get FCA Approved with absolute latest relevant data from FCA Api
-		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
+		// Initialize approval flags for each commission
+		let fcaApproved = false, hmrcApproved = false, gamblingApproved = false;
 
-		// Unix timestamp generation.
+		// Conditional queries based on the presence of commission IDs to extract approval statuses
+		if (hmrc) {
+			const hmrcData = await findAllApprovedByRegId(hmrc);
+			hmrcApproved = hmrcData?.hmrc_approved ?? false;
+		}
+
+		if (gamblingCommission) {
+			const gamblingData = await findAllApprovedByRegId(gamblingCommission);
+			gamblingApproved = gamblingData?.gambling_approved ?? false;
+		}
+
+		if (fca) {
+			const { isAuthorised } = await fcaGetApprovalStatus(fca);
+			fcaApproved = isAuthorised;
+		}
+
+		// Generate a UNIX timestamp
 		const timestamp = new Date().toISOString();
 
-		const hmrcApproved = businessData?.hmrc_approved ?? false;
-
-		const gamblingApproved = businessData?.gambling_approved ?? false;
-		// Construct the response JSON object
+		// Construct the response JSON object (could just return the object straight, but I prefer to define it like this as it makes it clearer to read).
 		const responseObj: ResponseBodyStatus = {
 			timestamp,
-			registrationId,
+			commissionIDs,
 			businessName,
 			approvedWith: {
-				fca: isAuthorised,
+				fca: fcaApproved,
 				hmrc: hmrcApproved,
 				gamblingCommission: gamblingApproved,
 			},
-			approved: (isAuthorised || hmrcApproved || gamblingApproved),
+			approved: fcaApproved || hmrcApproved || gamblingApproved,
 		};
-		// Send the response object
+
 		return responseObj;
 	} catch (error) {
-		console.error(error);
-		// Error hadnling needs working on.
+		console.error("Error in queryAggregator:", error);
+		// Consider how to handle errors properly; possibly throw or return a specific error object
+		return undefined;
 	}
 }
 

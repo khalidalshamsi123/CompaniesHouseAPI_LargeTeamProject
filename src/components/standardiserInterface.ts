@@ -1,7 +1,7 @@
 import path from 'path';
 import GamblingCommission from './GamblingCommission/GamblingCommission';
-import pool from '../database/databasePool';
-import hmrcStandardiser from './hmrc/HmrcStandardiser';
+import pool from '../database/setup/databasePool';
+import hmrcStandardiser from './HMRC/HmrcStandardiser';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 import {type Request} from 'express-serve-static-core';
 
@@ -20,18 +20,6 @@ type Standardiser = {
 	standardise(data: CsvKeys[] | Request, schema: string): Promise<void>;
 };
 
-/* Obselete following implementation of custom "File-Commission" header.
-
-interface File {
-	// Since we only want the name to determine which standardiser the file goes to we define our own interface
-	originalname: string;
-
-}
-
-type FileProcessingResult = {
-	originalname: string;
-	status: string;
-}; */
 
 /**
  * Class responsible for managing different data standardisers.
