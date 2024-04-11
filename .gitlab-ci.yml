@@ -182,6 +182,15 @@ test_authentication:
     - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t AUTHENTICATION
 
+test_business_name_standardizer:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - npm install
+    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
+    - npm run test-ci -t STANDARDIZE_BUSINESS_NAME
+
 deploy_staging:
   stage: deploy
   script:
