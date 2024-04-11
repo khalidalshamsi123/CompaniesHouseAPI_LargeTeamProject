@@ -3,10 +3,14 @@ import * as fcaQuerier from '../components/fcaQuerier';
 import * as productionQueries from '../database/queries';
 
 // Assuming you have a global database connection setup function, let's call it here
-import {setupTestDatabase} from '../utils/databaseTestFuncs';
+import {clearTestDatabase, selectFromTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 
-// Call the setup function to establish the database connection
-void setupTestDatabase();
+beforeAll(async () => {
+	// Clearing in the afterAll section causes issues with test suites following this one.
+	await clearTestDatabase();
+
+	await setupTestDatabase();
+});
 
 describe('Testing the data retrieval functionality of the Aggregator', () => {
 	describe('Given the business is approved by at least one regulatory body.', () => {
