@@ -1,4 +1,4 @@
-import { hmrcComponent } from '../components/HMRC/HMRC';
+import {hmrcComponent} from '../components/HMRC/HMRC';
 import fs from 'fs';
 import * as processHmrcCsvModule from '../components/HMRC/processHmrcCsv';
 
