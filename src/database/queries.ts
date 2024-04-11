@@ -17,7 +17,6 @@ async function findAllApprovedByRegId(referenceId: string, schema: string): Prom
 	try {
 		// Query HMRC and gambling approvals
 		const hmrcResult = await pool.query(`SELECT * FROM ${schema}.hmrc_business_registry WHERE referenceid = $1 AND hmrc_approved = true`, [referenceId]);
-		
 		const gamblingResult = await pool.query(`SELECT * FROM ${schema}.gambling_business_registry WHERE referenceid = $1 AND gambling_approved = true`, [referenceId]);
 
 		// Determine if both HMRC and gambling approvals exist
