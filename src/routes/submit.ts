@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {scrapeWebsite} from '../scraping/fetchingHmrcFile';
+import {scrapeWebsite} from '../scraping/fetchingFiles';
 const router = Router();
 
 router.get('/', (req, res) => {

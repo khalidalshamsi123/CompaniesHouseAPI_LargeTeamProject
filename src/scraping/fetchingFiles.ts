@@ -33,7 +33,7 @@ async function scrapeWebsite(elementsPath: string, websiteLink: string) {
 		const promises = elements.map(async (index, element) => {
 			// Find the href
 			let href = $(element).attr('href');
-			// Checks if the file ends with businesses.csv, this is exlusive to gambling commission.
+			// Checks if the file ends with businesses.csv, this is exclusive to gambling commission.
 			if (href?.endsWith('businesses.csv')) {
 				href = 'https://www.gamblingcommission.gov.uk' + href;
 				returnedHref = href;

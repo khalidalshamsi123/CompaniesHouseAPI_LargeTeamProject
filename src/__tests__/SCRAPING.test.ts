@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import axios from 'axios';
-import {scrapeWebsite} from '../scraping/fetchingHmrcFile';
+import {scrapeWebsite} from '../scraping/fetchingFiles';
 
 // Mock data
 const htmlData = `
