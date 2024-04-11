@@ -32,7 +32,6 @@ async function queryAggregator(referenceId: string, businessName: string, schema
 			},
 			approved: (isAuthorised || hmrcApproved || gamblingApproved),
 		};
-		console.log(responseObj);
 
 		// Send the response object
 		return responseObj;

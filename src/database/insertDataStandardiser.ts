@@ -19,7 +19,6 @@ async function insertDataStandardiser(data: DataRow | GamblingCommissionData): P
 		const status = statusValue.toLowerCase();
 		await hmrcProcess(row, referenceId, client, status);
 	} else if (isGamblingCommissionData(data)) {
-		console.log(data.gamblingApprovalStatuses);
 		// Data is of type GamblingCommissionData
 		await gamblingCommissionInsert(data.referenceId, data.businessNames, data.gamblingApprovalStatuses, data.insertClient, data.schema);
 	} else {
