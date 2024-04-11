@@ -12,7 +12,8 @@ beforeAll(async () => {
 	// that interacts with the test database, for the duration of this test suite.
 	jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockImplementation(selectFromTestDatabase);
 	jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
-	await setupTestDatabase();
+	// Moving this into the test since beforeAll does not seem to wait for schema to be created before running test.
+	// await setupTestDatabase();
 });
 
 afterAll(async () => {
