@@ -1,5 +1,5 @@
 import type {PoolClient} from 'pg';
-import {type DataRow, type GamblingCommissionData} from '../types/DatebaseInsertTypes';
+import {type DataRow, type GamblingCommissionData} from '../types/DatabaseInsertTypes';
 
 /**
  * Process a single row of CSV data.

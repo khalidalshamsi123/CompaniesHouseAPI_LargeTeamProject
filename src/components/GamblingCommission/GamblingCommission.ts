@@ -14,7 +14,7 @@ import Cursor from 'pg-cursor';
 import {type PoolClient} from 'pg';
 import {sortStringToFrontOfArray} from '../../utils/utils';
 import {insertDataStandardiser} from '../../database/insertDataStandardiser';
-import {type GamblingCommissionData} from '../../types/DatebaseInsertTypes';
+import {type GamblingCommissionData} from '../../types/DatabaseInsertTypes';
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
