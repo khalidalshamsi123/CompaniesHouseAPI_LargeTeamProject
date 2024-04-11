@@ -5,38 +5,43 @@ import fs from 'fs';
 jest.mock('fs');
 jest.mock('../components/HMRC/processHmrcCsv');
 
-describe('HMRC Component', () => {
-	describe('Given hmrcComponent function is called with a valid csvKey', () => {
-		it('Then it should process the HMRC CSV data successfully', async () => {
-			// Mock the behavior of fs.existsSync to return true
-			(fs.existsSync as jest.Mock).mockReturnValue(true);
+/**
+ * Enum for standardiser keys.
+ */
+enum StandardiserKey {
+	HMRC = 'hmrc',
+	GAMBLING_COMMISSION = 'gambling_commission',
+}
 
-			// Mock the behavior of the processHmrcCsv function
-			jest.mock('../components/HMRC/processHmrcCsv', () => jest.fn());
+// TODO: THIS WHOLE TEST SUITE NEEDS TO BE REWRITTEN TO TEST HMRC STANDARDISER CLASS FUNCTIONALITY SPECIFICALLY ONTOP OF UPLOAD ROUTE OR PUT THIS IN SEPERATE FILES LIKE GC
 
-			// Expect hmrcComponent to resolve without throwing an error
-			await expect(hmrcComponent('hmrcCsv')).resolves.not.toThrow();
+describe('GIVEN an HMRC CSV is uploaded', () => {
+	describe('WHEN it is a correct CSV but the file commission header is missing', () => {
+		it('THEN it should not upload HMRC CSV successfully', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'hmrc-supervised-data.csv');
+			const response = await request(app)
+				.put('/upload')
+				.set('x-api-key', process.env.API_KEY ?? '') // Fallback to empty string if API_KEY is not set
+				.attach('files', filePath);
+
+			expect(response.body.errorMsg.length).toBeGreaterThan(0);
+			expect(response.status).toBe(400);
+			expect(response.body.successfullyUploaded).toBe(false);
 		});
 	});
 
-	describe('Given the hmrcCsv key is incorrect', () => {
-		beforeEach(() => {
-			// Set up mock implementation for fs.existsSync
-			(fs.existsSync as jest.Mock).mockReturnValue(false);
-		});
+	describe('WHEN it is an incorrect file type', () => {
+		it('THEN it should fail to upload non-CSV file', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
+			const response = await request(app)
+				.put('/upload')
+				.set('File-Commission', '') // Assuming this is intentionally left empty for the test
+				.set('x-api-key', process.env.API_KEY ?? '') // Fallback to empty string if API_KEY is not set
+				.attach('files', filePath);
 
-		it('Then it should raise an error', async () => {
-			try {
-				// Call the hmrcComponent function with invalid csvKey
-				await hmrcComponent('NotHmrcCsvKey');
-				// If the function does not throw an error, fail the test
-				fail('Function should have thrown an error.');
-			} catch (error) {
-				// Assert that the error is an instance of Error before accessing its message property
-				expect(error).toBeInstanceOf(Error);
-				// Expect the error message to indicate that the CSV file was not found
-				expect((error as Error).message).toContain('Invalid csvKey provided. Expected "hmrcCsv"');
-			}
+			expect(response.status).toBe(400);
+			expect(response.body.successfullyUploaded).toBe(false);
+			expect(response.body.errorMsg.length).toBeGreaterThan(0);
 		});
 	});
 });

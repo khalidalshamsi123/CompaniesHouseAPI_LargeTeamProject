@@ -9,6 +9,6 @@ type GamblingCommissionFileDetails = {
 	mimeType: string;
 };
 
-type CsvKeys = 'licencesCsv' | 'businessesCsv';
+type CsvKeys = 'licencesCsv' | 'businessesCsv' | 'hmrcCsv';
 
 export type {GamblingCommissionFileDetails, GamblingCommissionColumns, CsvKeys};
