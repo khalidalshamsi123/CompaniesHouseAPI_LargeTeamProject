@@ -80,14 +80,39 @@ class StandardiserInterface {
 		let successfullyUploaded = false;
 		let errorMsg = '';
 		if (csvKeys.includes('businessesCsv') || csvKeys.includes('licencesCsv')) {
-			await this.buildGamblingCommissionStandardiser();
-			const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
-			await standardiser!.standardise(csvKeys, schema);
-			successfullyUploaded = true;
+			try {
+				await this.buildGamblingCommissionStandardiser();
+				const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
+				if (!standardiser) {
+					console.error('Standardiser not found for Gambling Commission');
+				}
+
+				await standardiser!.standardise(csvKeys, schema);
+				successfullyUploaded = true;
+			} catch (error) {
+				console.error('Error during standardisation:', error);
+				errorMsg = 'Standardise function not implemented';
+				// The errorMsg goes to companies house manually uploading so we can give insightful detail.
+				if (error instanceof Error) {
+					errorMsg = `Standardise function not implemented: ${error.message}`;
+				}
+			}
 		} else if (csvKeys.includes('hmrcCsv')) {
-			const standardiser = this.standardisers.get(StandardiserKey.HMRC);
-			await standardiser!.standardise(csvKeys, schema);
-			successfullyUploaded = true;
+			try {
+				const standardiser = this.standardisers.get(StandardiserKey.HMRC);
+				if (!standardiser) {
+					console.error('Standardiser not found for HMRC');
+				}
+
+				await standardiser!.standardise(csvKeys, schema);
+				successfullyUploaded = true;
+			} catch (error) {
+				console.error('Error during standardisation:', error);
+				errorMsg = 'Standardise function not implemented';
+				if (error instanceof Error) {
+					errorMsg = `Standardise function not implemented: ${error.message}`;
+				}
+			}
 		} else {
 			console.error('Invalid combination of files');
 			errorMsg = 'Invalid combination of files';
@@ -95,58 +120,6 @@ class StandardiserInterface {
 
 		return {successfullyUploaded, errorMsg};
 	}
-
-	/**
-     * Processes a request object containing file uploads.
-     * @param {Request} request - The request object from Express.
-     * @param {string} schema - The database schema to be used.
-     * @returns {Promise<{ successfulUploads: string[], failedUploads: string[] }>} - The result of the file processing.
-     */
-
-	/* This whole implementation I (IV) wrote is now obselete as we are assuming that the request contains a custom header informing the file(s) commissions
-		so there is no need to use multer. See below for updated implementation.
-
-	async processRequest(request: Request, schema: string): Promise<{ successfulUploads: string[]; failedUploads: string[] }> {
-		try {
-			// Normalize request.files to an array of File objects
-			let files: File[] = [];
-			const filesData = request.files;
-			if (filesData instanceof Array) { // Single file input or multiple files under one field name
-				files = filesData as File[];
-			} else if (typeof filesData === 'object') { // Multiple file inputs with different field names
-				for (const [fieldname, fileArray] of Object.entries(filesData)) {
-					files = files.concat(fileArray as File[]);
-				}
-			}
-
-			const fileProcessingPromises = files.map(async (file): Promise<FileProcessingResult> => {
-				const fileExtension = path.extname(file.originalname);
-
-				if (fileExtension !== '.csv') {
-					return { originalname: file.originalname, status: 'Invalid file type' };
-				}
-
-				const fileName = path.basename(file.originalname, fileExtension);
-
-				if (fileName.includes('hmrc-supervised-data') || fileName.includes('business-licence-register-businesses')) {
-					// Since we are not processing the files here, just return the original name and status
-					return { originalname: file.originalname, status: 'CSV' };
-				}
-
-				return { originalname: file.originalname, status: 'Invalid file name' };
-			});
-
-			const results = await Promise.all(fileProcessingPromises);
-			const successfulUploads = results.filter(r => r.status === 'CSV').map(r => r.originalname);
-			const failedUploads = results.filter(r => r.status !== 'CSV').map(r => r.originalname);
-
-			return { successfulUploads, failedUploads };
-		} catch (error) {
-			console.error('Error processing request:', error);
-			throw error; // Rethrow the error after logging it.
-		}
-	} */
-
 
 	/**
 	 * Processes the incoming request by validating custom headers and
@@ -184,17 +157,46 @@ class StandardiserInterface {
 			// so more commissions could be easier to add. Remembering to always use the ENUMS so any keys can be changed much easier.
 			switch (fileCommission) {
 				case StandardiserKey.GAMBLING_COMMISSION:
-					await this.buildGamblingCommissionStandardiser();
-					await this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION)!.standardise(request, '');
-					successfullyUploaded = true;
+					try {
+						await this.buildGamblingCommissionStandardiser();
+						const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
+						if (!standardiser) {
+							console.error('Standardiser not found for Gambling Commission');
+						}
+
+						await standardiser!.standardise(request, '');
+						successfullyUploaded = true;
+					} catch (error) {
+						console.error('Error during standardisation:', error);
+						errorMsg = 'Standardise function not implemented';
+						// The errorMsg goes to companies house manually uploading so we can give insightful detail.
+						if (error instanceof Error) {
+							errorMsg = `Standardise function not implemented: ${error.message}`;
+						}
+					}
+
 					break;
 				case StandardiserKey.HMRC:
-					await this.standardisers.get(StandardiserKey.HMRC)!.standardise(request, '');
-					successfullyUploaded = true;
+					try {
+						const standardiser = this.standardisers.get(StandardiserKey.HMRC);
+						if (!standardiser) {
+							console.error('Standardiser not found for HMRC');
+						}
+
+						await standardiser!.standardise(request, '');
+						successfullyUploaded = true;
+					} catch (error) {
+						console.error('Error during standardisation:', error);
+						errorMsg = 'Standardise function not implemented';
+						if (error instanceof Error) {
+							errorMsg = `Standardise function not implemented: ${error.message}`;
+						}
+					}
+
 					break;
 				default:
 					// Always have this last, no keys would've been matched so we just set error msg here for now as its an invalid file commission
-					errorMsg = 'Incorrect File-Commission header: ' + fileCommission;
+					errorMsg = `Incorrect File-Commission header: ${fileCommission}`;
 			}
 		} catch (error) {
 			console.error('Error processing request:', error);
