@@ -44,7 +44,7 @@ router.post('/gambling-commission', isAuthorised, async (req, res) => {
    are manually uploaded we will need to only allow one commissions file to be uploaded at a time. As this is not main channel of upload this simplified implementation
    should be fine and not cause major inconvenience to the users. */
 // The new response is simply a successfullyUploaded boolean and a errorMsg (error message).
-router.put('/', upload.array('files'), async (req: Request, res) => {
+router.put('/', async (req: Request, res) => {
 	try {
 		/* We shouldn't need to do any validation here because each standardiser implementation will do this and handle the errors.
 
