@@ -11,7 +11,6 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 				// Make the request and wait for the response
 				const response = await queryAggregator('122702', 'Barclays', 'test_schema');
-
 				// Assert that the overall approval status is true if any regulatory body approves the business
 				expect(response).toHaveProperty('approved');
 				expect(response?.approved).toEqual(true);
@@ -22,9 +21,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 	describe('Given the business is approved by no regulatory bodies.', () => {
 		describe('When the aggregator requests this information.', () => {
 			it('Then the overall approval status for the business should be returned as false by the aggregator.', async () => {
-
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
-
 				// Make the request and wait for the response
 				const response = await queryAggregator('123456', 'Fake Company', 'test_schema');
 				expect(response).toHaveProperty('approved');
@@ -79,4 +76,3 @@ describe('Testing the boolean "approved" value is as expected when returned by t
 		});
 	});
 });
-
