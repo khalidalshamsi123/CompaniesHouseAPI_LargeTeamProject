@@ -164,7 +164,7 @@ class StandardiserInterface {
 							console.error('Standardiser not found for Gambling Commission');
 						}
 
-						await standardiser!.standardise(request, '');
+						await standardiser!.standardise(request, 'registration_schema');
 						successfullyUploaded = true;
 					} catch (error) {
 						console.error('Error during standardisation:', error);
@@ -183,7 +183,7 @@ class StandardiserInterface {
 							console.error('Standardiser not found for HMRC');
 						}
 
-						await standardiser!.standardise(request, '');
+						await standardiser!.standardise(request, 'registration_schema');
 						successfullyUploaded = true;
 					} catch (error) {
 						console.error('Error during standardisation:', error);
