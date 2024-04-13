@@ -5,13 +5,6 @@ import request from 'supertest';
 import app from '../app';
 import path from 'path';
 
-import {hmrcComponent} from '../components/HMRC/HMRC';
-import fs from 'fs';
-
-// Mocking the dependencies
-jest.mock('fs');
-jest.mock('../components/HMRC/processHmrcCsv');
-
 /**
  * Enum for standardiser keys.
  */
