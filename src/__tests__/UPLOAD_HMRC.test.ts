@@ -5,6 +5,13 @@ import request from 'supertest';
 import app from '../app';
 import path from 'path';
 
+import {hmrcComponent} from '../components/HMRC/HMRC';
+import fs from 'fs';
+
+// Mocking the dependencies
+jest.mock('fs');
+jest.mock('../components/HMRC/processHmrcCsv');
+
 /**
  * Enum for standardiser keys.
  */
@@ -31,17 +38,18 @@ describe('GIVEN an HMRC CSV is uploaded', () => {
 	});
 });
 
-describe('WHEN it is an incorrect file type', () => {
-	it('THEN it should fail to upload non-CSV file', async () => {
-		const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
-		const response = await request(app)
-			.put('/upload')
-			.set('File-Commission', '') // Assuming this is intentionally left empty for the test
-			.set('x-api-key', process.env.API_KEY ?? '') // Fallback to empty string if API_KEY is not set
-			.attach('files', filePath);
+	describe('WHEN it is an incorrect file type', () => {
+		it('THEN it should fail to upload non-CSV file', async () => {
+			const filePath = path.join(__dirname, 'test-files', 'invalid.txt');
+			const response = await request(app)
+				.put('/upload')
+				.set('File-Commission', '') // Assuming this is intentionally left empty for the test
+				.set('x-api-key', process.env.API_KEY ?? '') // Fallback to empty string if API_KEY is not set
+				.attach('files', filePath);
 
-		expect(response.status).toBe(400);
-		expect(response.body.successfullyUploaded).toBe(false);
-		expect(response.body.errorMsg.length).toBeGreaterThan(0);
+			expect(response.status).toBe(400);
+			expect(response.body.successfullyUploaded).toBe(false);
+			expect(response.body.errorMsg.length).toBeGreaterThan(0);
+		});
 	});
 });
