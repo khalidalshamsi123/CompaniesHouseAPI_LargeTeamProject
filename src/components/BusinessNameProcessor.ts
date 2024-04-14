@@ -1,4 +1,5 @@
 import pool from '../database/setup/databasePool';
+import {type Regulator} from '../types/CSVRegulatorTypes';
 
 export default class BusinessNameProcessor {
 	/** A hashmap of the legal structures found in the UK.
@@ -53,13 +54,13 @@ export default class BusinessNameProcessor {
      * standardizes the provided business name using `standardizeSingle`, and checks for a match.
 	 * @param {string} recordID - The unique identifier for the business record in the database.
  	 * @param {string} businessName - The business name to compare against the database.
- 	 * @param {'hmrc' | 'gambling'} regulator - The regulator type, which determines the database schema and table. Valid values are 'hmrc' or 'gambling'.
+ 	 * @param {Regulator} regulator - The regulator type, which determines the database schema and table. Valid values are 'hmrc' or 'gambling'.
  	 * @returns {Promise<{isMatch: boolean, message?: string}>} A promise that resolves to an object containing:
  	 *    - `isMatch`: A boolean indicating whether the provided business name matches the name in the database.
  	 *    - `message`: An optional message describing the result of the comparison. This message is included if there is a mismatch.
  	 * @throws {Error} Throws an error if the business cannot be found, or if other issues occur.
 	 */
-	public async compareBusinessNameWithRecord(recordID: string, businessName: string, regulator: 'hmrc' | 'gambling'): Promise<{isMatch: boolean; message?: string}> {
+	public async compareBusinessNameWithRecord(recordID: string, businessName: string, regulator: Regulator): Promise<{isMatch: boolean; message?: string}> {
 		let schema = 'registration_schema';
 		if (process.env.NODE_ENV === 'test') {
 			schema = 'test_schema';
