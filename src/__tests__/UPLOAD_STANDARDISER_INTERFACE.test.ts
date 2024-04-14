@@ -10,6 +10,7 @@ import standardiserInterface from '../components/standardiserInterface';
 jest.mock('../components/GamblingCommission/GamblingCommission');
 jest.mock('../components/HMRC/HmrcStandardiser');
 jest.mock('../database/setup/databasePool');
+jest.mock('../components/TableSnapshot/SnapshotManager');
 
 // Set up enums
 enum StandardiserKey {

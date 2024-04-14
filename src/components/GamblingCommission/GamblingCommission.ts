@@ -15,6 +15,7 @@ import {type PoolClient} from 'pg';
 import {sortStringToFrontOfArray} from '../../utils/utils';
 import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type GamblingCommissionData} from '../../types/DatabaseInsertTypes';
+import SnapshotManager from '../TableSnapshot/SnapshotManager';
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
@@ -219,6 +220,9 @@ export default class GamblingCommission {
 			`));
 			// Reads from the cursor and performs upsert. Batches of 50 till completion.
 			await this.readBatchAndInsert(cursor, insertClient, schema);
+			// Take snapshot of table with the new changes.
+			const snapshotManager = new SnapshotManager(insertClient);
+			await snapshotManager.takeSnapshot('gambling');
 			// If no errors have occured, commit the changes to the database.
 			await insertClient.query('COMMIT');
 			console.log('Successfully updated businesses in main database table with latest Gambling Commission statuses.');

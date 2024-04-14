@@ -8,6 +8,8 @@ import fs from 'node:fs';
 import build from '../components/GamblingCommission/GamblingCommissionFactory';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 
+jest.mock('../components/TableSnapshot/SnapshotManager');
+
 beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();

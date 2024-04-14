@@ -16,6 +16,8 @@ jest.mock('busboy', () => jest.fn().mockImplementation(options => {
 	return instance;
 }));
 
+jest.mock('../components/TableSnapshot/SnapshotManager');
+
 // When called will return a mock request object. Object has the pipe method defined but will do nothing when called.
 const createMockRequest = () => ({
 	pipe: jest.fn().mockReturnThis(),
