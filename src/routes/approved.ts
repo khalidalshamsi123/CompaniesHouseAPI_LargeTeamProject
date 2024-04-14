@@ -50,7 +50,7 @@ router.post('/', isAuthorised, async (req, res) => {
 
 		const responseObj = await queryAggregator(referenceId, businessName, schema, commissions);
 		console.log(responseObj);
-		if (responseObj === undefined || !responseObj.approved) {
+		if (!responseObj?.approved) {
 			res.sendStatus(400);
 			return;
 		}
