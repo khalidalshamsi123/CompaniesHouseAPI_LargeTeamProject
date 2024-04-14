@@ -1,38 +1,67 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
 
-import type {ResponseBodyStatus} from '../types/AggregatorTypes';
 import {hmrcCsvReader} from '../components/HmrcProcessing';
 
 import isAuthorised from '../middleware/authentication';
 
+import type {PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
+
 const router = Router();
 
-router.get('/', isAuthorised, async (req, res) => {
+/**
+ * Retrieves business information based on multiple registration IDs (commissions)
+ * and business name. Validates that at least one registration ID is provided.
+ *
+ * @route POST /
+ * @param {Request} req - Request object, expects a query with businessName and a commissions object.
+ * @param {Response} res - Response object used to send back HTTP responses.
+ * @returns Returns JSON data with business approval details as responseObj, or an error status.
+ */
+router.post('/', isAuthorised, async (req, res) => {
 	try {
-		const {registrationId} = req.query;
-		const {businessName} = req.query;
+		const {referenceId, businessName, commissions, schema} = req.body as PostCommissionIDsQueryBody;
 
-		// @ts-expect-error registrationid will always be string, so this error can be supressed, any error handling is done within the function
-		const responseObj: ResponseBodyStatus = await queryAggregator(registrationId, businessName);
-
-		// Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
-		if (!responseObj) {
-			res.sendStatus(404);
+		if (!referenceId) {
+			res.status(400).json({error: 'Missing reference ID'});
 			return;
 		}
 
-		// Check if business data was found and if not approved change status code to return 400 or if approved change to 200.
-		const statusCode = responseObj.approved ? 200 : 400;
+		if (!businessName.trim().length) {
+			res.status(400).json({error: 'Invalid or missing business name'});
+			return;
+		}
 
-		// Send the response with correct status code
+		if (!commissions || typeof commissions !== 'object') {
+			res.status(400).json({error: 'Invalid or missing commissions data'});
+			return;
+		}
+
+		const {gamblingCommission, hmrc, fca} = commissions;
+		if (!gamblingCommission && !hmrc && !fca) {
+			res.status(400).json({error: 'At least one commission ID must be provided'});
+			return;
+		}
+
+		if (!schema) {
+			res.status(400).json({error: 'Missing schema information'});
+			return;
+		}
+
+		const responseObj = await queryAggregator(referenceId, businessName, schema, commissions);
+		console.log(responseObj);
+		if (!responseObj?.approved) {
+			res.sendStatus(400);
+			return;
+		}
+
+		const statusCode = responseObj.approved ? 200 : 400;
 		res.status(statusCode).json(responseObj);
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(400);
 	}
 });
-// Checking if my branch works
 
 // All hmrc data router.
 router.get('/allhmrc', (req, res) => {

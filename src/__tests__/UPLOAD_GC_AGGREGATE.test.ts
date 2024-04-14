@@ -31,7 +31,7 @@ beforeAll(async () => {
 beforeEach(async () => {
 	await deleteRowsFromTestTable('business_licence_register_businesses');
 	await deleteRowsFromTestTable('business_licence_register_licences');
-	await deleteRowsFromTestTable('business_registry');
+	await deleteRowsFromTestTable('gambling_business_registry');
 });
 
 afterAll(async () => {
@@ -39,7 +39,7 @@ afterAll(async () => {
 });
 
 // Can change variables if the table names ever change.
-const mainTable = 'business_registry';
+const mainTable = 'gambling_business_registry';
 const businessTempTable = 'business_licence_register_businesses';
 const licenceTempTable = 'business_licence_register_licences';
 
@@ -48,12 +48,12 @@ const licenceTempTable = 'business_licence_register_licences';
 // Given.
 describe('Given there are businesses already listed in our main database table.', () => {
 	// When.
-	describe('When there is matching business data in the temporary tables indicating approval status from the Gambling Commission.', () => {
+	describe('When there is matching business data in the temporary tables .', () => {
 		// Then.
 		it('Then the gambling_approved column for these businesses in the main database should be updated to reflect their current approval status, ensuring accurate compliance records.', async () => {
 			// Insert record to main database table. Record will have gambling licence approval status set to false.
-			await pool.query(`INSERT INTO test_schema.${mainTable} (registrationid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
-				['2895', 'John Owns a Business Limited', 'false']);
+			await pool.query(`INSERT INTO test_schema.${mainTable} (referenceid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
+				['012179-N-105324-221', 'John Owns a Business Limited', 'false']);
 
 			// Add rows that will be joined to temporary tables.
 			await pool.query(`INSERT INTO test_schema.${businessTempTable} (account_number, licence_account_name) VALUES ($1, $2)`, [
@@ -70,13 +70,11 @@ describe('Given there are businesses already listed in our main database table.'
 			]);
 
 			const gcInstance = await build();
-
 			// Call method that will aggregate then use data to update main table.
 			// Testing these methods separately to the prior step, which was creating the temporary tables from CSV data.
 			await gcInstance.uploadCsv(createMockRequest() as unknown as Request, 'test_schema');
 
 			const response = await pool.query(`SELECT * FROM test_schema.${mainTable}`);
-
 			expect(response.rows[0].gambling_approved).toBe(true);
 		});
 	});
@@ -128,7 +126,7 @@ describe('Given there is existing data within the main database table.', () => {
 		// Then.
 		it('Then the update should fail, and the completeness of the existing data should be maintained.', async () => {
 			// Insert record to main database table.
-			await pool.query(`INSERT INTO test_schema.${mainTable} (registrationid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
+			await pool.query(`INSERT INTO test_schema.${mainTable} (referenceid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
 				['2895', 'John Owns a Business Limited', 'true']);
 
 			// Add two rows to temporary tables. JOIN will occur on the temporary tables.
