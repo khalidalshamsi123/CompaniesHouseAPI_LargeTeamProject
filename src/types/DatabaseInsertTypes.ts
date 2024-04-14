@@ -14,4 +14,11 @@ type GamblingCommissionData = {
 	insertClient: PoolClient;
 	schema: string;
 };
-export type {GamblingCommissionData, DataRow};
+// These need to be spelt to match the column names in database so when we read it maps it correctly to this type.
+type HmrcBusinessData = {
+	referenceid: string;
+	businessname: string;
+	hmrc_approved: boolean;
+};
+
+export type {GamblingCommissionData, DataRow, HmrcBusinessData};
