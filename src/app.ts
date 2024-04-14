@@ -16,4 +16,7 @@ app.use('/submit', submitRoute);
 import uploadRoute from './routes/upload';
 app.use('/upload', isAuthorised, uploadRoute);
 
+import automateRoute from './scraping/automating';
+app.use('/automate', automateRoute);
+
 export default app;

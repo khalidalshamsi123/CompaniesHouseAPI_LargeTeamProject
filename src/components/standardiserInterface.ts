@@ -1,6 +1,6 @@
 import path from 'path';
 import GamblingCommission from './GamblingCommission/GamblingCommission';
-import pool from '../database/databasePool';
+import pool from '../database/setup/databasePool';
 import hmrcStandardiser from './hmrc/HmrcStandardiser';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 import {type Request} from 'express-serve-static-core';
