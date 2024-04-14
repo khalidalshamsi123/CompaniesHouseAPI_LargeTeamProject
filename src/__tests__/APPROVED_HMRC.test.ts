@@ -25,7 +25,7 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 		it('Then it should return a 400 status code.', async () => {
 			// Make the request and expect status code 400
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).post('/approved/')
+			const response = await request(app).get('/approved/')
 				.set(headers)
 				.send({
 					referenceId: '1241294',

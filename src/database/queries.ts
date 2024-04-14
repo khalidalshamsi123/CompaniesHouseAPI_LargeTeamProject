@@ -11,7 +11,6 @@ import type {CommissionIDs} from '../types/AggregatorTypes';
  */
 async function findAllApprovedByRegId(referenceId: string, schema: string, commissions: CommissionIDs): Promise<boolean> {
 	const {hmrc, gamblingCommission} = commissions;
-
 	if (!hmrc && !gamblingCommission) {
 		throw new Error('Invalid commission types given');
 	}

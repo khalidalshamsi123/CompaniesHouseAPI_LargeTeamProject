@@ -5,8 +5,6 @@ import {hmrcCsvReader} from '../components/HmrcProcessing';
 
 import isAuthorised from '../middleware/authentication';
 
-import type {PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
-
 const router = Router();
 
 /**
@@ -18,51 +16,32 @@ const router = Router();
  * @param {Response} res - Response object used to send back HTTP responses.
  * @returns Returns JSON data with business approval details as responseObj, or an error status.
  */
-router.post('/', isAuthorised, async (req, res) => {
+router.get('/', isAuthorised, async (req, res) => {
 	try {
-		const {referenceId, businessName, commissions, schema} = req.body as PostCommissionIDsQueryBody;
+		const {referenceId} = req.query;
+		const {businessName} = req.query;
+		const {commissions} = req.query;
+		const {schema} = req.query;
 
-		if (!referenceId) {
-			res.status(400).json({error: 'Missing reference ID'});
+		// @ts-expect-error referenceid will always be string, so this error can be supressed, any error handling is done within the function
+		const responseObj: ResponseBodyStatus = await queryAggregator(referenceId, businessName, schema, commissions);
+
+		// Check if the business was not found in the database nor the fca api, then return status code 404 defined earlier.
+		if (!responseObj) {
+			res.sendStatus(404);
 			return;
 		}
 
-		if (!businessName.trim().length) {
-			res.status(400).json({error: 'Invalid or missing business name'});
-			return;
-		}
-
-		if (!commissions || typeof commissions !== 'object') {
-			res.status(400).json({error: 'Invalid or missing commissions data'});
-			return;
-		}
-
-		const {gamblingCommission, hmrc, fca} = commissions;
-		if (!gamblingCommission && !hmrc && !fca) {
-			res.status(400).json({error: 'At least one commission ID must be provided'});
-			return;
-		}
-
-		if (!schema) {
-			res.status(400).json({error: 'Missing schema information'});
-			return;
-		}
-
-		const responseObj = await queryAggregator(referenceId, businessName, schema, commissions);
-		console.log(responseObj);
-		if (!responseObj?.approved) {
-			res.sendStatus(400);
-			return;
-		}
-
+		// Check if business data was found and if not approved change status code to return 400 or if approved change to 200.
 		const statusCode = responseObj.approved ? 200 : 400;
+
+		// Send the response with correct status code
 		res.status(statusCode).json(responseObj);
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(400);
 	}
 });
-
 // All hmrc data router.
 router.get('/allhmrc', (req, res) => {
 	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
