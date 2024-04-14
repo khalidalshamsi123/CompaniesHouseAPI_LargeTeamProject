@@ -58,7 +58,7 @@ export default class SnapshotManager {
            These results are put into descending order, which will order the tables from most recent
            to oldest.
 
-           Finally, we use OFFSET to ignore the top 5 recent results, and any excess that should be deleted. */
+           Finally, we use OFFSET to ignore the top 5 recent results, and retain only the excess tables (snapshots) that should be deleted. */
 		const excessSnapshots = await this.client.query(`
             SELECT table_name
             FROM information_schema.tables
