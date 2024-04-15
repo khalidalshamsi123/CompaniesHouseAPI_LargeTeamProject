@@ -25,16 +25,17 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 		it('Then it should return a 400 status code.', async () => {
 			// Make the request and expect status code 400
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).get('/approved/')
+			const response = await request(app).post('/approved/')
 				.set(headers)
 				.send({
-					referenceId: '1241294',
 					businessName: 'ShouldFail LTD',
 					commissions: {
-						gamblingCommission: 'gcId',
-					},
-					schema: 'test_schema',
-				});
+						gamblingCommission: '1241294',
+						hmrc: '',
+						fca: '',
+					}
+				})
+				.set('Content-Type', 'application/json');
 
 			// Assert the response
 			expect(response.status).toBe(400);

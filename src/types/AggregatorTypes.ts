@@ -25,3 +25,15 @@ export type PostCommissionIDsQueryBody = {
 	businessName: string;
 	commissions: CommissionIDs;
 };
+
+
+
+export type ApprovalResult = {
+	hmrcApproved: boolean;
+
+	gamblingApproved: boolean;
+
+	fcaApproved: boolean;
+
+
+}

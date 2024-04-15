@@ -40,7 +40,8 @@ router.post('/', isAuthorised, async (req, res) => {
 			return;
 		}
 
-		const responseObj = await queryAggregator(businessName, commissions);
+		// Just give an empty schema name and itll resolve to registration_schema, defining it is only needed for test_schema
+		const responseObj = await queryAggregator(businessName, commissions, '');
 
 		if (responseObj === undefined) {
 			res.sendStatus(404);

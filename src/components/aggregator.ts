@@ -1,6 +1,7 @@
 import {fcaGetApprovalStatus} from './fcaQuerier';
-import type {CommissionIDs, ResponseBodyStatus} from '../types/AggregatorTypes';
+import type {CommissionIDs, ResponseBodyStatus, ApprovalResult} from '../types/AggregatorTypes';
 import {findAllApprovedByRegId} from '../database/queries';
+
 
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
@@ -21,7 +22,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 	try {
 		const {gamblingCommission, hmrc, fca} = commissionIDs;
 
-		const schemaToUse = schema ?? 'business_registry';
+		const schemaToUse = schema && schema.length > 0 ? schema : 'registration_schema';
 
 		// Initialize approval flags for each commission
 		let fcaApproved = false;
@@ -32,28 +33,44 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 
 		// Conditional queries based on the presence of commission IDs to extract approval statuses
 		if (hmrc) {
-			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, hmrc)
+			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, 'hmrc')
 				.then(approved => {
 					hmrcApproved = approved;
+					//return { hmrcApproved };
 				}));
 		}
 
 		if (gamblingCommission) {
-			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, gamblingCommission)
+			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, 'gamblingCommission')
 				.then(approved => {
 					gamblingApproved = approved;
+					//return { gamblingApproved };
 				}));
 		}
 
 		if (fca) {
 			promises.push(fcaGetApprovalStatus(fca)
 				.then(({ isAuthorised }) => {
-					fcaApproved = isAuthorised;
+					fcaApproved = isAuthorised as boolean;
+					//return { fcaApproved };
 				}));
 		}
 
 		// Wait for all the promises to resolve, we have all the needed results for querying
-		await Promise.all(promises);
+		await Promise.allSettled(promises);
+		//const results = await Promise.allSettled(promises);
+
+		/* // Incase the promises werent resolved in time, we set the booleans after.
+		results.forEach(result => {
+			if (result.status === 'fulfilled') {
+				const value = result.value as ApprovalResult;
+				hmrcApproved = value.hmrcApproved;
+				gamblingApproved = value.gamblingApproved;
+				fcaApproved = value.fcaApproved;
+			} else {
+				console.error('Promise failed:', result.reason);
+			}
+		}); */
 
 		// Generate a UNIX timestamp
 		const timestamp = new Date().toISOString();
@@ -71,11 +88,12 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 				gamblingCommission: gamblingApproved,
 			},
 			approved: fcaApproved || hmrcApproved || gamblingApproved,
+
 		};
 
 		return responseObj;
-	} catch (error) {
-		console.error('Error in queryAggregator:', error);
+	} catch (errorLog) {
+		console.error('Error in queryAggregator:', errorLog);
 		// Before we didnt return anything but I think its better practise to promise to return atleast an undefined object so reliable error handling can be done.
 		return undefined;
 	}
