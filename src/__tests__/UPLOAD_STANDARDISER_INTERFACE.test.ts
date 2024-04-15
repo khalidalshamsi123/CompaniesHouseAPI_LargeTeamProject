@@ -1,12 +1,14 @@
 import StandardiserInterface from '../components/standardiserInterface';
-import HmrcStandardiser from '../components/hmrc/HmrcStandardiser';
+import GamblingCommission from '../components/GamblingCommission/GamblingCommission';
+import HmrcStandardiser from '../components/HMRC/HmrcStandardiser';
+import pool from '../database/setup/databasePool';
 import {type Request} from 'express-serve-static-core';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 
 // Mocking dependencies
 jest.mock('../components/GamblingCommission/GamblingCommission');
-jest.mock('../components/hmrc/HmrcStandardiser');
-jest.mock('../database/databasePool');
+jest.mock('../components/HMRC/HmrcStandardiser');
+jest.mock('../database/setup/databasePool');
 
 // Set up enums
 enum StandardiserKey {

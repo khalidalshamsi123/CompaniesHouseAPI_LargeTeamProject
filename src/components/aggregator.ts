@@ -1,41 +1,50 @@
-import {hmrcStatusRetriever, hmrcCsvReader} from '../components/HmrcProcessing';
 import {fcaGetApprovalStatus} from './fcaQuerier';
-import type {ResponseBodyStatus} from '../types/AggregatorTypes';
+import type {ResponseBodyStatus, CommissionIDs} from '../types/AggregatorTypes';
 import {findAllApprovedByRegId} from '../database/queries';
 
-// HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
-
-async function queryAggregator(registrationId: string, businessName: string) {
+/**
+ * Retrieves and aggregates approval status information for a business from various regulatory bodies.
+ * @param {string} referenceId - The reference ID of the business.
+ * @param {string} businessName - The name of the business.
+ * @param {string} schema - The schema to query in the database.
+ * @param {CommissionIDs} commissions - An object containing commission IDs for querying.
+ * @returns {Promise<ResponseBodyStatus>} A promise resolving to the response body status object.
+ * @throws {Error} If an error occurs during data retrieval or aggregation.
+ */
+async function queryAggregator(referenceId: string, businessName: string, schema: string, commissions: CommissionIDs) {
 	try {
-		// This will only be used for the HMRC and gambling status
-		const businessData = await findAllApprovedByRegId(registrationId);
+		// Retrieve approval status for each commission type
+		let databaseCommissionApproved = false;
 
-		// Get FCA Approved with absolute latest relevant data from FCA Api
-		const {isAuthorised} = await fcaGetApprovalStatus(registrationId);
+		// Hardcoding this for now becaquse itll be fixed on my branch (#43)
+		const commission = commissions.gamblingCommission ?? commissions.hmrc ?? '';
 
-		// Unix timestamp generation.
+		const databaseResult = await findAllApprovedByRegId(referenceId, schema, commission);
+		if (databaseResult !== undefined) {
+			databaseCommissionApproved = databaseResult;
+		}
+
+		// Retrieve FCA approval status from the API
+		const {isAuthorised} = await fcaGetApprovalStatus(referenceId);
+
+		// Generate timestamp
 		const timestamp = new Date().toISOString();
-
-		const hmrcApproved = businessData?.hmrc_approved ?? false;
-
-		const gamblingApproved = businessData?.gambling_approved ?? false;
-		// Construct the response JSON object
+		// Construct response object
 		const responseObj: ResponseBodyStatus = {
 			timestamp,
-			registrationId,
+			referenceId,
 			businessName,
 			approvedWith: {
 				fca: isAuthorised,
-				hmrc: hmrcApproved,
-				gamblingCommission: gamblingApproved,
+				databaseCommissions: databaseCommissionApproved,
 			},
-			approved: (isAuthorised || hmrcApproved || gamblingApproved),
+			approved: isAuthorised || databaseCommissionApproved,
 		};
-		// Send the response object
+
 		return responseObj;
 	} catch (error) {
 		console.error(error);
-		// Error hadnling needs working on.
+		throw error;
 	}
 }
 
