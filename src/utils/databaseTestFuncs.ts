@@ -1,5 +1,5 @@
 import pool from '../database/setup/databasePool';
-import {type HmrcBusinessData} from '../database/queries';
+import {type HmrcBusinessData} from '../types/DatabaseInsertTypes';
 
 // Function to create database schema and insert test data
 const setupTestDatabase = async () => {
@@ -25,15 +25,15 @@ const setupTestDatabase = async () => {
 
 		// Avoid duplication of data
 		await pool.query(`
-            DELETE FROM test_schema.hmrc_business_registry
-            WHERE referenceid = '122702';
-        `);
+			DELETE FROM test_schema.hmrc_business_registry
+			WHERE referenceid = '122702';
+		`);
 
 		// Insert test data
 		await pool.query(`
-            INSERT INTO test_schema.hmrc_business_registry (referenceid, businessname,hmrc_approved)
-            VALUES ('122702', 'Barclays', true);
-        `);
+			INSERT INTO test_schema.hmrc_business_registry (referenceid, businessname,hmrc_approved)
+			VALUES ('122702', 'Barclays', true);
+		`);
 	} catch (error) {
 		console.error('Error setting up test database:', error);
 		throw error; // Rethrow the error to propagate it to the caller
@@ -82,19 +82,19 @@ const createTestGamblingCommissionTables = async () => {
 	// Table definitions match the current format used for the required gambling commission CSVs.
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_businesses (
-			account_number BIGINT PRIMARY KEY,
-			licence_account_name VARCHAR(255) NOT NULL
-		);`);
+																						account_number BIGINT PRIMARY KEY,
+																						licence_account_name VARCHAR(255) NOT NULL
+			);`);
 	await pool.query(`
 		CREATE TABLE IF NOT EXISTS test_schema.business_licence_register_licences (
-			account_number BIGINT NOT NULL,
-			licence_number VARCHAR(255) NOT NULL,
+																					  account_number BIGINT NOT NULL,
+																					  licence_number VARCHAR(255) NOT NULL,
 			status VARCHAR(255) NOT NULL,
 			type VARCHAR(255) NOT NULL,
 			activity VARCHAR(255) NOT NULL,
 			start_date timestamptz,
 			end_date timestamptz
-		);`);
+			);`);
 };
 
 export {
