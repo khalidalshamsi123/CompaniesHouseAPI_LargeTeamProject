@@ -1,7 +1,4 @@
 import express from 'express';
-// For good security defaults.
-import helmet from 'helmet';
-import multer from 'multer';
 import isAuthorised from './middleware/authentication';
 
 const app = express();
