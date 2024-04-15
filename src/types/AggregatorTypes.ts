@@ -11,14 +11,17 @@ export type ResponseBodyStatus = {
 	approved: boolean;
 };
 
+// We have chosen to not follow PascalCase for this type. (typescript-eslint/naming-convention)
+// eslint-disable-next-line
 export type CommissionIDs = {
 	gamblingCommission: string;
 	hmrc: string;
 	fca: string;
-}
+};
 
-
+// We have chosen to not follow PascalCase for this type. (typescript-eslint/naming-convention)
+// eslint-disable-next-line
 export type PostCommissionIDsQueryBody = {
 	businessName: string;
 	commissions: CommissionIDs;
-}
+};

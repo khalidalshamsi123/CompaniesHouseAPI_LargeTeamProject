@@ -6,10 +6,9 @@ import {hmrcCsvReader} from '../components/HmrcProcessing';
 
 import isAuthorised from '../middleware/authentication';
 
-import {PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
+import {type PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
 
 const router = Router();
-
 
 /**
  * Retrieves business information based on multiple registration IDs (commissions)
@@ -22,28 +21,28 @@ const router = Router();
  */
 router.post('/', isAuthorised, async (req, res) => {
 	try {
-		const { businessName, commissions } = req.body as PostCommissionIDsQueryBody;
+		const {businessName, commissions} = req.body as PostCommissionIDsQueryBody;
 
 		// Validate input, remove whitespace so no invalid characters are counted toward the check
 		if (!businessName.trim().length) {
-			res.status(400).json({ error: "Invalid or missing business name" });
+			res.status(400).json({error: 'Invalid or missing business name'});
 			return;
 		}
 
 		if (!commissions || (typeof commissions !== 'object')) {
-			res.status(400).json({ error: "Invalid or missing commissions data" });
+			res.status(400).json({error: 'Invalid or missing commissions data'});
 			return;
 		}
 
-		const { gamblingCommission, hmrc, fca } = commissions;
+		const {gamblingCommission, hmrc, fca} = commissions;
 		if (!gamblingCommission && !hmrc && !fca) {
-			res.status(400).json({ error: "At least one commission ID must be provided" });
+			res.status(400).json({error: 'At least one commission ID must be provided'});
 			return;
 		}
 
 		const responseObj = await queryAggregator(businessName, commissions);
 
-		if (responseObj == undefined) {
+		if (responseObj === undefined) {
 			res.sendStatus(404);
 			return;
 		}

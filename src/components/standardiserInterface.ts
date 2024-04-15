@@ -20,7 +20,6 @@ type Standardiser = {
 	standardise(data: CsvKeys[] | Request, schema: string): Promise<void>;
 };
 
-
 /**
  * Class responsible for managing different data standardisers.
  */

@@ -15,7 +15,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 				jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValueOnce(true);
 
-				const response = await queryAggregator('122702', 'Barclays', 'test_schema', {hmrc: 'hmrcId'});
+				const response = await queryAggregator('Barclays', {hmrc: 'hmrcId', gamblingCommission: '', fca: ''}, 'test_schema');
 
 				expect(response).toHaveProperty('approved');
 				expect(response?.approved).toEqual(true);
@@ -29,7 +29,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 				jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValueOnce(false);
 
-				const response = await queryAggregator('123456', 'Fake Company', 'test_schema', {gamblingCommission: 'gcId'});
+				const response = await queryAggregator('Fake Company', {hmrc: '', gamblingCommission: '2999931', fca: ''}, 'test_schema');
 
 				expect(response).toHaveProperty('approved');
 				expect(response?.approved).toEqual(false);
@@ -47,7 +47,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 					jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue(fcaExpectedResult);
 					jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValue(databaseExpectedResult);
 
-					const response = await queryAggregator('122702', 'Barclays', 'test_schema', {fca: 'fcaId'});
+					const response = await queryAggregator('Barclays', {hmrc: '', gamblingCommission: '', fca: '122702'}, 'test_schema');
 
 					expect(response).toHaveProperty('approved');
 					expect(response?.approved).toEqual(true);
@@ -64,7 +64,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 					jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue(fcaExpectedResult);
 					jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValue(databaseExpectedResult);
 
-					const response = await queryAggregator('122702', 'Barclays', 'test_schema', {hmrc: 'hmrcId'});
+					const response = await queryAggregator('Barclays', {hmrc: '', gamblingCommission: '', fca: '122702'}, 'test_schema');
 
 					expect(response).toHaveProperty('approved');
 					expect(response?.approved).toEqual(false);
