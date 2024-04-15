@@ -74,7 +74,7 @@ export default class BusinessNameProcessor {
 				table = 'hmrc_business_registry';
 				break;
 			case 'gambling':
-				regulatorName = 'The Gambling Commission';
+				regulatorName = 'the Gambling Commission';
 				table = 'gambling_business_registry';
 				break;
 			// Can't remove default case even though it's redundant because another lint rule will then throw an error.
