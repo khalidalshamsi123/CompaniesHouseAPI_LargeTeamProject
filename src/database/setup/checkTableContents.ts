@@ -16,13 +16,14 @@ async function printTableContents(schema: string, tableName: string) {
 async function printAllTableContents(schema: string) {
 	try {
 		const results = await Promise.allSettled([
-			printTableContents(schema, 'business_registry'),
+			printTableContents(schema, 'hmrc_business_registry'),
+			printTableContents(schema, 'gambling_business_registry'),
 			// Add additional print functions for other tables if needed
 		]);
 
 		results.forEach((result, index) => {
 			if (result.status === 'rejected') {
-				console.error(`Failed to print table ${index === 0 ? 'business_registry' : 'another_table'} in schema '${schema}':`, result.reason);
+				console.error(`Failed to print table ${index === 0 ? 'hmrc_business_registry' : 'gambling_business_registry'} in schema '${schema}':`, result.reason);
 			}
 		});
 
