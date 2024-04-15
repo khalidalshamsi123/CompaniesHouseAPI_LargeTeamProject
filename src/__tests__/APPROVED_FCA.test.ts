@@ -7,14 +7,6 @@ import * as productionQueries from '../components/aggregator';
 beforeAll(async () => {
 	// Clear the test database and set up necessary mocks
 	await clearTestDatabase();
-	jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: true});
-	jest.spyOn(productionQueries, 'queryAggregator').mockResolvedValue({
-		approved: true,
-		timestamp: String(Date.now()),
-		referenceId: '122702',
-		businessName: 'Barclays',
-		approvedWith: {fca: true, databaseCommissions: false},
-	});
 	await setupTestDatabase();
 });
 
@@ -30,16 +22,18 @@ jest.mock('../database/queries', () => ({
 describe('Given Companies House wants to retrieve the approval status of Barclays from the FCA endpoint and its approved by FCA.', () => {
 	describe('Given Companies House wants to retrieve the approval status of Barclays from the FCA endpoint and its approved by FCA.', () => {
 		it('Then authorized should be true and status code of 200 returned', async () => {
+			jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: true});
 			// Make the request to the route handler function directly
-			const response = await request(app).get('/approved/')
-				.query({
-					referenceId: '122702',
+			const response = await request(app).post('/approved/')
+				.send({
 					businessName: 'Barclays',
 					commissions: {
-						fca: 'fcaId',
+						fca: '122702',
+						gamblingCommission: '',
+						hmrc: '',
 					},
-					schema: 'registration_schema',
 				})
+				.set('Content-Type', 'application/json')
 				.set('x-api-key', process.env.API_KEY!);
 
 			console.log('Response received:', response.body);
