@@ -17,7 +17,6 @@ describe('Given the scheduler is set to execute the function at a specified inte
 				console.log('Cron job executed');
 				scrapeWebsiteMock();
 				// After executing once, stop the cron job
-				cronJob.stop();
 			});
 
 			// Wait for a sufficient amount of time for cron to execute the job

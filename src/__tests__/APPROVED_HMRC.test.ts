@@ -4,6 +4,7 @@ import * as fcaQuerier from '../components/fcaQuerier';
 
 import {clearTestDatabase, setupTestDatabase, selectFromTestDatabase} from '../utils/databaseTestFuncs';
 import * as productionQueries from '../database/queries';
+import pool from '../database/setup/databasePool';
 
 beforeAll(async () => {
 	// Clearing in the afterAll section causes issues with test suites following this one.
@@ -18,6 +19,7 @@ beforeAll(async () => {
 afterAll(async () => {
 	// Clears all the spy mocks.
 	jest.clearAllMocks();
+	await pool.end();
 });
 
 // Given.
