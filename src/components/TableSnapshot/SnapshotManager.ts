@@ -52,7 +52,7 @@ export default class SnapshotManager {
 		/* The information schema provides an insight into all the tables in the database.
            It's preferable to query this table over the 'pg_table' since it most closely
            follows the SQL standard. Meaning queries that uses it will by extension
-           be easier to port over to over DBMS systems.
+           be easier to port over to other DBMS systems.
 
            We find all snapshot tables for a regulatory body and that are part of the working schema.
            These results are put into descending order, which will order the tables from most recent
