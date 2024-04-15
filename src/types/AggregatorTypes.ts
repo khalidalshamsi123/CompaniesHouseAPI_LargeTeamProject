@@ -1,28 +1,36 @@
 // Define type that enforces the response object to contain these needed values.
-type ResponseBodyStatus = {
+export type ResponseBodyStatus = {
 	timestamp: string;
-	referenceId: string;
+	commissionIDs: CommissionIDs;
 	businessName: string;
 	approvedWith: {
 		fca: boolean;
-		databaseCommissions: boolean;
+		hmrc: boolean;
+		gamblingCommission: boolean;
 	};
 	approved: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type CommissionIDs = Partial<{
+// We have chosen to not follow PascalCase for this type. (typescript-eslint/naming-convention)
+// eslint-disable-next-line
+export type CommissionIDs = {
 	gamblingCommission: string;
 	hmrc: string;
 	fca: string;
-}>;
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type PostCommissionIDsQueryBody = {
-	referenceId: string;
-	businessName: string;
-	commissions: CommissionIDs;
-	schema: string;
 };
 
-export type {CommissionIDs, ResponseBodyStatus, PostCommissionIDsQueryBody};
+// We have chosen to not follow PascalCase for this type. (typescript-eslint/naming-convention)
+// eslint-disable-next-line
+export type PostCommissionIDsQueryBody = {
+	businessName: string;
+	commissions: CommissionIDs;
+};
+
+export type ApprovalResult = {
+	hmrcApproved: boolean;
+
+	gamblingApproved: boolean;
+
+	fcaApproved: boolean;
+
+};

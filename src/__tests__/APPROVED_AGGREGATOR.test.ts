@@ -11,11 +11,11 @@ beforeAll(async () => {
 describe('Testing the data retrieval functionality of the Aggregator', () => {
 	describe('Given the business is approved by at least one regulatory body.', () => {
 		describe('When the aggregator receives this information.', () => {
-			it('Then the overall approval status for the business.', async () => {
-				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
+			it('Then the overall approval status for the business should be true.', async () => {
+				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: true});
 				jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValueOnce(true);
 
-				const response = await queryAggregator('122702', 'Barclays', 'test_schema', {hmrc: 'hmrcId'});
+				const response = await queryAggregator('Barclays', {hmrc: '122702', gamblingCommission: '', fca: ''}, 'test_schema');
 
 				expect(response).toHaveProperty('approved');
 				expect(response?.approved).toEqual(true);
@@ -29,7 +29,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 				jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue({isAuthorised: false});
 				jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValueOnce(false);
 
-				const response = await queryAggregator('123456', 'Fake Company', 'test_schema', {gamblingCommission: 'gcId'});
+				const response = await queryAggregator('Fake Company', {hmrc: '', gamblingCommission: '2999931', fca: ''}, 'test_schema');
 
 				expect(response).toHaveProperty('approved');
 				expect(response?.approved).toEqual(false);
@@ -41,13 +41,13 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 		describe('Given the business is approved by at least one regulatory body.', () => {
 			describe('When the aggregator receives this information.', () => {
 				it('Then the overall approval status for the business should be returned as true by the aggregator.', async () => {
-					const fcaExpectedResult = {isAuthorised: false};
+					const fcaExpectedResult = {isAuthorised: true};
 					const databaseExpectedResult = true;
 
 					jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue(fcaExpectedResult);
 					jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValue(databaseExpectedResult);
 
-					const response = await queryAggregator('122702', 'Barclays', 'test_schema', {fca: 'fcaId'});
+					const response = await queryAggregator('Barclays', {hmrc: '', gamblingCommission: '', fca: '122702'}, 'test_schema');
 
 					expect(response).toHaveProperty('approved');
 					expect(response?.approved).toEqual(true);
@@ -64,7 +64,7 @@ describe('Testing the data retrieval functionality of the Aggregator', () => {
 					jest.spyOn(fcaQuerier, 'fcaGetApprovalStatus').mockResolvedValue(fcaExpectedResult);
 					jest.spyOn(productionQueries, 'findAllApprovedByRegId').mockResolvedValue(databaseExpectedResult);
 
-					const response = await queryAggregator('122702', 'Barclays', 'test_schema', {hmrc: 'hmrcId'});
+					const response = await queryAggregator('Barclays', {hmrc: '', gamblingCommission: '', fca: '122702'}, 'test_schema');
 
 					expect(response).toHaveProperty('approved');
 					expect(response?.approved).toEqual(false);
