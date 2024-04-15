@@ -15,7 +15,11 @@ async function queryAggregator(referenceId: string, businessName: string, schema
 	try {
 		// Retrieve approval status for each commission type
 		let databaseCommissionApproved = false;
-		const databaseResult = await findAllApprovedByRegId(referenceId, schema, commissions);
+
+		// Hardcoding this for now becaquse itll be fixed on my branch (#43)
+		const commission = commissions.gamblingCommission ?? commissions.hmrc ?? '';
+
+		const databaseResult = await findAllApprovedByRegId(referenceId, schema, commission);
 		if (databaseResult !== undefined) {
 			databaseCommissionApproved = databaseResult;
 		}
