@@ -1,55 +1,43 @@
 import pool from './setup/databasePool';
+import type {CommissionIDs} from '../types/AggregatorTypes';
 
-// These need to be spelt to match the column names in database so when we read it maps it correctly to this type.
-export type BusinessData = {
-	registrationid: string;
-	businessname: string;
-	fca_approved: boolean;
-	hmrc_approved: boolean;
-	gambling_approved: boolean;
-};
-
-async function insertBusinessData(data: BusinessData): Promise<void> {
-	// eslint-disable-next-line @typescript-eslint/naming-convention
-	const {registrationid, businessname, fca_approved, hmrc_approved, gambling_approved} = data;
-	try {
-		const query = `
-			INSERT INTO registration_schema.business_registry (registrationid, businessname, fca_approved, hmrc_approved, gambling_approved)
-			VALUES ($1, $2, $3, $4, $5)
-		`;
-
-		const values = [registrationid, businessname, fca_approved, hmrc_approved, gambling_approved];
-
-		await pool.query(query, values);
-
-		console.log('Data inserted successfully!');
-	} catch (error: any) {
-		// Check if the error is a unique constraint violation
-		if (error.code === '23505') {
-			console.log(`Data with registration ID ${registrationid} already exists in the database.`);
-		} else {
-			console.error('Error inserting data:', error);
-			throw new Error('Error inserting data'); // Creating and throwing an error object
-		}
+/**
+ * Changed this so the function can be called at same time to query the two different rather than have to wait for both.
+ * Finds if a given reference ID is approved by specified commissions.
+ * @param {string} referenceId - The reference ID to search for.
+ * @param {string} schema - The schema to query.
+ * @param {string} commission - The commission string containing a commission type ('hmrc' or 'gamblingCommission').
+ * @returns {Promise<boolean>} - A boolean indicating if the reference ID is approved by any of the specified commissions.
+ * @throws {Error} - If an invalid commission type is given.
+ */
+async function findAllApprovedByRegId(referenceId: string, schema: string, commission: string): Promise<boolean> {
+	// @ts-expect-error No overlap error, but this is intentional comparison
+	if (commission !== 'hmrc' || commission !== 'gamblingCommission') {
+		throw new Error('Invalid commission types given');
 	}
-}
 
-// Finds and returns all the approved (HMRC and gambling) by registration ID
-async function findAllApprovedByRegId(registrationId: string): Promise<BusinessData | undefined> {
+	let approved = false;
+	let result;
+
 	try {
-		const result = await pool.query('SELECT * FROM registration_schema.business_registry WHERE registrationid = $1', [registrationId]);
-		const businessData: BusinessData = result.rows[0] as BusinessData;
-
-		// Return null if cant find any data
-		if (!businessData) {
-			return undefined;
+		switch (commission) {
+			case 'hmrc':
+				result = await pool.query(`SELECT * FROM ${schema}.hmrc_business_registry WHERE referenceid = $1 AND hmrc_approved = true`, [referenceId]);
+				approved = result.rows.length > 0;
+				break;
+			case 'gamblingCommission':
+				result = await pool.query(`SELECT * FROM ${schema}.gambling_business_registry WHERE referenceid = $1 AND gambling_approved = true`, [referenceId]);
+				approved = result.rows.length > 0;
+				break;
+			default:
+				break;
 		}
-
-		return businessData;
 	} catch (error) {
-		console.error('Error retrieving data:', error);
-		throw new Error('Error retrieving data');
+		console.error('Error in findAllApprovedByRegId:', error);
+		throw error;
 	}
+
+	return approved;
 }
 
 /**
@@ -58,8 +46,8 @@ async function findAllApprovedByRegId(registrationId: string): Promise<BusinessD
  */
 const deleteTableRows = async (tableName: string) => {
 	/* I don't use try-catch deliberately. If an error occurs I think the caller
-	   should handle the error and decide what to do next. */
+       should handle the error and decide what to do next. */
 	await pool.query(`DELETE FROM registration_schema.${tableName}`);
 };
 
-export {findAllApprovedByRegId, insertBusinessData, deleteTableRows};
+export {findAllApprovedByRegId};
