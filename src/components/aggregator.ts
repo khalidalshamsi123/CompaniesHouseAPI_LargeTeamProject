@@ -50,7 +50,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		if (fca) {
 			promises.push(fcaGetApprovalStatus(fca)
 				.then(({isAuthorised}) => {
-					fcaApproved = isAuthorised as boolean;
+					fcaApproved = isAuthorised;
 					// Return { fcaApproved };
 				}));
 		}
