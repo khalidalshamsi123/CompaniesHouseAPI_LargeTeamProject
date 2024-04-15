@@ -1,10 +1,7 @@
 import StandardiserInterface from '../components/standardiserInterface';
-import GamblingCommission from '../components/GamblingCommission/GamblingCommission';
 import HmrcStandardiser from '../components/hmrc/HmrcStandardiser';
-import pool from '../database/databasePool';
 import {type Request} from 'express-serve-static-core';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
-import standardiserInterface from '../components/standardiserInterface';
 
 // Mocking dependencies
 jest.mock('../components/GamblingCommission/GamblingCommission');
