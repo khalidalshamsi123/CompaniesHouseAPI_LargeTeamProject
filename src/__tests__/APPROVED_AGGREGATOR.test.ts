@@ -8,6 +8,7 @@ beforeAll(async () => {
 	await setupTestDatabase();
 });
 
+
 describe('Testing the data retrieval functionality of the Aggregator', () => {
 	describe('Given the business is approved by at least one regulatory body.', () => {
 		describe('When the aggregator receives this information.', () => {

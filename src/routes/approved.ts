@@ -1,8 +1,6 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
 
-import type {ResponseBodyStatus} from '../types/AggregatorTypes';
-import {hmrcCsvReader} from '../components/HmrcProcessing';
 
 import isAuthorised from '../middleware/authentication';
 
@@ -57,9 +55,5 @@ router.post('/', isAuthorised, async (req, res) => {
 	}
 });
 
-// All hmrc data router.
-router.get('/allhmrc', (req, res) => {
-	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
-});
 
 export default router;
