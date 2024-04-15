@@ -6,8 +6,6 @@
   "scripts": {
     "dev": "nodemon ./src/index.ts",
     "build": "tsc -p . --outDir dist",
-    "database-setup": "node dist/database/setup/setupDatabase.js",
-    "load-HMRC-data-into-DB": "node ./dist/components/HMRC/loadData.js",
     "check-database-table-content": "node ./dist/database/setup/checkTableContents.js",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",

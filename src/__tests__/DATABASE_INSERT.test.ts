@@ -16,11 +16,11 @@ describe('processDataRow function', () => {
 	describe('when processing data for HMRC approved businesses', () => {
 		type MockDataRow = {
 			row: {
-				REGISTRATION_ID: string;
+				REFERENCE_ID: string;
 				BUSINESS_NAME: string;
 				STATUS: string;
 			};
-			regIdIndex: number;
+			refIdIndex: number;
 			status1Index: number;
 			client: PoolClient;
 		};
@@ -28,13 +28,13 @@ describe('processDataRow function', () => {
 		const mockDataRow: MockDataRow = {
 			row: {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
-				REGISTRATION_ID: '12345',
+				REFERENCE_ID: '12345',
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				BUSINESS_NAME: 'Test Company',
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				STATUS: 'approved',
 			},
-			regIdIndex: 0,
+			refIdIndex: 0,
 			status1Index: 2,
 			client: mockClient,
 		};
@@ -51,6 +51,7 @@ describe('processDataRow function', () => {
 
 	describe('when processing data for Gambling Commission approved businesses', () => {
 		const mockCsvData = {
+			referenceId: ['12345-N-54321'],
 			businessNames: ['Test Company'],
 			gamblingApprovalStatuses: [true],
 			insertClient: mockClient,

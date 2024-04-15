@@ -27,9 +27,9 @@ export type FcaApprovalStatusResult = {
 // Since if we handle it, we would need to return a boolean which would be incorrect. As just because
 // the API request may have failed, that doesn't mean the business itself is unapproved.
 // The code does not include a try...catch block within the fcaGetApprovalStatus function itself. Instead, it relies on the caller to handle the thrown errors
-async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthorised: boolean; isCertified?: boolean}> {
-	// Check if registrationId contains only numerical characters (internal)
-	if (!/^\d+$/.test(registrationId)) {
+async function fcaGetApprovalStatus(referenceId: string): Promise<{isAuthorised: boolean; isCertified?: boolean}> {
+	// Check if referenceId contains only numerical characters (internal)
+	if (!/^\d+$/.test(referenceId)) {
 		throw new Error('FSR-API-02-01-11: Bad Request - Invalid Input for registrationId');
 	}
 
@@ -41,7 +41,7 @@ async function fcaGetApprovalStatus(registrationId: string): Promise<{isAuthoris
 		throw new Error('FSR-API-01-01-11 Unauthorised: Please include a valid API key and Email address');
 	}
 
-	const fcaResponse = await axios.get(`https://register.fca.org.uk/services/V0.1/Firm/${registrationId}`, axiosConfig);
+	const fcaResponse = await axios.get(`https://register.fca.org.uk/services/V0.1/Firm/${referenceId}`, axiosConfig);
 
 	// Checks for to see if this if running fca indivdual in the env is set to true in order to excetue the code
 	const runFcaCheck = process.env.RUN_FCA_CHECK === 'true';
