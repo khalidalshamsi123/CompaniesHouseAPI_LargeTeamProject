@@ -14,7 +14,7 @@ import Cursor from 'pg-cursor';
 import {type PoolClient} from 'pg';
 import {sortStringToFrontOfArray} from '../../utils/utils';
 import {insertDataStandardiser} from '../../database/insertDataStandardiser';
-import {type GamblingCommissionData} from '../../types/DatebaseInsertTypes';
+import {type GamblingCommissionData} from '../../types/DatabaseInsertTypes';
 
 /**
  * Holds logic relating to the Gambling Commission flow. **DO NOT** directly instantiate this class, use the Gambling Commission Factory instead.
@@ -259,12 +259,13 @@ export default class GamblingCommission {
 			// If status is 'Active' i.e., approved. Then we set that records approval status as true.
 			// Otherwise, it will be set to false.
 			const gamblingApprovalStatuses = rows.map(row => row.status === 'Active');
-
+			const referenceId = rows.map(row => row.licence_number as string);
 			/* Insert batch of rows.
 			   ignore eslint rule as we need to sequentially process rows here to maintain data
 			   integrity and ensure that we only process 50 rows at a time. */
 
 			const gamblingCommissionData: GamblingCommissionData = {
+				referenceId,
 				businessNames,
 				gamblingApprovalStatuses,
 				insertClient,
@@ -434,9 +435,9 @@ export default class GamblingCommission {
 				const columns: string[] = this.columnNames[typedKey];
 
 				/**
-					* Specify order columns should have. But do not write them in the resulting csv string.
-					* https://c2fo.github.io/fast-csv/docs/formatting/examples/
-				*/
+				 * Specify order columns should have. But do not write them in the resulting csv string.
+				 * https://c2fo.github.io/fast-csv/docs/formatting/examples/
+				 */
 				const csvFormatStream = format({
 					headers: columns,
 					writeHeaders: false,
