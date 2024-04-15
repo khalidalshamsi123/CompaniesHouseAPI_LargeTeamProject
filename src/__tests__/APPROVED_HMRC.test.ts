@@ -3,7 +3,6 @@ import app from '../app';
 import * as fcaQuerier from '../components/fcaQuerier';
 import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 import * as productionQueries from '../components/aggregator';
-import pool from '../database/setup/databasePool';
 
 beforeAll(async () => {
 	// Clear the test database and set up necessary mocks
