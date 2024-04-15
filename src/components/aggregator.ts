@@ -28,19 +28,32 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		let hmrcApproved = false;
 		let gamblingApproved = false;
 
+		const promises = [];
+
 		// Conditional queries based on the presence of commission IDs to extract approval statuses
 		if (hmrc) {
-			hmrcApproved = await findAllApprovedByRegId(hmrc, schemaToUse, hmrc);
+			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, hmrc)
+				.then(approved => {
+					hmrcApproved = approved;
+				}));
 		}
 
 		if (gamblingCommission) {
-			gamblingApproved = await findAllApprovedByRegId(gamblingCommission, schemaToUse, gamblingCommission);
+			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, gamblingCommission)
+				.then(approved => {
+					gamblingApproved = approved;
+				}));
 		}
 
 		if (fca) {
-			const {isAuthorised} = await fcaGetApprovalStatus(fca);
-			fcaApproved = isAuthorised;
+			promises.push(fcaGetApprovalStatus(fca)
+				.then(({ isAuthorised }) => {
+					fcaApproved = isAuthorised;
+				}));
 		}
+
+		// Wait for all the promises to resolve, we have all the needed results for querying
+		await Promise.all(promises);
 
 		// Generate a UNIX timestamp
 		const timestamp = new Date().toISOString();
