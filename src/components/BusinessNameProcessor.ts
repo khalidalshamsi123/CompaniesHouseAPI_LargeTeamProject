@@ -67,11 +67,14 @@ export default class BusinessNameProcessor {
 		}
 
 		let table;
+		let regulatorName;
 		switch (regulator) {
 			case 'hmrc':
+				regulatorName = 'HMRC';
 				table = 'hmrc_business_registry';
 				break;
 			case 'gambling':
+				regulatorName = 'The Gambling Commission';
 				table = 'gambling_business_registry';
 				break;
 			// Can't remove default case even though it's redundant because another lint rule will then throw an error.
@@ -95,7 +98,7 @@ export default class BusinessNameProcessor {
 			return {isMatch: true};
 		}
 
-		const message = `Provided standardized business name mistmaches with the one in our records. Given: ${businessName}, Expected: ${businessNameDatabase}`;
+		const message = `The standardized version of the provided business name does not match the one stored in our database for ${regulatorName}. Given: '${businessName}' | Expected: '${businessNameDatabase}'`;
 		return {isMatch: false, message};
 	}
 
