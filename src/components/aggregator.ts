@@ -2,7 +2,6 @@ import {fcaGetApprovalStatus} from './fcaQuerier';
 import type {CommissionIDs, ResponseBodyStatus, ApprovalResult} from '../types/AggregatorTypes';
 import {findAllApprovedByRegId} from '../database/queries';
 
-
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
 /**
@@ -36,7 +35,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, 'hmrc')
 				.then(approved => {
 					hmrcApproved = approved;
-					//return { hmrcApproved };
+					// Return { hmrcApproved };
 				}));
 		}
 
@@ -44,21 +43,21 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, 'gamblingCommission')
 				.then(approved => {
 					gamblingApproved = approved;
-					//return { gamblingApproved };
+					// Return { gamblingApproved };
 				}));
 		}
 
 		if (fca) {
 			promises.push(fcaGetApprovalStatus(fca)
-				.then(({ isAuthorised }) => {
+				.then(({isAuthorised}) => {
 					fcaApproved = isAuthorised as boolean;
-					//return { fcaApproved };
+					// Return { fcaApproved };
 				}));
 		}
 
 		// Wait for all the promises to resolve, we have all the needed results for querying
 		await Promise.allSettled(promises);
-		//const results = await Promise.allSettled(promises);
+		// Const results = await Promise.allSettled(promises);
 
 		/* // Incase the promises werent resolved in time, we set the booleans after.
 		results.forEach(result => {

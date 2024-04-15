@@ -33,7 +33,7 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 						gamblingCommission: '1241294',
 						hmrc: '',
 						fca: '',
-					}
+					},
 				})
 				.set('Content-Type', 'application/json');
 

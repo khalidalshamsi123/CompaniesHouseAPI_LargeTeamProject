@@ -31,7 +31,7 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 						fca: '122702',
 						gamblingCommission: '',
 						hmrc: '',
-					}
+					},
 				})
 				.set('Content-Type', 'application/json')
 				.set('x-api-key', process.env.API_KEY!);

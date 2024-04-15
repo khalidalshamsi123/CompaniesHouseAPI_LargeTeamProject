@@ -1,7 +1,6 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
 
-
 import isAuthorised from '../middleware/authentication';
 
 import {type PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
@@ -54,6 +53,5 @@ router.post('/', isAuthorised, async (req, res) => {
 		res.sendStatus(400);
 	}
 });
-
 
 export default router;

@@ -26,8 +26,6 @@ export type PostCommissionIDsQueryBody = {
 	commissions: CommissionIDs;
 };
 
-
-
 export type ApprovalResult = {
 	hmrcApproved: boolean;
 
@@ -35,5 +33,4 @@ export type ApprovalResult = {
 
 	fcaApproved: boolean;
 
-
-}
+};
