@@ -32,6 +32,7 @@ function scheduleFetching() {
 
 router.get('/', (req, res) => {
 	scheduleFetching();
+	res.send('Fetching files...');
 });
 
 export default router;
