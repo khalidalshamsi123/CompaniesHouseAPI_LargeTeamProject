@@ -102,6 +102,11 @@ export default class BusinessNameProcessor {
 		return {isMatch: false, message};
 	}
 
+	/**
+	 * Standardizes a single business name. Unabbrevates company legal structures (e.g. Ltd -> limited) and lowercases the string.
+	 * @param {string} name Unstandardized name.
+	 * @returns {string} Standardized name.
+	 */
 	private standardizeSingle(name: string): string {
 		name = name.toLowerCase();
 		for (const [abbreviated, unabbreviated] of this.legalStructures.entries()) {
