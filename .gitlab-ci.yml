@@ -19,7 +19,6 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
 
-
 cache:
   paths:
     - node_modules/
@@ -173,13 +172,21 @@ test_authentication:
     - npm install
     - npm run test-ci -t AUTHENTICATION
 
-test_business_name_standardizer:
+test_standardize_business_names:
   extends:
     - .standard-rules
   stage: test
   script:
     - npm install
     - npm run test-ci -t STANDARDIZE_BUSINESS_NAME
+
+test_validate_business_names:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - npm install
+    - npm run test-ci -t VALIDATE_BUSINESS_NAME
 
 deploy_staging:
   stage: deploy

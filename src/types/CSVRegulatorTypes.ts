@@ -1,3 +1,3 @@
-type Regulator = 'hmrc' | 'gambling';
+type Regulator = 'gambling' | 'hmrc';
 
 export type {Regulator};
