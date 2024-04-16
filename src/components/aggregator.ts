@@ -37,7 +37,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		// Conditional queries based on the presence of commission IDs to extract approval statuses
 		if (hmrc) {
 			businessNameMessages.push(
-				(await businessNameProcessor.compareBusinessNameWithRecord(hmrc, businessName, 'hmrc')).message,
+				(await businessNameProcessor.compareBusinessNameWithRecord(hmrc, businessName, 'hmrc')),
 			);
 			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, 'hmrc')
 				.then(approved => {
@@ -48,7 +48,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 
 		if (gamblingCommission) {
 			businessNameMessages.push(
-				(await businessNameProcessor.compareBusinessNameWithRecord(gamblingCommission, businessName, 'gambling')).message,
+				(await businessNameProcessor.compareBusinessNameWithRecord(gamblingCommission, businessName, 'gambling')),
 			);
 			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, 'gamblingCommission')
 				.then(approved => {
@@ -68,8 +68,11 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		let concatenatedMessage = '';
 		// Mismatching business name detected.
 		if (businessNameMessages.length > 0) {
-			for (const message of businessNameMessages) {
-				concatenatedMessage = concatenatedMessage + '\n' + message;
+			for (const messageFull of businessNameMessages) {
+				if (messageFull && messageFull.message !== undefined){
+					let messageExtracted = messageFull.message;
+					concatenatedMessage = concatenatedMessage + '\n' + messageExtracted;
+				}
 			}
 		}
 
