@@ -172,21 +172,19 @@ test_authentication:
     - npm install
     - npm run test-ci -t AUTHENTICATION
 
-test_standardize_business_names:
+test_components:
   extends:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
     - npm install
-    - npm run test-ci -t STANDARDIZE_BUSINESS_NAME
-
-test_validate_business_names:
-  extends:
-    - .standard-rules
-  stage: test
-  script:
-    - npm install
-    - npm run test-ci -t VALIDATE_BUSINESS_NAME
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t COMPONENT
 
 deploy_staging:
   stage: deploy
