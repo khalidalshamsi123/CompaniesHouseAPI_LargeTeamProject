@@ -14,7 +14,7 @@ describe('Given Companies House wants to retrieve the approval status of Barclay
 		it('Then authorized should be true and status code of 200 returned', async () => {
 			// Make the request and wait for the response
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
-			const response = await request(app).get('/approved/')
+			const response = await request(app).post('/approved/')
 				.query({referenceId: '122702', businessName: 'Barclays'})
 				.set(headers);
 			// Assert the response
