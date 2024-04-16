@@ -193,6 +193,14 @@ test_snapshot:
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SNAPSHOT_TABLE
 
+# No environment variables needed for this test
+test_validate_business_names:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - npm install
+    - npm run test-ci -t VALIDATE_BUSINESS_NAME
 
 deploy_staging:
   stage: deploy
