@@ -69,8 +69,8 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		// Mismatching business name detected.
 		if (businessNameMessages.length > 0) {
 			for (const messageFull of businessNameMessages) {
-				if (messageFull && messageFull.message !== undefined){
-					let messageExtracted = messageFull.message;
+				if (messageFull?.message !== undefined) {
+					const messageExtracted = messageFull.message;
 					concatenatedMessage = concatenatedMessage + '\n' + messageExtracted;
 				}
 			}
