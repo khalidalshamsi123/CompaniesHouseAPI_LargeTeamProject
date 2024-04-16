@@ -36,7 +36,7 @@ class HmrcCsvUploader {
 			}
 
 			// Construct file path using __dirname
-			const filePath = path.join(__dirname, `../../files/${fileName}.csv`);
+			const filePath = path.join(__dirname, `../../../files/${fileName}.csv`);
 			// Check if the file exists
 			if (!fs.existsSync(filePath)) {
 				throw new Error(`CSV file "${fileName}.csv" not found at "${filePath}".`);
