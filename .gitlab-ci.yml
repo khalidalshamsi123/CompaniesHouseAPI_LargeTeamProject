@@ -19,7 +19,6 @@ variables:
   POSTGRES_USER: postgres
   POSTGRES_PASSWORD: postgres
 
-
 cache:
   paths:
     - node_modules/
@@ -187,7 +186,6 @@ test_validate_business_names:
   stage: test
   script:
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t VALIDATE_BUSINESS_NAME
 
 deploy_staging:

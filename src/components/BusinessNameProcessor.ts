@@ -80,7 +80,8 @@ export default class BusinessNameProcessor {
 			// Can't remove default case even though it's redundant because another lint rule will then throw an error.
 			// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 			default:
-				// Do nothing.
+				console.error('Invalid Regulatory Body Provided.');
+				break;
 		}
 
 		businessName = this.standardizeSingle(businessName);
