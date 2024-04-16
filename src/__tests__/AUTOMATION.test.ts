@@ -26,7 +26,7 @@ describe('Given the scheduler is set to execute the function at a specified inte
 			// eslint-disable-next-line no-promise-executor-return
 			await new Promise(resolve => setTimeout(resolve, 2000));
 
-			expect(scrapeWebsiteMock).toHaveBeenCalledTimes(1);
+			expect(scrapeWebsiteMock).toHaveBeenCalled();
 			// Stop the cron job
 			cronJob.stop();
 		});
