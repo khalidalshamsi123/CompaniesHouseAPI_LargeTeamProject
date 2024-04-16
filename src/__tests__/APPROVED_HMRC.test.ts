@@ -28,13 +28,14 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 			const response = await request(app).post('/approved/')
 				.set(headers)
 				.send({
-					referenceId: '1241294',
 					businessName: 'ShouldFail LTD',
 					commissions: {
-						gamblingCommission: 'gcId',
+						gamblingCommission: '1241294',
+						hmrc: '',
+						fca: '',
 					},
-					schema: 'test_schema',
-				});
+				})
+				.set('Content-Type', 'application/json');
 
 			// Assert the response
 			expect(response.status).toBe(400);

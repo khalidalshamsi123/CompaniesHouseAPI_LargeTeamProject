@@ -20,19 +20,6 @@ type Standardiser = {
 	standardise(data: CsvKeys[] | Request, schema: string): Promise<void>;
 };
 
-/* Obselete following implementation of custom "File-Commission" header.
-
-interface File {
-	// Since we only want the name to determine which standardiser the file goes to we define our own interface
-	originalname: string;
-
-}
-
-type FileProcessingResult = {
-	originalname: string;
-	status: string;
-}; */
-
 /**
  * Class responsible for managing different data standardisers.
  */

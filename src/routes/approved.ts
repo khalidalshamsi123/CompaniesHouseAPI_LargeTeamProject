@@ -1,11 +1,9 @@
 import {Router} from 'express';
 import {queryAggregator} from '../components/aggregator';
 
-import {hmrcCsvReader} from '../components/HmrcProcessing';
-
 import isAuthorised from '../middleware/authentication';
 
-import type {PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
+import {type PostCommissionIDsQueryBody} from '../types/AggregatorTypes';
 
 const router = Router();
 
@@ -20,19 +18,15 @@ const router = Router();
  */
 router.post('/', isAuthorised, async (req, res) => {
 	try {
-		const {referenceId, businessName, commissions, schema} = req.body as PostCommissionIDsQueryBody;
+		const {businessName, commissions} = req.body as PostCommissionIDsQueryBody;
 
-		if (!referenceId) {
-			res.status(400).json({error: 'Missing reference ID'});
-			return;
-		}
-
+		// Validate input, remove whitespace so no invalid characters are counted toward the check
 		if (!businessName.trim().length) {
 			res.status(400).json({error: 'Invalid or missing business name'});
 			return;
 		}
 
-		if (!commissions || typeof commissions !== 'object') {
+		if (!commissions || (typeof commissions !== 'object')) {
 			res.status(400).json({error: 'Invalid or missing commissions data'});
 			return;
 		}
@@ -43,29 +37,21 @@ router.post('/', isAuthorised, async (req, res) => {
 			return;
 		}
 
-		if (!schema) {
-			res.status(400).json({error: 'Missing schema information'});
+		// Just give an empty schema name and itll resolve to registration_schema, defining it is only needed for test_schema
+		const responseObj = await queryAggregator(businessName, commissions, '');
+
+		if (responseObj === undefined) {
+			res.sendStatus(404);
 			return;
 		}
 
-		const responseObj = await queryAggregator(referenceId, businessName, schema, commissions);
-		console.log(responseObj);
-		if (!responseObj?.approved) {
-			res.sendStatus(400);
-			return;
-		}
-
+		// Determine status code based on approval status of commission results
 		const statusCode = responseObj.approved ? 200 : 400;
 		res.status(statusCode).json(responseObj);
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(400);
 	}
-});
-
-// All hmrc data router.
-router.get('/allhmrc', (req, res) => {
-	res.send(hmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1')).status(200);
 });
 
 export default router;

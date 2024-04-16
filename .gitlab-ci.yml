@@ -4,6 +4,7 @@ image: node:latest
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == 'development'
 
 # Only needed when using docker container to run the tests.
 # Check out: https://docs.gitlab.com/ee/ci/services/index.html
@@ -36,7 +37,6 @@ install_dependencies:
   stage: install
   script:
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
 
 build:
   extends:
@@ -44,7 +44,6 @@ build:
   stage: build
   script:
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run build
 
 lint:
@@ -66,7 +65,6 @@ test_submit:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SUBMIT
 
@@ -80,7 +78,6 @@ test_approved:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t APPROVED
 
@@ -95,7 +92,6 @@ test_fca_individual:
       CI=${CI}\n
       FCA_CHECK=${FCA_CHECK}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t FCA_INDIVIDUAL
 
@@ -110,7 +106,6 @@ test_error_fca:
       NODE_ENV=${NODE_ENV}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t ERROR_FCA
 
@@ -125,7 +120,6 @@ test_rate_limiter:
       NODE_ENV=${NODE_ENV}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t RATE
 
@@ -140,7 +134,6 @@ test_upload:
       NODE_ENV=${NODE_ENV}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t UPLOAD
 
@@ -166,7 +159,6 @@ test_database:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t DATABASE
 
 test_authentication:
@@ -179,7 +171,6 @@ test_authentication:
       API_KEY=${API_KEY}\n
       CI=${CI}" >> ".env"
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t AUTHENTICATION
 
 test_business_name_standardizer:
@@ -188,7 +179,6 @@ test_business_name_standardizer:
   stage: test
   script:
     - npm install
-    - npm install nodejs-polars-linux-x64-gnu #we have to manually install linux version of polars since we are coding on windows machines
     - npm run test-ci -t STANDARDIZE_BUSINESS_NAME
 
 deploy_staging:
