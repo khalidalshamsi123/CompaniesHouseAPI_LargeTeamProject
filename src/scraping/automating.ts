@@ -17,7 +17,7 @@ const eventEmitter = new EventEmitter();
  * To schedule weekly change it to ('0 0 * * 0')
  */
 function scheduleFetching() {
-	cron.schedule('*/10 * * * * *', async () => {
+	cron.schedule('*/5 * * * * *', async () => {
 		try {
 			await scrapeWebsite('#main-content > div > div > div > div > div:nth-child(7) > div > div > div.doc-content.govuk-\\!-margin-bottom-0 > p.gcweb-body.govuk-\\!-margin-bottom-3 > a', 'https://www.gamblingcommission.gov.uk/public-register/businesses/download');
 			await scrapeWebsite('#main-content > div > div > div > div > div:nth-child(10) > div > div > div.doc-content.govuk-\\!-margin-bottom-0 > p.gcweb-body.govuk-\\!-margin-bottom-3 > a', 'https://www.gamblingcommission.gov.uk/public-register/businesses/download');
