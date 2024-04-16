@@ -60,25 +60,25 @@ async function scrapeWebsite(elementsPath: string, websiteLink: string) {
 				href = gamblingBaseUrl + href;
 				returnedHref = href;
 				console.log(returnedHref);
-				await downloadCsvFile(href, './business-licence-register-businesses.csv');
+				await downloadCsvFile(href, './files/business-licence-register-businesses.csv');
 			// This checks if the href ends with licences.csv and is exclusive to the license gambling commission file.
 			} else if (href?.endsWith('licences.csv')) {
 				href = gamblingBaseUrl + href;
 				returnedHref = href;
 				console.log(returnedHref);
-				await downloadCsvFile(href, './business-licence-register-licences.csv');
+				await downloadCsvFile(href, './files/business-licence-register-licences.csv');
 			// This checks if the href ends with csv and is exclusive to the HMRC website
 			} else if (href?.endsWith('.csv')) {
 				returnedHref = href;
 				console.log(returnedHref);
-				await downloadCsvFile(href, './HmrcFile.csv');
+				await downloadCsvFile(href, './files/Supervised_Business_Register.csv');
 			// This checks if the href ends with ods and is exlusive t the HMRC.
 			// This part also converts the ods file to a csv file.
 			} else if (href?.endsWith('.ods')) {
 				returnedHref = href;
 				console.log(returnedHref);
 				const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
-				await convertToCsv(downloadedOdsFile, './HmrcFile.csv');
+				await convertToCsv(downloadedOdsFile, './files/Supervised_Business_Register.csv');
 			}
 		}).get();
 
