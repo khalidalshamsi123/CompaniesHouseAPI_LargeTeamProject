@@ -15,6 +15,8 @@ afterAll(async () => {
 	jest.clearAllMocks();
 });
 
+jest.mock('../components/BusinessNameProcessor');
+
 jest.mock('../database/queries', () => ({
 	findAllApprovedByRegId: jest.fn(),
 }));

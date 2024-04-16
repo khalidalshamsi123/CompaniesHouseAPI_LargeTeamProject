@@ -9,6 +9,7 @@ export type ResponseBodyStatus = {
 		gamblingCommission: boolean;
 	};
 	approved: boolean;
+	message: string;
 };
 
 // We have chosen to not follow PascalCase for this type. (typescript-eslint/naming-convention)
