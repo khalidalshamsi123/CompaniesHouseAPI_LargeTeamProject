@@ -5,6 +5,8 @@ import request from 'supertest';
 import app from '../app';
 import path from 'path';
 
+jest.mock('../components/TableSnapshot/SnapshotManager');
+
 /**
  * Enum for standardiser keys.
  */

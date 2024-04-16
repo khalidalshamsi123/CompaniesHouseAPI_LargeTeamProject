@@ -4,6 +4,8 @@ import {insertDataStandardiser} from '../../database/insertDataStandardiser';
 import {type PoolClient} from 'pg';
 import path from 'path';
 
+import SnapshotManager from '../TableSnapshot/SnapshotManager';
+
 /**
  * Read and process CSV data from the given file.
  * @param filename Path to the CSV file.
@@ -49,6 +51,9 @@ async function csvReader(filePath: string, client: PoolClient, batchSize: number
 			// Event handler for the end of the CSV file
 			.on('end', async () => {
 				try {
+					// Take Snapshot of table.
+					const snapshotManager = new SnapshotManager(client);
+					await snapshotManager.takeSnapshot('hmrc');
 					// Commit any remaining rows in the database
 					await client.query('COMMIT');
 					console.log(`CSV data loaded successfully from file: ${fileName}`);
