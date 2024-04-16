@@ -181,6 +181,19 @@ test_business_name_standardizer:
     - npm install
     - npm run test-ci -t STANDARDIZE_BUSINESS_NAME
 
+test_snapshot:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t SNAPSHOT_TABLE
+
+
 deploy_staging:
   stage: deploy
   script:
