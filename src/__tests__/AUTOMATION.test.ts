@@ -3,10 +3,13 @@ import app from '../app';
 import {Router} from 'express';
 import * as cron from 'node-cron';
 import {scrapeWebsite} from '../scraping/fetchingFiles';
+import {scheduleFetching} from '../scraping/scheduleFetchingCSVFiles';
 
-jest.mock('../scraping/fetchingFiles', () => ({
-	scrapeWebsite: jest.fn(),
-}));
+jest.mock('../scraping/scheduleFetchingCSVFiles', () =>
+	({
+		scheduleFetching: jest.fn(),
+	}),
+);
 
 describe('Given the scheduler is set to execute the function at a specified interval', () => {
 	describe('When that specified interval is reached', () => {
@@ -27,5 +30,15 @@ describe('Given the scheduler is set to execute the function at a specified inte
 			// Stop the cron job
 			cronJob.stop();
 		});
+	});
+});
+
+describe('When the /automate route is reached', () => {
+	it('the scheduleFetching function should be called', async () => {
+		await request(app)
+			.get('/automate');
+
+		// Expect the original scheduleFetching method to be called once
+		expect(scheduleFetching).toHaveBeenCalled();
 	});
 });
