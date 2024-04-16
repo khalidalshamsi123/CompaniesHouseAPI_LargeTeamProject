@@ -33,7 +33,7 @@ export default class BusinessNameProcessor {
 	public standardize(businessNames: string[]): string;
 	/**
 	 * Standardizes a business name, sets it to lower-case and converts any known abbreviated legal structures to the unabbreviated version.
-	 * @param businessName Business name to standardize.
+	 * @param {string} businessName Business name to standardize.
 	 * @returns {string} A standardized version of the provided business name.
 	 */
 	public standardize(businessName: string): string;
