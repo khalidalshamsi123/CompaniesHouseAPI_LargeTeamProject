@@ -19,6 +19,8 @@ const uploadGamblingCommissionEndpoint = '/upload/gambling-commission';
 
 const apiKey = process.env.API_KEY!;
 
+jest.mock('../components/TableSnapshot/SnapshotManager');
+
 beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();

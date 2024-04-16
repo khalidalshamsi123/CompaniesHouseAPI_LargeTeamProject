@@ -8,6 +8,8 @@ import {
 	clearTestDatabase, setupTestDatabase, createTestGamblingCommissionTables, deleteRowsFromTestTable,
 } from '../utils/databaseTestFuncs';
 
+jest.mock('../components/TableSnapshot/SnapshotManager');
+
 beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();
