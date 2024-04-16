@@ -1,6 +1,7 @@
 import {fcaGetApprovalStatus} from './fcaQuerier';
 import type {CommissionIDs, ResponseBodyStatus, ApprovalResult} from '../types/AggregatorTypes';
 import {findAllApprovedByRegId} from '../database/queries';
+import BusinessNameProcessor from './BusinessNameProcessor';
 
 // HmrcCsvReader('hmrc-supervised-data-test-data.csv', 'BUSINESS_NAME', 'STATUS1');
 
@@ -23,15 +24,21 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 
 		const schemaToUse = schema && schema.length > 0 ? schema : 'registration_schema';
 
+		const businessNameProcessor = new BusinessNameProcessor();
+
 		// Initialize approval flags for each commission
 		let fcaApproved = false;
 		let hmrcApproved = false;
 		let gamblingApproved = false;
 
 		const promises = [];
+		const businessNameMessages = [];
 
 		// Conditional queries based on the presence of commission IDs to extract approval statuses
 		if (hmrc) {
+			businessNameMessages.push(
+				(await businessNameProcessor.compareBusinessNameWithRecord(hmrc, businessName, 'hmrc')),
+			);
 			promises.push(findAllApprovedByRegId(hmrc, schemaToUse, 'hmrc')
 				.then(approved => {
 					hmrcApproved = approved;
@@ -40,6 +47,9 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 		}
 
 		if (gamblingCommission) {
+			businessNameMessages.push(
+				(await businessNameProcessor.compareBusinessNameWithRecord(gamblingCommission, businessName, 'gambling')),
+			);
 			promises.push(findAllApprovedByRegId(gamblingCommission, schemaToUse, 'gamblingCommission')
 				.then(approved => {
 					gamblingApproved = approved;
@@ -53,6 +63,17 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 					fcaApproved = isAuthorised;
 					// Return { fcaApproved };
 				}));
+		}
+
+		let concatenatedMessage = '';
+		// Mismatching business name detected.
+		if (businessNameMessages.length > 0) {
+			for (const messageFull of businessNameMessages) {
+				if (messageFull?.message !== undefined) {
+					const messageExtracted = messageFull.message;
+					concatenatedMessage = concatenatedMessage + '\n' + messageExtracted;
+				}
+			}
 		}
 
 		// Wait for all the promises to resolve, we have all the needed results for querying
@@ -87,7 +108,7 @@ async function queryAggregator(businessName: string, commissionIDs: CommissionID
 				gamblingCommission: gamblingApproved,
 			},
 			approved: fcaApproved || hmrcApproved || gamblingApproved,
-
+			message: concatenatedMessage,
 		};
 
 		return responseObj;

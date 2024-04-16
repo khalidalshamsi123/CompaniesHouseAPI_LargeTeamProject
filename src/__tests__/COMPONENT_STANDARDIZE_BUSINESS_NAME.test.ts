@@ -1,6 +1,6 @@
-//  Scenario: Long-form legal structure in name.
+import BusinessNameProcessor from '../components/BusinessNameProcessor';
 
-import BusinessNameStandardizer from '../components/BusinessNameStandardizer';
+//  Scenario: Long-form legal structure in name.
 
 // Given.
 describe('Given a business name with an abbreviated business structure within.', () => {
@@ -8,7 +8,7 @@ describe('Given a business name with an abbreviated business structure within.',
 	const businessNames = ['Test Business Ltd.', 'Test Company Plc'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.
@@ -30,7 +30,7 @@ describe('Given a business name with a unabbreviated business structure within.'
 	const businessNames = ['Test Business Limited.', 'Test Company public limited company'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.
@@ -52,7 +52,7 @@ describe('Given a business name with abbreviated legal structures in different c
 	const businessNames = ['Test Business LTD.', 'Test Company PLc'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.
@@ -74,7 +74,7 @@ describe('Given a business name including capitalisation.', () => {
 	const businessNames = ['Test Business Ltd.', 'Test Company Plc'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.
@@ -96,7 +96,7 @@ describe('Given a business name with an unincluded, or unrecognized abbreviated 
 	const businessNames = ['Test Business UNOWEN.', 'Test Company UNOWEN usp'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.
@@ -117,7 +117,7 @@ describe('Given a business name with an abbreviated legal structure mixed in wit
 	const businessNames = ['BusinessUNLTD Ltd.', 'CompGames Plc'];
 	// When.
 	describe('When the business name standardizer is used on this name.', () => {
-		const businessNameStandardizer = new BusinessNameStandardizer();
+		const businessNameStandardizer = new BusinessNameProcessor();
 		const standardizedName = businessNameStandardizer.standardize(businessName);
 		const standardizedNames = businessNameStandardizer.standardize(businessNames);
 		// Then.

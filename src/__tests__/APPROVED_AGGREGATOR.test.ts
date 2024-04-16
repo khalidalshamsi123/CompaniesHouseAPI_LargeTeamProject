@@ -3,6 +3,8 @@ import * as fcaQuerier from '../components/fcaQuerier';
 import * as productionQueries from '../database/queries';
 import {clearTestDatabase, setupTestDatabase} from '../utils/databaseTestFuncs';
 
+jest.mock('../components/BusinessNameProcessor');
+
 beforeAll(async () => {
 	await clearTestDatabase();
 	await setupTestDatabase();
