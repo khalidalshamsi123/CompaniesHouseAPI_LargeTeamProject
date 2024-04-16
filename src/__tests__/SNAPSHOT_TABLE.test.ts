@@ -122,7 +122,7 @@ describe('Given there are already five snapshots for the regulator\'s approval d
 
 		const snapshotManager = new SnapshotManager(client);
 		for await (const regulator of regulators) {
-			for (let i = 0; i < 5; i++) {
+			for (let i = 0; i < 4; i++) {
 				// eslint-disable-next-line no-await-in-loop
 				await snapshotManager.takeSnapshot(regulator as Regulator);
 			}
