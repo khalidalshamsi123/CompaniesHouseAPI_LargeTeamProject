@@ -54,7 +54,7 @@ describe('StandardiserInterface', () => {
 		it('should process HTTP request data correctly', async () => {
 			const req = mockRequest({
 				body: {someData: 'value'},
-				headers: {'File-Commission': StandardiserKey.GAMBLING_COMMISSION},
+				headers: {'file-commission': StandardiserKey.GAMBLING_COMMISSION},
 			});
 			await standardiserInterface.setupStandardiserMaps();
 			const result = await standardiserInterface.processInput(req as Request, 'some_schema');
@@ -68,7 +68,7 @@ describe('StandardiserInterface', () => {
 		it('should return an error when the file commission header is missing', async () => {
 			const req = mockRequest({
 				body: {someData: 'value'},
-				headers: {'File-Commission': ''},
+				headers: {'file-commission': ''},
 			});
 
 			const result = await standardiserInterface.processInput(req as Request, 'test_schema');
@@ -80,7 +80,7 @@ describe('StandardiserInterface', () => {
 		it('should return an error when the file commission header value is invalid', async () => {
 			const req = mockRequest({
 				body: {someData: 'value'},
-				headers: {'File-Commission': 'invalid commission'},
+				headers: {'file-commission': 'invalid commission'},
 			});
 
 			const result = await standardiserInterface.processInput(req as Request, 'test_schema');

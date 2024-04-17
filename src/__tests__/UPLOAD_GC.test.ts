@@ -34,7 +34,7 @@ describe('GIVEN a Gambling Commission CSV is uploaded', () => {
 			const filePath = path.join(__dirname, 'test-files', 'invalid.csv');
 			const response = await request(app)
 				.put('/upload')
-				.set('File-Commission', '') // Assuming this is intentionally left empty for the test
+				.set('file-commission', '') // Assuming this is intentionally left empty for the test
 				.set('x-api-key', process.env.API_KEY ?? '') // Fallback to empty string if API_KEY is not set
 				.attach('files', filePath);
 
