@@ -1,25 +1,36 @@
 import app from './app';
 
 import * as dotenv from 'dotenv';
+import {createSchema} from './database/setup/setupDatabase';
 import type {CsvKeys} from './types/GamblingCommissionTypes';
 import StandardiserInterface from './components/standardiserInterface';
 import {scrapingAllFiles} from './scraping/fetchingFiles';
 
 dotenv.config();
 
+
 (async () => {
 	try {
 		await scrapingAllFiles();
 		// Create an instance
-		const uploader = new StandardiserInterface();
-		const csvKeys: CsvKeys[] = ['businessesCsv', 'licencesCsv'];
-		await uploader.processInput(csvKeys, 'registration_schema');
+		createSchema()
+		.then(() => {
+			console.log('Schema creation completed successfully.');
+		// Any additional code to run after schema creation
+		})
+		.catch(error => {
+		console.error('Schema creation failed:', error);
+		// Handle errors if necessary
+		});
 
-		const csvHmrcKeys: CsvKeys[] = ['hmrcCsv'];
-		await uploader.processInput(csvHmrcKeys, 'registration_schema');
-	} catch (e) {
-		console.error(e);
-	}
+		const csvKeys = ['businessesCsv', 'licencesCsv', 'hmrcCsv'] as CsvKeys[];
+		// Create new instance of standardiser interface class
+		const standardiserInterface = new StandardiserInterface();
+		// Process all the csv keys to update the database from files for all commissions.
+		await standardiserInterface.processInput(csvKeys, 'registration_schema').catch(console.error);
+		} catch (e) {
+			console.error(e);
+		}
 })();
 
 // Configure port and start listening for requests.
