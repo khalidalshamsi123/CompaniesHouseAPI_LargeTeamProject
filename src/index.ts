@@ -11,7 +11,7 @@ dotenv.config();
 
 (async () => {
 	try {
-		// Add the scheduleFetching(); and comment out scrapingAllFiles if you want to run the automation.
+		// Add the scheduleFetching(); if you want to run the automation.
 		await scrapingAllFiles();
 		// Create an instance
 		createSchema()
