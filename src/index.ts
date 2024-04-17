@@ -22,7 +22,9 @@ const csvKeys = ['businessesCsv', 'licencesCsv', 'hmrcCsv'] as CsvKeys[];
 // Create new instance of standardiser interface class
 const standardiserInterface = new StandardiserInterface();
 // Process all the csv keys to update the database from files for all commissions.
-standardiserInterface.processInput(csvKeys,'registration_schema');
+let reply = standardiserInterface.processInput(csvKeys,'registration_schema');
+
+console.log(`Succesfully uploaded: ${reply}`)
 
 // Configure port and start listening for requests.
 const port = process.env.port ?? 5000;
