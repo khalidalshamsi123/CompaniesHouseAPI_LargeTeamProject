@@ -78,7 +78,7 @@ async function scrapeWebsite(elementsPath: string, websiteLink: string) {
 				returnedHref = href;
 				console.log(returnedHref);
 				const downloadedOdsFile = await downloadCsvFile(href, './temphmrcfile.ods');
-				await convertToCsv(downloadedOdsFile, './files/Supervised_Business_Register.csv');
+				await convertToCsv(downloadedOdsFile, './files/Supervised-Business-Register.csv');
 			}
 		}).get();
 
