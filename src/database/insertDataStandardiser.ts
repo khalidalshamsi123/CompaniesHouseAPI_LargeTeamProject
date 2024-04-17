@@ -19,7 +19,7 @@ async function insertDataStandardiser(data: DataRow | GamblingCommissionData): P
 		const statusValue = String(row[statusIndex]); // Convert status value to string
 		// Determine the boolean value based on the status string
 		const status = statusValue.toLowerCase();
-		row.BUSINESS_NAME = businessNameProcessor.standardize(row['Business Name'] as string);
+		row['Business Name'] = businessNameProcessor.standardize(row['Business Name'] as string);
 		await hmrcProcess(row, referenceId, client, status);
 	} else if (isGamblingCommissionData(data)) {
 		data.businessNames = businessNameProcessor.standardize(data.businessNames);
