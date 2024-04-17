@@ -2,6 +2,7 @@ import axios, {type AxiosResponse} from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import {convertToCsv} from './odsToCsv';
+import StandardiserInterface from '../components/standardiserInterface';
 /**
  *
  * @param hrefLink
@@ -91,4 +92,15 @@ async function scrapeWebsite(elementsPath: string, websiteLink: string) {
 	}
 }
 
-export {scrapeWebsite, downloadCsvFile};
+/**
+ * This method would be run in the build and in the cron job.
+ */
+async function scrapingAllFiles() {
+	await scrapeWebsite('#main-content > div > div > div > div > div:nth-child(7) > div > div > div.doc-content.govuk-\\!-margin-bottom-0 > p.gcweb-body.govuk-\\!-margin-bottom-3 > a', 'https://www.gamblingcommission.gov.uk/public-register/businesses/download');
+	await scrapeWebsite('#main-content > div > div > div > div > div:nth-child(10) > div > div > div.doc-content.govuk-\\!-margin-bottom-0 > p.gcweb-body.govuk-\\!-margin-bottom-3 > a', 'https://www.gamblingcommission.gov.uk/public-register/businesses/download');
+	await scrapeWebsite('#contents > div.gem-c-govspeak.govuk-govspeak > div > p:nth-child(13) > span > a', 'https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register');
+	const standardiserInterface = new StandardiserInterface();
+	await standardiserInterface.processCsvKeys(['businessesCsv', 'licencesCsv'], 'registration_schema');
+}
+
+export {scrapeWebsite, downloadCsvFile, scrapingAllFiles};
