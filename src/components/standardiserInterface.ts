@@ -143,9 +143,9 @@ class StandardiserInterface {
 		let successfullyUploaded = false;
 		try {
 			// Validate that the "File-Commission" custom header exists
-			const fileCommission = Array.isArray(request.headers['File-Commission'])
-				? request.headers['File-Commission'][0]
-				: request.headers['File-Commission'];
+			const fileCommission = Array.isArray(request.headers['file-commission'])
+				? request.headers['file-commission'][0]
+				: request.headers['file-commission'];
 			if (!fileCommission) {
 				successfullyUploaded = false;
 				errorMsg = 'File-Commission header is missing';
