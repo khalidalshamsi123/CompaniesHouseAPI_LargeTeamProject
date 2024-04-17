@@ -1,10 +1,10 @@
 import {type Request} from 'express';
 import {type CsvKeys} from '../../types/GamblingCommissionTypes';
-import {PoolClient} from "pg";
-import pool from "../../database/setup/databasePool";
-import path from "path";
-import fs from "fs";
-import {processHmrcCsv} from "./processHmrcCsv";
+import {type PoolClient} from 'pg';
+import pool from '../../database/setup/databasePool';
+import path from 'path';
+import fs from 'fs';
+import {processHmrcCsv} from './processHmrcCsv';
 
 export default class HmrcStandardiser {
 	public async standardise(data: Request | CsvKeys[], schema: string): Promise<void> {
@@ -14,7 +14,6 @@ export default class HmrcStandardiser {
 			// Handle the case where the first argument is a Request object. NOT IMPLEMENTED
 		}
 	}
-
 
 	/**
 	 * Private function to update HMRC data from a CSV file.
@@ -37,7 +36,7 @@ export default class HmrcStandardiser {
 			// Generate file name from csvKey
 			const fileName = hmrcCsvContained ? 'Supervised-Business-Register' : undefined;
 			if (!fileName) {
-				throw new Error(`No file name found for csvKeys "${csvKeys}".`);
+				throw new Error(`No file name found for csvKeys "${csvKeys.toString()}".`);
 			}
 
 			// Construct file path using __dirname

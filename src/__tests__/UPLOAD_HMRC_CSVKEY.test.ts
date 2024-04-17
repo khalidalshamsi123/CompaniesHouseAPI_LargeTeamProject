@@ -1,5 +1,6 @@
-import {HmrcCsvUploader} from '../components/HMRC/HMRC';
 import fs from 'fs';
+import HmrcStandardiser from '../components/HMRC/HmrcStandardiser';
+import {type CsvKeys} from '../types/GamblingCommissionTypes';
 
 // Mocking the dependencies
 jest.mock('fs');
@@ -15,8 +16,9 @@ describe('HMRC Component', () => {
 			(fs.existsSync as jest.Mock).mockReturnValue(true);
 
 			// Expect uploadHmrcCsv to resolve without throwing an error
-			const uploader = new HmrcCsvUploader();
-			await expect(uploader.uploadHmrcCsv('hmrcCsv')).resolves.not.toThrow();
+			const uploader = new HmrcStandardiser();
+			const csvKeys = ['hrmcCsv' as CsvKeys];
+			await expect(uploader.standardise(csvKeys, 'test_schema')).resolves.not.toThrow();
 		});
 	});
 
@@ -29,8 +31,9 @@ describe('HMRC Component', () => {
 		it('Then it should raise an error', async () => {
 			try {
 				// Call the uploadHmrcCsv function with invalid csvKey
-				const uploader = new HmrcCsvUploader();
-				await uploader.uploadHmrcCsv('NotHmrcCsvKey');
+				const uploader = new HmrcStandardiser();
+				const csvKeys = ['nothrmcCsv' as CsvKeys];
+				expect(uploader.standardise(csvKeys, 'test_schema'));
 				// If the function does not throw an error, fail the test
 				fail('Function should have thrown an error.');
 			} catch (error) {

@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import {createSchema} from './database/setup/setupDatabase';
 import GamblingCommission from './components/GamblingCommission/GamblingCommission';
 import type {CsvKeys} from './types/GamblingCommissionTypes';
-import StandardiserInterface from "./components/standardiserInterface";
+import StandardiserInterface from './components/standardiserInterface';
 
 dotenv.config();
 
@@ -22,9 +22,7 @@ const csvKeys = ['businessesCsv', 'licencesCsv', 'hmrcCsv'] as CsvKeys[];
 // Create new instance of standardiser interface class
 const standardiserInterface = new StandardiserInterface();
 // Process all the csv keys to update the database from files for all commissions.
-let reply = standardiserInterface.processInput(csvKeys,'registration_schema');
-
-console.log(`Succesfully uploaded: ${reply}`)
+standardiserInterface.processInput(csvKeys, 'registration_schema').catch(console.error);
 
 // Configure port and start listening for requests.
 const port = process.env.port ?? 5000;

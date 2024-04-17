@@ -4,7 +4,7 @@ import pool from '../database/setup/databasePool';
 import hmrcStandardiser from './HMRC/HmrcStandardiser';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 import {type Request} from 'express-serve-static-core';
-import HmrcStandardiser from "./HMRC/HmrcStandardiser";
+import HmrcStandardiser from './HMRC/HmrcStandardiser';
 
 /**
  * Enum for standardiser keys.
@@ -72,9 +72,9 @@ class StandardiserInterface {
 		const filterForGamblingCommission = (commissionKeys: CsvKeys[]) => commissionKeys.filter(commissionKey => commissionKey === 'businessesCsv' || commissionKey === 'licencesCsv');
 
 		// Helper function to filter CSV keys for HMRC, returning new array with values that match HMRC
-		const filterForHMRC = (commissionKeys: CsvKeys[]) => commissionKeys.filter(commissionKey => commissionKey === 'hmrcCsv');
+		const filterForHmrc = (commissionKeys: CsvKeys[]) => commissionKeys.filter(commissionKey => commissionKey === 'hmrcCsv');
 
-		if (csvKeys.includes('businessesCsv' || csvKeys.includes('licencesCsv'))) {
+		if (csvKeys.includes('businessesCsv') || csvKeys.includes('licencesCsv')) {
 			try {
 				await this.buildGamblingCommissionStandardiser();
 				const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
@@ -82,9 +82,10 @@ class StandardiserInterface {
 					console.error('Standardiser not found for Gambling Commission');
 					throw new Error('Standardiser not found');
 				}
+
 				// Filter out the keys that aren't applicable for gambling commission standardiser.
 				const filteredKeys = filterForGamblingCommission(csvKeys);
-				await standardiser!.standardise(filteredKeys, schema);
+				await standardiser.standardise(filteredKeys, schema);
 				successfullyUploaded = true;
 			} catch (error) {
 				console.error('Error during standardisation:', error);
@@ -104,8 +105,8 @@ class StandardiserInterface {
 				}
 
 				// Filter out the keys that aren't applicable to HMRC standardiser.
-				const filteredKeys = filterForHMRC(csvKeys);
-				await standardiser!.standardise(filteredKeys, schema);
+				const filteredKeys = filterForHmrc(csvKeys);
+				await standardiser.standardise(filteredKeys, schema);
 				successfullyUploaded = true;
 			} catch (error) {
 				console.error('Error during standardisation:', error);
