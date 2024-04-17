@@ -4,6 +4,7 @@ import pool from '../database/setup/databasePool';
 import hmrcStandardiser from './HMRC/HmrcStandardiser';
 import {type CsvKeys} from '../types/GamblingCommissionTypes';
 import {type Request} from 'express-serve-static-core';
+import HmrcStandardiser from "./HMRC/HmrcStandardiser";
 
 /**
  * Enum for standardiser keys.
@@ -55,7 +56,7 @@ class StandardiserInterface {
      */
 	// Made this public for testing purposes and there is no real affect of it being public so it should be fine.
 	async setupStandardiserMaps(): Promise<void> {
-		this.standardisers.set(StandardiserKey.HMRC, new hmrcStandardiser());
+		this.standardisers.set(StandardiserKey.HMRC, new HmrcStandardiser());
 	}
 
 	/**
@@ -66,43 +67,58 @@ class StandardiserInterface {
 	async processCsvKeys(csvKeys: CsvKeys[], schema: string): Promise<{successfullyUploaded: boolean; errorMsg: string}> {
 		let successfullyUploaded = false;
 		let errorMsg = '';
-		if (csvKeys.includes('businessesCsv') || csvKeys.includes('licencesCsv')) {
+
+		// Helper function to filter CSV keys for the Gambling Commission, returning new array with values that match GC
+		const filterForGamblingCommission = (commissionKeys: CsvKeys[]) => commissionKeys.filter(commissionKey => commissionKey === 'businessesCsv' || commissionKey === 'licencesCsv');
+
+		// Helper function to filter CSV keys for HMRC, returning new array with values that match HMRC
+		const filterForHMRC = (commissionKeys: CsvKeys[]) => commissionKeys.filter(commissionKey => commissionKey === 'hmrcCsv');
+
+		if (csvKeys.includes('businessesCsv' || csvKeys.includes('licencesCsv'))) {
 			try {
 				await this.buildGamblingCommissionStandardiser();
 				const standardiser = this.standardisers.get(StandardiserKey.GAMBLING_COMMISSION);
 				if (!standardiser) {
 					console.error('Standardiser not found for Gambling Commission');
+					throw new Error('Standardiser not found');
 				}
-
-				await standardiser!.standardise(csvKeys, schema);
+				// Filter out the keys that aren't applicable for gambling commission standardiser.
+				const filteredKeys = filterForGamblingCommission(csvKeys);
+				await standardiser!.standardise(filteredKeys, schema);
 				successfullyUploaded = true;
 			} catch (error) {
 				console.error('Error during standardisation:', error);
-				errorMsg = 'Standardise function not implemented';
-				// The errorMsg goes to companies house manually uploading so we can give insightful detail.
+				errorMsg = 'Standardise function not implemented. ';
 				if (error instanceof Error) {
-					errorMsg = `Standardise function not implemented: ${error.message}`;
+					errorMsg += `Error: ${error.message}`;
 				}
 			}
-		} else if (csvKeys.includes('hmrcCsv')) {
+		}
+
+		if (csvKeys.includes('hmrcCsv')) {
 			try {
 				const standardiser = this.standardisers.get(StandardiserKey.HMRC);
 				if (!standardiser) {
 					console.error('Standardiser not found for HMRC');
+					throw new Error('Standardiser not found');
 				}
 
-				await standardiser!.standardise(csvKeys, schema);
+				// Filter out the keys that aren't applicable to HMRC standardiser.
+				const filteredKeys = filterForHMRC(csvKeys);
+				await standardiser!.standardise(filteredKeys, schema);
 				successfullyUploaded = true;
 			} catch (error) {
 				console.error('Error during standardisation:', error);
-				errorMsg = 'Standardise function not implemented';
+				errorMsg += 'Standardise function not implemented. ';
 				if (error instanceof Error) {
-					errorMsg = `Standardise function not implemented: ${error.message}`;
+					errorMsg += `Error: ${error.message}`;
 				}
 			}
-		} else {
-			console.error('Invalid combination of files');
-			errorMsg = 'Invalid combination of files';
+		}
+
+		if (!successfullyUploaded) {
+			console.error('Invalid combination of files or no operation performed');
+			errorMsg += 'Invalid combination of files or no operation performed.';
 		}
 
 		return {successfullyUploaded, errorMsg};

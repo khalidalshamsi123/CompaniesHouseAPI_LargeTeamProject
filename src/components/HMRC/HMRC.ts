@@ -3,24 +3,27 @@ import {processHmrcCsv} from './processHmrcCsv';
 import fs from 'fs';
 import path from 'path'; // Import path module to handle file paths
 import pool from '../../database/setup/databasePool';
+import {CsvKeys} from "../../types/GamblingCommissionTypes";
 
-class HmrcCsvUploader {
+export default class HmrcCsvUploader {
 	/**
 	 * Public function to upload CSV file based on the provided key.
 	 * @param csvKey The key identifying the type of CSV file to upload.
 	 */
-	public async uploadHmrcCsv(csvKey: string) {
+	public async uploadHmrcCsv(csvKey: CsvKeys[]) {
 		await this.hmrcUpdateFromCsvKey(csvKey);
 	}
 
 	/**
 	 * Private function to update HMRC data from a CSV file.
-	 * @param csvKey The key identifying the type of CSV file to update.
+	 * @param csvKeys The keys identifying the type of CSV file to update.
 	 * @throws {Error} If the provided csvKey is invalid or if there's an error processing the CSV file.
 	 */
-	private async hmrcUpdateFromCsvKey(csvKey: string) {
+	private async hmrcUpdateFromCsvKey(csvKeys: CsvKeys[]) {
+		const hmrcCsvContained = csvKeys.includes('hmrcCsv');
+
 		// Check if the csvKey is valid
-		if (csvKey !== 'hmrcCsv') {
+		if (!hmrcCsvContained) {
 			throw new Error('Invalid csvKey provided. Expected "hmrcCsv".');
 		}
 
@@ -30,9 +33,9 @@ class HmrcCsvUploader {
 			// Start transaction
 			await client.query('BEGIN');
 			// Generate file name from csvKey
-			const fileName = csvKey === 'hmrcCsv' ? 'Supervised-Business-Register' : undefined;
+			const fileName = hmrcCsvContained ? 'Supervised-Business-Register' : undefined;
 			if (!fileName) {
-				throw new Error(`No file name found for csvKey "${csvKey}".`);
+				throw new Error(`No file name found for csvKeys "${csvKeys}".`);
 			}
 
 			// Construct file path using __dirname
