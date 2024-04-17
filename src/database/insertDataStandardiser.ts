@@ -1,5 +1,6 @@
 import type {PoolClient} from 'pg';
 import {type DataRow, type GamblingCommissionData} from '../types/DatabaseInsertTypes';
+import BusinessNameProcessor from '../components/BusinessNameProcessor';
 
 /**
  * Process a single row of CSV data.
@@ -9,6 +10,7 @@ async function insertDataStandardiser(data: GamblingCommissionData): Promise<voi
 // eslint-disable-next-line @typescript-eslint/unified-signatures
 async function insertDataStandardiser(data: DataRow): Promise<void>;
 async function insertDataStandardiser(data: DataRow | GamblingCommissionData): Promise<void> {
+	const businessNameProcessor = new BusinessNameProcessor();
 	if (isDataRow(data)) {
 		// Data is of type DataRow
 		const {row, refIdIndex, status1Index, client} = data;
@@ -17,8 +19,10 @@ async function insertDataStandardiser(data: DataRow | GamblingCommissionData): P
 		const statusValue = String(row[statusIndex]); // Convert status value to string
 		// Determine the boolean value based on the status string
 		const status = statusValue.toLowerCase();
+		row.BUSINESS_NAME = businessNameProcessor.standardize(row.BUSINESS_NAME as string);
 		await hmrcProcess(row, referenceId, client, status);
 	} else if (isGamblingCommissionData(data)) {
+		data.businessNames = businessNameProcessor.standardize(data.businessNames);
 		// Data is of type GamblingCommissionData
 		await gamblingCommissionInsert(data.referenceId, data.businessNames, data.gamblingApprovalStatuses, data.insertClient, data.schema);
 	} else {
