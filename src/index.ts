@@ -12,13 +12,10 @@ dotenv.config();
 (async () => {
 	try {
 		// Add the scheduleFetching(); if you want to run the automation.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 		await scrapingAllFiles();
 		// Create an instance
-		createSchema()
-			.then(() => {
-				console.log('Schema creation completed successfully.');
-				// Any additional code to run after schema creation
-			})
+		await createSchema()
 			.catch(error => {
 				console.error('Schema creation failed:', error);
 				// Handle errors if necessary

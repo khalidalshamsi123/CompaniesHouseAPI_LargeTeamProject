@@ -148,13 +148,13 @@ class StandardiserInterface {
 				: request.headers['file-commission'];
 			if (!fileCommission) {
 				successfullyUploaded = false;
-				errorMsg = 'File-Commission header is missing';
+				errorMsg = 'file-commission header is missing';
 			}
 
 			// Validate that the "File-Commission" header has a valid string
 			if (typeof fileCommission !== 'string') {
 				successfullyUploaded = false;
-				errorMsg = 'File-Commission value must be a string';
+				errorMsg = 'file-commission value must be a string';
 			}
 
 			// Switch on the file commission to call correct standardiser to run. I did switch instead of chain of if statements feels cleaner/more maintainable

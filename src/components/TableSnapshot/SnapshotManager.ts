@@ -22,12 +22,18 @@ export default class SnapshotManager {
 
 	private async createSnapshotTable(regulator: Regulator): Promise<string> {
 		const baseTable = this.getBaseTableName(regulator);
+
+		// Shouldn't ever throw, just here to remove the eslint issue.
+		if (!baseTable) {
+			throw new Error('Undefined base table. Invalid regulator provided.');
+		}
+
 		const snapshotName = `${baseTable}_snapshot_${Date.now()}`;
 
 		await this.client.query(`CREATE TABLE ${this.schema}.${snapshotName} AS TABLE ${this.schema}.${baseTable}`);
 		console.log(`Snapshot created: ${snapshotName}`);
 
-		return snapshotName;
+		return baseTable;
 	}
 
 	private getBaseTableName(regulator: string) {
@@ -59,18 +65,21 @@ export default class SnapshotManager {
            to oldest.
 
            Finally, we use OFFSET to ignore the top 5 recent results, and retain only the excess tables (snapshots) that should be deleted. */
+		const snapshotTableName = `${tableName}_snapshot_%`;
 		const excessSnapshots = await this.client.query(`
             SELECT table_name
             FROM information_schema.tables
-            WHERE table_schema = $1 AND table_name LIKE $2
-            ORDER BY table_name DESC
-            OFFSET ${maxSnapshots}`,
-		[this.schema, `${tableName}_snapshot_%`]);
+			WHERE table_schema = $1 AND table_name ILIKE $2
+			ORDER BY table_name DESC
+			OFFSET $3;`,
+		[this.schema, snapshotTableName, maxSnapshots]);
 
+		if (excessSnapshots.rows) {
 		// Delete excess tables.
-		for await (const snapshot of excessSnapshots.rows) {
-			await this.client.query(`DROP TABLE ${this.schema}.${snapshot.table_name}`);
-			console.log(`Deleted old snapshot: ${snapshot.table_name}`);
+			for await (const snapshot of excessSnapshots.rows) {
+				await this.client.query(`DROP TABLE ${this.schema}.${snapshot.table_name}`);
+				console.log(`Deleted old snapshot: ${snapshot.table_name}`);
+			}
 		}
 	}
 }
