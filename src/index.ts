@@ -2,7 +2,6 @@ import app from './app';
 
 import * as dotenv from 'dotenv';
 import {createSchema} from './database/setup/setupDatabase';
-import GamblingCommission from './components/GamblingCommission/GamblingCommission';
 import type {CsvKeys} from './types/GamblingCommissionTypes';
 import StandardiserInterface from './components/standardiserInterface';
 

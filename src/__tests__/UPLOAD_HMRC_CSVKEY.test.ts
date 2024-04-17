@@ -17,7 +17,7 @@ describe('HMRC Component', () => {
 
 			// Expect uploadHmrcCsv to resolve without throwing an error
 			const uploader = new HmrcStandardiser();
-			const csvKeys = ['hrmcCsv' as CsvKeys];
+			const csvKeys = ['hmrcCsv' as CsvKeys];
 			await expect(uploader.standardise(csvKeys, 'test_schema')).resolves.not.toThrow();
 		});
 	});
@@ -32,8 +32,8 @@ describe('HMRC Component', () => {
 			try {
 				// Call the uploadHmrcCsv function with invalid csvKey
 				const uploader = new HmrcStandardiser();
-				const csvKeys = ['nothrmcCsv' as CsvKeys];
-				expect(uploader.standardise(csvKeys, 'test_schema'));
+				const csvKeys = ['nothmrcCsv' as CsvKeys];
+				expect(uploader.standardise(csvKeys, 'test_schema').catch(console.error));
 				// If the function does not throw an error, fail the test
 				fail('Function should have thrown an error.');
 			} catch (error) {
