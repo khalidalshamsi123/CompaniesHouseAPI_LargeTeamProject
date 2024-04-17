@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
-import {convertToCsv} from '../scraping/odsToCsv';
+import {convertToCsv} from '../components/scraping/odsToCsv';
 
 describe('Given the ods file is located', () => {
 	describe('When the ods file is downloaded', () => {

@@ -2,10 +2,10 @@ import request from 'supertest';
 import app from '../app';
 import {Router} from 'express';
 import * as cron from 'node-cron';
-import {scrapeWebsite} from '../scraping/fetchingFiles';
-import {scheduleFetching} from '../scraping/scheduleFetchingCSVFiles';
+import {scrapeWebsite} from '../components/scraping/fetchingFiles';
+import {scheduleFetching} from '../components/scraping/scheduleFetchingCSVFiles';
 
-jest.mock('../scraping/scheduleFetchingCSVFiles', () =>
+jest.mock('../components/scraping/scheduleFetchingCSVFiles', () =>
 	({
 		scheduleFetching: jest.fn(),
 	}),
