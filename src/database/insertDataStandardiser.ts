@@ -78,7 +78,7 @@ async function gamblingCommissionInsert(referenceIds: string[], businessNames: s
         -- Unnest the referenceIds, businessNames, and gamblingApprovalStatuses arrays to insert multiple rows at once
         SELECT * FROM UNNEST($1::TEXT[], $2::TEXT[], $3::BOOLEAN[])
         AS t (referenceid, businessname, gambling_approved)
-        ON CONFLICT (referenceid, businessname)
+        ON CONFLICT (referenceid)
         DO UPDATE SET gambling_approved = EXCLUDED.gambling_approved;
     `;
 	// Execute the query using the database client
