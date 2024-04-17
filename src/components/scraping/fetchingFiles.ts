@@ -2,7 +2,7 @@ import axios, {type AxiosResponse} from 'axios';
 import * as cheerio from 'cheerio';
 import * as fs from 'fs';
 import {convertToCsv} from './odsToCsv';
-import StandardiserInterface from '../components/standardiserInterface';
+import StandardiserInterface from '../standardiserInterface';
 /**
  *
  * @param hrefLink

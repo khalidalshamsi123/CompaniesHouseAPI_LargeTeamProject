@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv';
 import {createSchema} from './database/setup/setupDatabase';
 import type {CsvKeys} from './types/GamblingCommissionTypes';
 import StandardiserInterface from './components/standardiserInterface';
-import {scrapingAllFiles} from './scraping/fetchingFiles';
-import {scheduleFetching} from './scraping/scheduleFetchingCSVFiles';
+import {scrapingAllFiles} from './components/scraping/fetchingFiles';
+import {scheduleFetching} from './components/scraping/scheduleFetchingCSVFiles';
 
 dotenv.config();
 

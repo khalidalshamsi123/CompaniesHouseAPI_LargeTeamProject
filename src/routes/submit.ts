@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {scrapeWebsite} from '../scraping/fetchingFiles';
+import {scrapeWebsite} from '../components/scraping/fetchingFiles';
 const router = Router();
 
 router.get('/', (req, res) => {

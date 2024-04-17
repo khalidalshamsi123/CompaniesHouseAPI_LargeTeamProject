@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
 import {scrapeWebsite, scrapingAllFiles} from './fetchingFiles';
-import StandardiserInterface from '../components/standardiserInterface';
+import StandardiserInterface from '../standardiserInterface';
 
 /**
  * To automate the scraping method, i used cron to trigger the scrapingWebsite method once every week
