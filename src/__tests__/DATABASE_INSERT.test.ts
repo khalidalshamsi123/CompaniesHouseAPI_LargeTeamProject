@@ -17,7 +17,7 @@ describe('processDataRow function', () => {
 		type MockDataRow = {
 			row: {
 				REFERENCE_ID: string;
-				BUSINESS_NAME: string;
+				'Business Name': string;
 				STATUS: string;
 			};
 			refIdIndex: number;
@@ -30,7 +30,7 @@ describe('processDataRow function', () => {
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				REFERENCE_ID: '12345',
 				// eslint-disable-next-line @typescript-eslint/naming-convention
-				BUSINESS_NAME: 'Test Company',
+				'Business Name': 'Test Company',
 				// eslint-disable-next-line @typescript-eslint/naming-convention
 				STATUS: 'approved',
 			},

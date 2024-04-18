@@ -1,12 +1,10 @@
 import * as cron from 'node-cron';
 import {scrapeWebsite, scrapingAllFiles} from './fetchingFiles';
-import StandardiserInterface from '../components/standardiserInterface';
+import StandardiserInterface from '../standardiserInterface';
 
 /**
  * To automate the scraping method, i used cron to trigger the scrapingWebsite method once every week
- * on Sunday 12am. After the files are fetched, the standardiserInterface class will be called to assign
- * each file a csv key that would be used for identifying each files so that they could be processed.
- * To schedule weekly change it to ('0 0 * * 0')
+ * on Sunday 12am. To schedule weekly change it to ('0 0 * * 0')
  */
 function scheduleFetching() {
 	cron.schedule('*/5 * * * * *', async () => {

@@ -55,7 +55,7 @@ describe('Given there are businesses already listed in our main database table.'
 		it('Then the gambling_approved column for these businesses in the main database should be updated to reflect their current approval status, ensuring accurate compliance records.', async () => {
 			// Insert record to main database table. Record will have gambling licence approval status set to false.
 			await pool.query(`INSERT INTO test_schema.${mainTable} (referenceid, businessname, gambling_approved) VALUES ($1, $2, $3)`,
-				['012179-N-105324-221', 'John Owns a Business Limited', 'false']);
+				['2895', 'John Owns a Business Limited', 'false']);
 
 			// Add rows that will be joined to temporary tables.
 			await pool.query(`INSERT INTO test_schema.${businessTempTable} (account_number, licence_account_name) VALUES ($1, $2)`, [

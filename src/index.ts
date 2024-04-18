@@ -4,21 +4,18 @@ import * as dotenv from 'dotenv';
 import {createSchema} from './database/setup/setupDatabase';
 import type {CsvKeys} from './types/GamblingCommissionTypes';
 import StandardiserInterface from './components/standardiserInterface';
-import {scrapingAllFiles} from './scraping/fetchingFiles';
-import {scheduleFetching} from './scraping/scheduleFetchingCSVFiles';
+import {scrapingAllFiles} from './components/scraping/fetchingFiles';
+import {scheduleFetching} from './components/scraping/scheduleFetchingCSVFiles';
 
 dotenv.config();
 
 (async () => {
 	try {
 		// Add the scheduleFetching(); if you want to run the automation.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 		await scrapingAllFiles();
 		// Create an instance
-		createSchema()
-			.then(() => {
-				console.log('Schema creation completed successfully.');
-				// Any additional code to run after schema creation
-			})
+		await createSchema()
 			.catch(error => {
 				console.error('Schema creation failed:', error);
 				// Handle errors if necessary
