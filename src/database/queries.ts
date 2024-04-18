@@ -11,8 +11,7 @@ import type {CommissionIDs} from '../types/AggregatorTypes';
  * @throws {Error} - If an invalid commission type is given.
  */
 async function findAllApprovedByRegId(referenceId: string, schema: string, commission: string): Promise<boolean> {
-	// @ts-expect-error No overlap error, but this is intentional comparison
-	if (commission !== 'hmrc' || commission !== 'gamblingCommission') {
+	if (commission !== 'hmrc' && commission !== 'gamblingCommission') {
 		throw new Error('Invalid commission types given');
 	}
 
@@ -29,6 +28,7 @@ async function findAllApprovedByRegId(referenceId: string, schema: string, commi
 				result = await pool.query(`SELECT * FROM ${schema}.gambling_business_registry WHERE referenceid = $1 AND gambling_approved = true`, [referenceId]);
 				approved = result.rows.length > 0;
 				break;
+			// eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
 			default:
 				break;
 		}
