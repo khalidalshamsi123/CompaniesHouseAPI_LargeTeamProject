@@ -24,8 +24,8 @@ afterAll(async () => {
 
 describe('Given Companies House wants to retrieve the approval status of GWYN DEBBSON AND DAUGHTER with the HMRC. And given the business is not in the database.', () => {
 	describe('When Companies House sends a request to the /approved endpoint querying for the business.', () => {
-		it('Then it should return a 400 status code.', async () => {
-			// Make the request and expect status code 400
+		it('Then it should return a 500 status code.', async () => {
+			// Make the request and expect status code 500
 			const headers: Record<string, string> = {'x-api-key': process.env.API_KEY!};
 			const response = await request(app).post('/approved/')
 				.set(headers)
@@ -40,7 +40,7 @@ describe('Given Companies House wants to retrieve the approval status of GWYN DE
 				.set('Content-Type', 'application/json');
 
 			// Assert the response
-			expect(response.status).toBe(400);
+			expect(response.status).toBe(500);
 		});
 	});
 });

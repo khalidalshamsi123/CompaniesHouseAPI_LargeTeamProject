@@ -46,11 +46,11 @@ router.post('/', isAuthorised, async (req, res) => {
 		}
 
 		// Determine status code based on approval status of commission results
-		const statusCode = responseObj.approved ? 200 : 400;
+		const statusCode = responseObj.approved ? 200 : 404;
 		res.status(statusCode).json(responseObj);
 	} catch (error) {
 		console.error(error);
-		res.sendStatus(400);
+		res.sendStatus(500);
 	}
 });
 
