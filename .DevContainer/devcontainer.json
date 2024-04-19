@@ -1,4 +1,5 @@
 {
+  "dockerFile": "./Dockerfile",
   "plugins": [],
   "recurseDepth": 10,
   "opts": {
