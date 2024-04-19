@@ -16,7 +16,7 @@ export default class HmrcStandardiser {
 	}
 
 	/**
-	 * Private function to update HMRC data from a CSV file.
+	 * Private function to update the HMRC data from the locally found CSV file using CSV keys.
 	 * @param csvKeys The keys identifying the type of CSV file to update.
 	 * @throws {Error} If the provided csvKey is invalid or if there's an error processing the CSV file.
 	 */

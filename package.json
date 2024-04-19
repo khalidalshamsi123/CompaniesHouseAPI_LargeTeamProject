@@ -12,8 +12,7 @@
     "lint-fix": "eslint src/**/*.ts --fix",
     "test": "jest --runInBand",
     "test:coverage": "jest --coverage --runInBand",
-    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage --passWithNoTests --runInBand",
-    "database-gambling-setup": "node dist/database/setup/setupDatabase.js"
+    "test-ci": "jest --max_old_space_size=4096 --watchAll=false --ci --coverage --passWithNoTests --runInBand"
   },
   "repository": {
     "type": "git",

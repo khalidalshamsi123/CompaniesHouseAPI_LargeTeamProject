@@ -7,8 +7,8 @@ import path from 'path';
 import SnapshotManager from '../TableSnapshot/SnapshotManager';
 
 /**
- * Read and process CSV data from the given file.
- * @param filename Path to the CSV file.
+ * Read and process the HMRC CSV data from the received file.
+ * @param filePath Specifies the filePath in order to print the fileName.
  * @param client Database client.
  * @param batchSize Size of each batch for database transactions.
  * @returns The number of rows processed.

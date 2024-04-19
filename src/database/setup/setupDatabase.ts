@@ -1,5 +1,10 @@
 import pool from './databasePool';
 
+/**
+ * Creates the database schema and tables for the hmrc and gambling business registries if they do not exist.
+ * @returns {Promise<void>} A Promise that resolves when schema creation is completed successfully.
+ * @throws {Error} Throws an error if schema creation fails.
+ */
 async function createSchema() {
 	try {
 		console.log('Creating database schema...');
@@ -25,14 +30,3 @@ async function createSchema() {
 }
 
 export {createSchema};
-
-// Call the createSchema function
-createSchema()
-	.then(() => {
-		console.log('Schema creation completed successfully.');
-		// Any additional code to run after schema creation
-	})
-	.catch(error => {
-		console.error('Schema creation failed:', error);
-		// Handle errors if necessary
-	});

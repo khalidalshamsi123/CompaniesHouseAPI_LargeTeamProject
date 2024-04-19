@@ -3,8 +3,8 @@ import {type DataRow, type GamblingCommissionData} from '../types/DatabaseInsert
 import BusinessNameProcessor from '../components/BusinessNameProcessor';
 
 /**
- * Process a single row of CSV data.
- * @param data The data object containing row, regIdIndex, cache, client, batchSize, and rowCount.
+ * Process a single row of hmrc and gambling CSV data and insert the reference ID, business name and approval status into the corresponding table.
+ * @param data The data object of DataRow or GamblingCommisionData.
  */
 async function insertDataStandardiser(data: GamblingCommissionData): Promise<void>;
 // eslint-disable-next-line @typescript-eslint/unified-signatures
