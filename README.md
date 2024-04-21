@@ -56,7 +56,11 @@ NODE_ENV=test
 
 ## Database
 
-The database **schemas** and **tables** are all instantiated by the application by running **'npm run dev'** in the terminal, meaning the only other setup required for the database is to simply **install** PostgreSQL and start its service.
+The database **schemas** and **tables** are all instantiated by the application when run, meaning the main setup required for the database is to simply **install** PostgreSQL, and start its service.
+
+Though it is worth noting that currently the application **expects** the user `postgres` to be used, with the password `postgres`. Both of these values can however be changed within `src/database/setup/databasePool.ts`. Simply edit the user and password fields, replacing them with valid details for a database account you've set-up instead. The application will then use this account as expected.
+
+If using a custom database user, within `src/database/setup/databasePool.ts` on line 5 you will also need to change the `postgres` username to the new one being used.
 
 For further instructions on how to **install PostgreSQL**, please follow the link to an informative step-by-step instruction site below, detailing the different installation approaches based on your computers operating system.
 
