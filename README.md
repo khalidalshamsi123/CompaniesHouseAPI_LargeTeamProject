@@ -1,93 +1,152 @@
-# team-project
+## API Keys and authentication
 
+* A private API key must be passed to authenticate and use the FCA API.
+* The FCA API key is registered as API_KEY_FCA in the .env. Storing these credentials in a .env is for security, they are excluded by default from being pushed to GitLab.
+* The same environment variable is also set up in git to make sure that the tests requiring the key pass when run in the pipeline
+* This field is not to be confused with API_KEY, which is another way to authenticate and secure our application internally
 
+## CSV's
 
-## Getting started
+* All CSV's should be stored within the **/files** directory of the project. During **development**, this would be sitting just outside of the **/src** directory. And for a **built** version of the project, this folder would sit within the **/dist** directory.
+* HMRC and Gambling Commission CSVs should be automatically scraped and downloaded by the application on launch. Storing those files in the directory mentioned previously.
+* For the tests to run properly, these CSVs are required. If the scraping mechanism has not fetched the files for whatever reason, you will need to manually provide them. Currently, these files can be acquired from the following websites:
+  * Gambling Commission CSVs ([**business-licence-register-licences.csv**](https://www.gamblingcommission.gov.uk/downloads/business-licence-register-licences.csv) & [**business-licence-register-businesses.csv**](https://www.gamblingcommission.gov.uk/downloads/business-licence-register-businesses.csv)): https://www.gamblingcommission.gov.uk/public-register/businesses/download.
+  * HMRC Files (Needs Conversion from ODS to CSV - Scraping system would normally handle this): https://www.gov.uk/guidance/money-laundering-regulations-supervised-business-register
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## CI/CD Configuration
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+* You will need to define in your local .env file the following:
 
 ```
-cd existing_repo
-git remote add origin https://git.cardiff.ac.uk/c21052928/team-project.git
-git branch -M main
-git push -uf origin main
+CI=false
 ```
 
-## Integrate with your tools
+* This environment variable tells your machine when setting up the database to use ‘localhost’ as the host (rather than 'postgres' which is used on the pipeline docker container).
 
-- [ ] [Set up project integrations](https://git.cardiff.ac.uk/c21052928/team-project/-/settings/integrations)
+## Triggering the FCA individual
 
-## Collaborate with your team
+* This ENV variable acts as a feature-toggle for the Individual FCA API feature.
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+```properties
+RUN_FCA_CHECK='false'
+```
 
-## Test and Deploy
+* The default is set as false due to clients' requirements, however to enable this function to execute, change the value to 'true'. If you would like the pipeline to do the same, then update the environment variable in GitLab too.
 
-Use the built-in continuous integration in GitLab.
+## Required fields for the .env - Production Environment
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+```properties
+API_KEY=<a custom api key of your choosing>
+API_KEY_FCA=<your fca API key>
+RUN_FCA_CHECK='false'
+CI=false
+NODE_ENV=production
+```
 
-***
+## Required fields for the .env - Test Envrionment
 
-# Editing this README
+```properties
+API_KEY=<a custom api key of your choosing>
+API_KEY_FCA=<your fca API key>
+RUN_FCA_CHECK='false'
+CI=false
+PORT=<yourport>
+NODE_ENV=test
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Database
 
-## Suggestions for a good README
+The database **schemas** and **tables** are all instantiated by the application by running **'npm run dev'** in the terminal, meaning the only other setup required for the database is to simply **install** PostgreSQL and start its service.
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+For further instructions on how to **install PostgreSQL**, please follow the link to an informative step-by-step instruction site below, detailing the different installation approaches based on your computers operating system.
 
-## Name
-Choose a self-explaining name for your project.
+- https://www.postgresqltutorial.com/postgresql-getting-started/install-postgresql/
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+**Video Tutorial for Windows**
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+- https://www.youtube.com/watch?v=yTT56NI2vUg
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+**Video Tutorial for MacOS**
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+- https://www.youtube.com/watch?v=wTqosS71Dc4
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+**Video Tutorial for Linux**
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+- https://www.youtube.com/watch?v=ovCwXUbJMEg&embeds_referring_euri=https%3A%2F%2Fwww.bing.com%2F&embeds_referring_origin=https%3A%2F%2Fwww.bing.com&source_ve_path=MTM5MTE4LDI4NjY2&feature=emb_logo
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Once you have installed PostgreSQL, another great tool to help you further dissect our database is **pgAdmin 4**. This database management tool allows you to easily visualize and interact with our application's database, providing great features for database administration and querying. Below is a link for a video tutorial to help you with installation and usage.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+**Video Tutorial on how to use Install and Use pgAdmin**
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- https://www.youtube.com/watch?v=WFT5MaZN6g4
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+**Adding another table into the Database**
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+If there is a situation where you would like to add another table into the database for a different regulatory body, simply locate the 'setupDatabase.ts' file in /src/database/setup , and add your new table's SQL code into the 'createSchema' function, following suit of the other tables.
 
-## License
-For open source projects, say how it is licensed.
+In order to insert into your new table you have created, navigate to the 'insertDataStandardiser.ts' in /src/database where our insert logic is held. Before you can insert the data you wish into this new table, you must define the data you're inserting in /src/types/databaseInsertTypes.ts. Here you will find previously declared dataset definitions for gambling commission and hmrc, simply follow suit. Then import your data 'type' into the 'insertDataStandardiser.ts' and add your dataset as a parameter to the function 'insertDataStandardiser'. Now add another 'else if' clause to this function and implement your insertion logic here, try to ensure cohesion with the rest of the file.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+If you would like to select from your new table, navigate to 'queries.ts' in /src/database and add another switch case for your regulatory body.
+
+## Scraping and Automation:
+
+- To download files from other bodies you could copy and paste the CSS selectors of the file div on their own websites and pass it to the scrapeWebsite method and you should also pass the URL to it.
+- You do this by calling **`scrapeWebsite()`** with its new parameters in the **`scrapingAllFiles()`** method which can be found in `scraping/fetchingFiles.ts`.
+- The other step would be to add another else if statement in the **`scrapeWebsite()`** method such as the example below:
+
+  ```typescript
+  			} else if (href?.endsWith('.csv')) {
+  				returnedHref = href;
+  				console.log(returnedHref);
+  				await downloadCsvFile(href, './files/Supervised_Business_Register.csv');
+  
+  ```
+
+The changes you have to make are:
+
+* Changing what the href ends with, as in the word of the href and its file type, ideally a CSV file.
+* Change the second parameter of the **`downloadCsvFile()`** function to a suitable name for the CSV file you want to download.
+
+When it comes to automation:
+
+* To run the **`scheduleFetching()`** method (the scraping automation method) uncomment it out in index.ts line 14.
+* To change the schedule in **"cron.schedule('\*/5 \* \* \* \* \*'"** to when it's supposed to run follow the guide below to see what each star represents, the code is found in file **`scheduleFetchingCsvFiles.ts`** : https://www.npmjs.com/package/node-cron
+* If you want it to run weekly on Sunday 12am change it to **`'0 0 * * 0'`**
+
+**For more detailed information on the codebase please refer to the pages under Documentation.**
+
+## Commands to run the project
+
+**Given all set-up has been completed e.g., ENV file, database downloaded etc.**
+
+**If you have been provided with our .zip file containing the software solution.**
+
+The three basic steps to have completed before doing anything else are:
+
+1. Extract the contents of the .zip to anywhere you would like.
+2. Open a terminal pointed at the directory the .zip contents have been extracted to.
+3. Run `npm install` in the same directory as the package.json file.
+
+**From here, to run the application:**
+
+* In the terminal pointing at where the .zip contents have been extracted, run: `node ./dist/index.js`
+
+The application should now be running.
+
+**To build the application again:**
+
+* In the terminal pointing at where the .zip contents have been extracted, run: `npm run build`
+
+The application should now be built using the contents of the **/src** directory.
+
+**To run the Jest test suites:**
+
+* In the terminal pointing at where the .zip contents have been extracted, run: `npm run test`
+
+The test suites should run.
+
+**To run the application in a development, hot-reload environment:**
+
+* In the terminal pointing at where the .zip contents have been extracted, run: `npm run dev`
+
+The application should auto-detect changes to any of the files in the /src directory and hot-reload the index.ts file.
