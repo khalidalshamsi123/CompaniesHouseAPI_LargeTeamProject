@@ -50,7 +50,11 @@ jspm_packages/
 web_modules/
 
 # Typescript
-build/
+build
+dist/
+
+# Database JavaScript files
+src/database/*.js
 
 # TypeScript cache
 *.tsbuildinfo
@@ -145,3 +149,4 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+

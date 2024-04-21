@@ -1,20 +1,35 @@
-import * as dotenv from 'dotenv';
-import express from 'express';
-// For good security defaults.
-import helmet from 'helmet';
+import app from './app';
 
-const app = express();
+import * as dotenv from 'dotenv';
+import {createSchema} from './database/setup/setupDatabase';
+import type {CsvKeys} from './types/GamblingCommissionTypes';
+import StandardiserInterface from './components/standardiserInterface';
+import {scrapingAllFiles} from './components/scraping/fetchingFiles';
+import {scheduleFetching} from './components/scraping/scheduleFetchingCSVFiles';
+
 dotenv.config();
 
-// Import and use routes.
-import approvedRoute from './routes/approved';
-app.use('/approved', approvedRoute);
+(async () => {
+	try {
+		// Add the scheduleFetching(); if you want to run the automation.
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+		await scrapingAllFiles();
+		// Create an instance
+		await createSchema()
+			.catch(error => {
+				console.error('Schema creation failed:', error);
+				// Handle errors if necessary
+			});
 
-import submitRoute from './routes/submit';
-app.use('/submit', submitRoute);
-
-import uploadRoute from './routes/upload';
-app.use('/upload', uploadRoute);
+		const csvKeys = ['businessesCsv', 'licencesCsv', 'hmrcCsv'] as CsvKeys[];
+		// Create new instance of standardiser interface class
+		const standardiserInterface = new StandardiserInterface();
+		// Process all the csv keys to update the database from files for all commissions.
+		await standardiserInterface.processInput(csvKeys, 'registration_schema').catch(console.error);
+	} catch (e) {
+		console.error(e);
+	}
+})();
 
 // Configure port and start listening for requests.
 const port = process.env.port ?? 5000;

@@ -1,9 +1,10 @@
 image: node:latest
 
-.standard-rules:     
+.standard-rules:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == 'development'
 
 # Only needed when using docker container to run the tests.
 # Check out: https://docs.gitlab.com/ee/ci/services/index.html
@@ -11,6 +12,12 @@ services:
   - mysql:latest
   - redis:latest
   - postgres:latest
+
+variables:
+  # Configure postgres service (https://hub.docker.com/_/postgres/)
+  POSTGRES_DB: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
 
 cache:
   paths:
@@ -52,6 +59,10 @@ test_submit:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t SUBMIT
@@ -61,15 +72,66 @@ test_approved:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t APPROVED
+
+test_fca_individual:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}\n
+      FCA_CHECK=${FCA_CHECK}" >> ".env"
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t FCA_INDIVIDUAL
+
+test_error_fca:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t ERROR_FCA
+
+test_rate_limiter:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t RATE
 
 test_upload:
   extends:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
     - npm install
     - set NODE_OPTIONS=--max_old_space_size=4096
     - npm run test-ci -t UPLOAD
@@ -79,6 +141,10 @@ test_frontend:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - npm run test-ci -t FRONTEND
 
@@ -87,12 +153,46 @@ test_database:
     - .standard-rules
   stage: test
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - npm install
     - npm run test-ci -t DATABASE
+
+test_authentication:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
+    - npm install
+    - npm run test-ci -t AUTHENTICATION
+
+test_components:
+  extends:
+    - .standard-rules
+  stage: test
+  script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      NODE_ENV=${NODE_ENV}\n
+      CI=${CI}" >> ".env"
+    - npm install
+    - set NODE_OPTIONS=--max_old_space_size=4096
+    - npm run test-ci -t COMPONENT
 
 deploy_staging:
   stage: deploy
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - echo "this is where we would deploy to a staging environment"
   only:
     - development
@@ -102,5 +202,9 @@ deploy_production:
   only:
     - main
   script:
+    - >
+      echo -e "API_KEY_FCA=${FCA_API_KEY}\n
+      API_KEY=${API_KEY}\n
+      CI=${CI}" >> ".env"
     - echo "this is where we would deploy to a production environment"
   environment: production
